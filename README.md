@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/fastlane/metadata/android/en-US/images/icon.png" alt="Metrolist app icon" width="200" />
+<img src="https://raw.githubusercontent.com/Davidix07TV/Nest-Music/master/assets/nest-music-logo.png" alt="Nest Music app icon" width="200" />
 
-# Metrolist
+# Nest Music
 
 ### YouTube Music client for Android
 
@@ -15,25 +15,22 @@
 <br/>
 <br/>
 
-[![Latest release](https://img.shields.io/github/v/release/MetrolistGroup/Metrolist?style=for-the-badge&labelColor=0d1117)](https://github.com/MetrolistGroup/Metrolist/releases)
-[![License](https://img.shields.io/github/license/MetrolistGroup/metrolist?style=for-the-badge&labelColor=0d1117)](https://github.com/MetrolistGroup/Metrolist/blob/main/LICENSE)
-[![Downloads](https://img.shields.io/github/downloads/MetrolistGroup/Metrolist/total?style=for-the-badge&labelColor=0d1117)](https://github.com/MetrolistGroup/Metrolist/releases)
+[![Latest release](https://img.shields.io/github/v/release/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases)
+[![License](https://img.shields.io/github/license/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/blob/master/LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/Davidix07TV/Nest-Music/total?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases)
 
 <br/>
 
-[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white&labelColor=0d1117)](https://dsc.gg/metrolist)
-[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white&labelColor=0d1117)](https://t.me/metrolistapp)
+[![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?style=for-the-badge&logo=github&logoColor=white&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music)
 
 <br/>
 
-[**Download**](#download-now) · [**Features**](#features) · [**Translate**](#translations) · [**FAQ**](#faq) · [**Support**](#support-the-project)
+[**Download**](#download-now) · [**Features**](#features) · [**FAQ**](#faq) · [**Support**](#support-the-project)
 
 </div>
 
-> [!WARNING]
-> # MAINTENANCE MODE
-> Metrolist is currently in maintenance mode. This means we will only be fixing bugs and making minor improvements. Please do not submit PRs for new features or major changes, as they will not be accepted.  
-> The app is **NOT** dead, please stay tuned for updates on our discord (found above).
+> [!NOTE]
+> **Nest Music** is a modern fork of the popular YouTube Music client, rebranded with a fresh new identity and improved features.
 
 > [!WARNING]
 > **Regional Restriction** - If YouTube Music is unavailable in your region, this app will not work without a **VPN or proxy** connecting to a supported region.
@@ -76,7 +73,7 @@
 #### Audio
 - Audio normalization
 - Tempo & pitch control
-- Equalizer
+- Equalizer with AutoEQ support
 
 </td>
   </tr>
@@ -84,8 +81,9 @@
     <td width="50%" valign="top">
 
 #### Lyrics & Discovery
-- Live synced lyrics
+- Live synced lyrics with word-by-word highlighting
 - AI-powered lyrics translation
+- Music recognition (Shazam integration)
 - Personalized quick picks
 - Search songs, albums, artists, videos, and playlists
 
@@ -94,28 +92,30 @@
 
 #### Library & Account
 - Full library management
-- Local playlists
-- Import playlists
+- Local and cloud playlists
+- Import/export playlists
 - Reorder songs in playlist or queue
-- YouTube Music account login
-- Sync songs, artists, albums, and playlists
+- YouTube Music account login & sync
 
 </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
 
-#### Social
+#### Social Features
 - Listen together with friends in real-time
+- Discord Rich Presence integration
+- Share what you're listening to
 
 </td>
     <td width="50%" valign="top">
 
 #### Interface
 - Home screen widget
-- Light / Dark / Black / Dynamic theme modes
+- Multiple theme modes (Light / Dark / Black / Dynamic)
 - Dynamic color + 19 preset color palettes
-- Built with Material 3
+- Built with Material 3 design
+- Android Auto support
 
 </td>
   </tr>
@@ -129,39 +129,23 @@
 
 <h1><a id="download-now"></a>Download Now</h1>
 
-<h2>Stable Release</h2>
+<h2>Latest Release</h2>
 
 <table>
   <tr>
-    <th align="center">Obtainium</th>
-    <th align="center">IzzyOnDroid</th>
+    <th align="center">GitHub Releases</th>
+    <th align="center">Build from Source</th>
   </tr>
   <tr>
     <td align="center">
-      <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/MetrolistGroup/Metrolist/">
-        <img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/badge_obtainium.png" alt="Download from Obtainium" height="40">
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://apt.izzysoft.de/fdroid/index/apk/com.metrolist.music">
-        <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Download from IzzyOnDroid" height="60">
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <th align="center">OpenAPK</th>
-    <th align="center">GitHub</th>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="https://www.openapk.net/metrolist/com.metrolist.music/">
-        <img src="https://www.openapk.net/images/openapk-badge.png" alt="Download from OpenAPK" height="60">
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/MetrolistGroup/Metrolist/releases/latest/download/Metrolist.apk">
+      <a href="https://github.com/Davidix07TV/Nest-Music/releases/latest">
         <img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Download from GitHub" height="60">
       </a>
+    </td>
+    <td align="center">
+      <pre><code>git clone https://github.com/Davidix07TV/Nest-Music
+cd Nest-Music
+./gradlew :app:assembleFossDebug</code></pre>
     </td>
   </tr>
 </table>
@@ -170,16 +154,29 @@
 
 <table>
   <tr>
-    <th align="center">GitHub</th>
+    <th align="center">GitHub Actions</th>
   </tr>
   <tr>
     <td align="center">
-      <a href="https://nightly.link/MetrolistGroup/Metrolist/workflows/build/main/app-with-Google-Cast.zip">
-        <img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Download from GitHub" height="75">
+      <a href="https://github.com/Davidix07TV/Nest-Music/actions">
+        <img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Download from GitHub Actions" height="75">
       </a>
     </td>
   </tr>
 </table>
+
+</div>
+
+---
+
+<div align="center">
+
+<h1><a id="requirements"></a>Requirements</h1>
+
+- **Android 8.0+** (API 26+)
+- **YouTube Music** subscription (for some features)
+- **Internet connection** required for streaming
+- Optional: VPN/Proxy if YouTube Music is region-restricted
 
 </div>
 
@@ -189,7 +186,21 @@
 
 <h1><a id="faq"></a>FAQ</h1>
 
-<h3>Got questions? Check out our <a href="https://metrolist.cc/#faq">FAQ page</a> for answers to the most common ones.</h3>
+### Can I use this without a YouTube Music subscription?
+Yes, but some features require an active subscription. Free users can still browse and search.
+
+### Is this legal?
+Yes! Nest Music is a third-party client that connects to YouTube Music's official API. It's similar to how web browsers access YouTube Music.
+
+### What's the difference between FOSS and GMS builds?
+- **FOSS**: Contains no Google libraries, supports music recognition via Shazam
+- **GMS**: Includes Google Play Services for enhanced features
+
+### Do I need to log in?
+Yes, you need a Google account to access your library and playlists.
+
+### Can I download songs for offline playback?
+Yes! The app supports caching and downloading songs for offline use (available space permitting).
 
 </div>
 
@@ -197,17 +208,31 @@
 
 <div align="center">
 
-<h1><a id="translations"></a>Translations</h1>
+<h1><a id="building"></a>Building from Source</h1>
 
-[![Translation status](https://img.shields.io/weblate/progress/metrolist?style=for-the-badge&labelColor=0d1117)](https://hosted.weblate.org/engage/metrolist/)
+### Prerequisites
+- [Android SDK](https://developer.android.com/studio)
+- [Java 17+](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+- [Gradle 9.7+](https://gradle.org/)
 
-<h3>We use Weblate to translate Metrolist. <a href="https://hosted.weblate.org/projects/Metrolist/">Help us bring Metrolist to more people!</a></h3>
+### Build Steps
 
-<a href="https://hosted.weblate.org/projects/Metrolist/">
-  <img src="https://hosted.weblate.org/widget/Metrolist/horizontal-auto.svg" alt="Translation status" />
-</a>
+```bash
+# Clone the repository
+git clone https://github.com/Davidix07TV/Nest-Music.git
+cd Nest-Music
 
-<h3>Thank you! Every translation makes Metrolist a little more accessible to someone, somewhere in the world.</h3>
+# Build debug APK (FOSS variant)
+./gradlew :app:assembleFossDebug
+
+# Build release APK
+./gradlew :app:assembleFossRelease
+
+# Install on connected device
+adb install app/build/outputs/apk/foss/debug/app-foss-debug.apk
+```
+
+APK output location: `app/build/outputs/apk/foss/debug/`
 
 </div>
 
@@ -217,21 +242,16 @@
 
 <h1><a id="support-the-project"></a>Support the Project</h1>
 
-<h3>Metrolist is free and open-source. If it brings you joy, consider supporting its development!</h3>
+<h3>Nest Music is free and open-source. If you enjoy it, please consider supporting the project!</h3>
 
-#### Monero (XMR)
+#### Star the Repository ⭐
+If you find Nest Music useful, please star this repository on GitHub!
 
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/assets/XMR.png" alt="Monero QR code" width="150" />
+#### Report Issues & Suggestions 🐛
+Found a bug or have a feature request? [Open an issue](https://github.com/Davidix07TV/Nest-Music/issues)!
 
-```text
-44XjSELSWcgJTZiCKzjpCQWyXhokrH9RqH3rpp35FkSKi57T25hniHWHQNhLeXyFn3DDYqufmfRB1iEtENerZpJc7xJCcqt
-```
-
-#### Buy Me a Coffee
-
-<a href="https://www.buymeacoffee.com/mostafaalagamy">
-  <img src="https://github.com/MetrolistGroup/Metrolist/blob/main/assets/buymeacoffee.png?raw=true" alt="Buy Me a Coffee" width="150" />
-</a>
+#### Contribute Code 💻
+Pull requests are welcome! Please ensure your changes align with the project goals.
 
 </div>
 
@@ -239,108 +259,64 @@
 
 <div align="center">
 
-<h1>Special Thanks</h1>
+<h1>Credits & Attribution</h1>
 
-<h3>Metrolist stands on the shoulders of incredible open-source work.</h3>
+<h3>Nest Music is built upon the excellent work of the Metrolist project.</h3>
 
-<h3>Main Inspirations</h3>
+**Original Project**: [Metrolist](https://github.com/MetrolistGroup/Metrolist) by MetrolistGroup
 
-<table>
-  <thead>
-    <tr>
-      <th align="center">Project</th>
-      <th align="center">Authors</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center"><strong>InnerTune</strong></td>
-      <td align="center"><a href="https://github.com/z-huang">Zion Huang</a> · <a href="https://github.com/Malopieds">Malopieds</a></td>
-    </tr>
-    <tr>
-      <td align="center"><strong>OuterTune</strong></td>
-      <td align="center"><a href="https://github.com/DD3Boh">Davide Garberi</a> · <a href="https://github.com/mikooomich">Michael Zh</a></td>
-    </tr>
-  </tbody>
-</table>
+**This fork**: Rebranded as Nest Music with UI/UX improvements and ongoing maintenance.
 
-<h3>Libraries & Integrations</h3>
+### Libraries & Integrations
 
 <table>
   <thead>
     <tr>
       <th align="center">Project</th>
-      <th align="center">Contribution</th>
+      <th align="center">Purpose</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td align="center"><a href="https://better-lyrics.boidu.dev"><strong>Better Lyrics</strong></a></td>
-      <td>Time-synced lyrics with word-by-word highlighting & YouTube Music integration</td>
+      <td>Time-synced lyrics with word-by-word highlighting</td>
     </tr>
     <tr>
       <td align="center"><a href="https://github.com/MetrolistGroup/metroserver"><strong>metroserver</strong></a></td>
-      <td>Listen-together real-time backend</td>
+      <td>Real-time listen-together backend</td>
     </tr>
     <tr>
       <td align="center"><a href="https://github.com/aleksey-saenko/MusicRecognizer"><strong>MusicRecognizer</strong></a></td>
-      <td>Music recognition feature & Shazam API integration</td>
+      <td>Music recognition and Shazam integration</td>
     </tr>
     <tr>
       <td align="center"><a href="https://github.com/ZemerTeam/zemer-cipher"><strong>zemer-cipher</strong></a></td>
-      <td>YouTube cipher deobfuscation and PoToken generation</td>
+      <td>YouTube cipher deobfuscation</td>
     </tr>
     <tr>
-      <td align="center"><a href="https://www.blacksmith.sh"><strong>Blacksmith</strong></a></td>
-      <td>High-performance GitHub Actions runners powering our CI</td>
+      <td align="center"><a href="https://developer.android.com/jetpack/compose"><strong>Jetpack Compose</strong></a></td>
+      <td>Modern Android UI framework</td>
     </tr>
   </tbody>
 </table>
 
-<br/>
-
-<a href="https://www.blacksmith.sh">
-  <img src="https://github.com/MetrolistGroup/Metrolist/blob/main/assets/blacksmith-powered.png" alt="CI powered by Blacksmith" width="280" />
-</a>
-
-<h3>We also thank the entire open-source community! For every library, tool, and API that powers this project.</h3>
-
 </div>
 
 ---
 
 <div align="center">
 
-<h1>Contributors</h1>
+## License
 
-<h3>This project wouldn't exist without these amazing people!</h3>
+Nest Music is licensed under the [GNU General Public License v3.0](LICENSE). See the LICENSE file for details.
 
-<a href="https://github.com/MetrolistGroup/Metrolist/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=MetrolistGroup/Metrolist" alt="Contributors" />
-</a>
-
-</div>
+### Disclaimer
+This project is not affiliated with YouTube, YouTube Music, or Google. All trademarks are the property of their respective owners.
 
 ---
 
-<div align="center">
+**Repository**: https://github.com/Davidix07TV/Nest-Music
 
-<h1>Disclaimer</h1>
-
-This project is **not affiliated with, funded, authorized, endorsed by, or in any way associated** with YouTube, Google LLC, Metrolist Group LLC, or any of their affiliates and subsidiaries.
-
-All trademarks, service marks, and intellectual property rights referenced in this project belong to their respective owners.
-
-</div>
-
----
-
-<div align="center">
-
-<br/>
-
-**Made with ❤️ by [Mo Agamy](https://github.com/mostafaalagamy)**
-
-**This project stands with Palestine 🇵🇸**
+**Last Updated**: August 2026
 
 </div>
