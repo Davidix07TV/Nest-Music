@@ -4,16 +4,7 @@
 
 # Nest Music
 
-### YouTube Music client for Android
-
-<br/>
-
-<a href="https://www.blacksmith.sh">
-  <img src="https://github.com/MetrolistGroup/Metrolist/blob/main/assets/blacksmith-powered.png" alt="CI powered by Blacksmith" width="280" />
-</a>
-
-<br/>
-<br/>
+### YouTube Music client for Android!
 
 [![Latest release](https://img.shields.io/github/v/release/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases)
 [![License](https://img.shields.io/github/license/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/blob/master/LICENSE)
@@ -34,23 +25,6 @@
 
 > [!WARNING]
 > **Regional Restriction** - If YouTube Music is unavailable in your region, this app will not work without a **VPN or proxy** connecting to a supported region.
-
----
-
-<div align="center">
-
-<h1><a id="screenshots"></a>Screenshots</h1>
-
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/fastlane/metadata/android/en-US/images/screenshots/screenshot_1.png" alt="Home screen" width="30%" />
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/fastlane/metadata/android/en-US/images/screenshots/screenshot_2.png" alt="Artist screen" width="30%" />
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/fastlane/metadata/android/en-US/images/screenshots/screenshot_3.png" alt="Recognize music screen" width="30%" />
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/fastlane/metadata/android/en-US/images/screenshots/screenshot_4.png" alt="Listen together screen" width="30%" />
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/fastlane/metadata/android/en-US/images/screenshots/screenshot_5.png" alt="Player screen" width="30%" />
-<img src="https://github.com/MetrolistGroup/Metrolist/blob/main/fastlane/metadata/android/en-US/images/screenshots/screenshot_6.png" alt="Player lyrics screen" width="30%" />
-
-</div>
-
----
 
 <div align="center">
 
