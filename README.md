@@ -8,7 +8,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases)
 [![License](https://img.shields.io/github/license/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/blob/master/LICENSE)
-[![Downloads](https://img.shields.io/github/downloads/Davidix07TV/Nest-Music/total?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases)
+[![Downloads](https://img.shields.io/github/downloads/Davidix07TV/Nest-Music/total?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases) 
 
 <br/>
 
