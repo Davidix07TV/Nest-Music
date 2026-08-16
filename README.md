@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Davidix07TV/Nest-Music/master/assets/nest-music-logo.png" alt="Nest Music app icon" width="200" />
+<img src="https://raw.githubusercontent.com/Davidix07TV/Nest-Music/refs/heads/master/assets/nest-music-logo.png" alt="Nest Music app icon" width="200" />
 
 # Nest Music
 
