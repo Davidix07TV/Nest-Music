@@ -14,6 +14,8 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?style=for-the-badge&logo=github&logoColor=white&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music)
 
+<a href="https://www.producthunt.com/products/nest-music?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-nest-music" target="_blank" rel="noopener noreferrer"><img alt="Nest Music - A music app YouTube-based | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1223725&amp;theme=light&amp;t=1786885683725"></a>
+
 <br/>
 
 [**Download**](#download-now) · [**Features**](#features) · [**FAQ**](#faq) · [**Support**](#support-the-project)
