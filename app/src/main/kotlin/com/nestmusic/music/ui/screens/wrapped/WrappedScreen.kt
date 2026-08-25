@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -39,22 +39,22 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.R
-import com.metrolist.music.ui.screens.wrapped.pages.ConclusionPage
-import com.metrolist.music.ui.screens.wrapped.pages.PlaylistPage
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedIntro
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedMinutesScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedMinutesTease
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTop5AlbumsScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTop5ArtistsScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTop5SongsScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTopAlbumScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTopArtistScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTopSongScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTotalAlbumsScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTotalArtistsScreen
-import com.metrolist.music.ui.screens.wrapped.pages.WrappedTotalSongsScreen
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.screens.wrapped.pages.ConclusionPage
+import com.nestmusic.music.ui.screens.wrapped.pages.PlaylistPage
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedIntro
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedMinutesScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedMinutesTease
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTop5AlbumsScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTop5ArtistsScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTop5SongsScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTopAlbumScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTopArtistScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTopSongScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTotalAlbumsScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTotalArtistsScreen
+import com.nestmusic.music.ui.screens.wrapped.pages.WrappedTotalSongsScreen
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 

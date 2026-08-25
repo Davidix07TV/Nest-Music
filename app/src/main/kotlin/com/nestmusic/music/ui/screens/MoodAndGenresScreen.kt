@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -35,14 +35,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.NavigationTitle
-import com.metrolist.music.ui.component.shimmer.ListItemPlaceHolder
-import com.metrolist.music.ui.component.shimmer.ShimmerHost
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.viewmodels.MoodAndGenresViewModel
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.NavigationTitle
+import com.nestmusic.music.ui.component.shimmer.ListItemPlaceHolder
+import com.nestmusic.music.ui.component.shimmer.ShimmerHost
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.viewmodels.MoodAndGenresViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

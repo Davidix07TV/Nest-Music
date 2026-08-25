@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -53,30 +53,30 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.music.LocalNavController
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.AutoRadioQueueKey
-import com.metrolist.music.constants.SuggestionItemHeight
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.YouTubeListItem
-import com.metrolist.music.ui.menu.YouTubeAlbumMenu
-import com.metrolist.music.ui.menu.YouTubeArtistMenu
-import com.metrolist.music.ui.menu.YouTubePlaylistMenu
-import com.metrolist.music.ui.menu.YouTubeSongMenu
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.OnlineSearchSuggestionViewModel
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AutoRadioQueueKey
+import com.nestmusic.music.constants.SuggestionItemHeight
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.ui.menu.YouTubeAlbumMenu
+import com.nestmusic.music.ui.menu.YouTubeArtistMenu
+import com.nestmusic.music.ui.menu.YouTubePlaylistMenu
+import com.nestmusic.music.ui.menu.YouTubeSongMenu
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.OnlineSearchSuggestionViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce

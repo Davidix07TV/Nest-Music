@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -7,10 +7,10 @@ package com.nestmusic.music.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
-import com.metrolist.music.lyrics.LyricsEntry
-import com.metrolist.music.lyrics.LyricsUtils
-import com.metrolist.music.ui.component.LyricsListItem
+import com.nestmusic.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
+import com.nestmusic.music.lyrics.LyricsEntry
+import com.nestmusic.music.lyrics.LyricsUtils
+import com.nestmusic.music.ui.component.LyricsListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,10 +6,10 @@
 package com.nestmusic.music.lyrics
 
 import android.content.Context
-import com.metrolist.kugou.KuGou
-import com.metrolist.music.constants.EnableKugouKey
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
+import com.nestmusic.kugou.KuGou
+import com.nestmusic.music.constants.EnableKugouKey
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
 
 object KuGouLyricsProvider : LyricsProvider {
     override val name = "Kugou"

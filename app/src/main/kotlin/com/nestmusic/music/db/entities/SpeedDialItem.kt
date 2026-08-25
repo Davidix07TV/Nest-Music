@@ -1,15 +1,15 @@
-﻿package com.nestmusic.music.db.entities
+package com.nestmusic.music.db.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.YTItem
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.YTItem
 
 @Entity(tableName = "speed_dial_item")
 data class SpeedDialItem(
@@ -33,7 +33,7 @@ data class SpeedDialItem(
                 artists = subtitle?.split(", ")?.mapIndexed { index, name ->
                     Artist(name = name, id = subtitleIds?.split(", ")?.getOrNull(index))
                 } ?: emptyList(),
-                album = if (albumId != null && albumName != null) com.metrolist.innertube.models.Album(name = albumName, id = albumId) else null,
+                album = if (albumId != null && albumName != null) com.nestmusic.innertube.models.Album(name = albumName, id = albumId) else null,
                 thumbnail = thumbnailUrl ?: "",
                 explicit = explicit
             )

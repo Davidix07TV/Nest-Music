@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.utils
+package com.nestmusic.music.ui.utils
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -17,7 +17,7 @@ class YouTubeUtilsTest {
     @Test
     fun `yt3 googleusercontent is rewritten too (YouTube migrated host - fixes the blurry player)`() {
         // YT moved album art to yt3.googleusercontent.com and serves a ~60px thumbnail; without
-        // matching this host, resize() would no-op and the player upscales the 60px image → blur.
+        // matching this host, resize() would no-op and the player upscales the 60px image ? blur.
         val url = "https://yt3.googleusercontent.com/_zDuDZFnSKmuQwDX=w60-h60-l90-rj"
         assertEquals(
             "https://yt3.googleusercontent.com/_zDuDZFnSKmuQwDX=w544-h544-l90-rj",

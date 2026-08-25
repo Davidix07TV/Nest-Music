@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -45,20 +45,20 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CONTENT_TYPE_ALBUM
-import com.metrolist.music.constants.CONTENT_TYPE_HEADER
-import com.metrolist.music.constants.GridItemSize
-import com.metrolist.music.constants.GridItemsSizeKey
-import com.metrolist.music.constants.GridThumbnailHeight
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LibraryAlbumGridItem
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.viewmodels.ArtistAlbumsViewModel
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CONTENT_TYPE_ALBUM
+import com.nestmusic.music.constants.CONTENT_TYPE_HEADER
+import com.nestmusic.music.constants.GridItemSize
+import com.nestmusic.music.constants.GridItemsSizeKey
+import com.nestmusic.music.constants.GridThumbnailHeight
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LibraryAlbumGridItem
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.viewmodels.ArtistAlbumsViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable

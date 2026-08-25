@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.discord
+package com.nestmusic.music.discord
 
 import android.content.Context
 import android.content.SharedPreferences

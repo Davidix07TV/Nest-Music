@@ -1,11 +1,11 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
 package com.nestmusic.music.constants
 
-import com.metrolist.music.ui.screens.OptionStats
+import com.nestmusic.music.ui.screens.OptionStats
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -30,10 +30,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.metrolist.music.R
-import com.metrolist.music.BuildConfig
-import com.metrolist.music.utils.ReleaseInfo
-import com.metrolist.music.utils.Updater
+import com.nestmusic.music.R
+import com.nestmusic.music.BuildConfig
+import com.nestmusic.music.utils.ReleaseInfo
+import com.nestmusic.music.utils.Updater
 
 private val markdownLinkRegex = Regex("(@[a-zA-Z0-9_-]+)|(https?://[\\w-]+(\\.[\\w-]+)+[\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])")
 

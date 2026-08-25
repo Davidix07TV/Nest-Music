@@ -1,11 +1,11 @@
-﻿package com.nestmusic.music.ui.screens.equalizer.wizard
+package com.nestmusic.music.ui.screens.equalizer.wizard
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.music.eq.data.EQProfileRepository
-import com.metrolist.music.eq.data.GitHubAutoEqSearch
-import com.metrolist.music.eq.data.SavedEQProfile
+import com.nestmusic.music.eq.data.EQProfileRepository
+import com.nestmusic.music.eq.data.GitHubAutoEqSearch
+import com.nestmusic.music.eq.data.SavedEQProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job

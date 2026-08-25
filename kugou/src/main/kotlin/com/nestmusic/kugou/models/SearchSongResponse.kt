@@ -1,4 +1,4 @@
-﻿package com.nestmusic.kugou.models
+package com.nestmusic.kugou.models
 
 import kotlinx.serialization.Serializable
 

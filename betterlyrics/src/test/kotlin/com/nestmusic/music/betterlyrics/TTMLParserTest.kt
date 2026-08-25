@@ -1,4 +1,4 @@
-﻿
+
 package com.nestmusic.music.betterlyrics
 
 import org.junit.Test

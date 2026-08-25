@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -35,35 +35,35 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.GridItemSize
-import com.metrolist.music.constants.GridItemsSizeKey
-import com.metrolist.music.constants.GridThumbnailHeight
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.YouTubeGridItem
-import com.metrolist.music.ui.component.YouTubeListItem
-import com.metrolist.music.ui.component.shimmer.GridItemPlaceHolder
-import com.metrolist.music.ui.component.shimmer.ListItemPlaceHolder
-import com.metrolist.music.ui.component.shimmer.ShimmerHost
-import com.metrolist.music.ui.menu.YouTubeAlbumMenu
-import com.metrolist.music.ui.menu.YouTubeArtistMenu
-import com.metrolist.music.ui.menu.YouTubePlaylistMenu
-import com.metrolist.music.ui.menu.YouTubeSongMenu
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.viewmodels.ArtistItemsViewModel
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.GridItemSize
+import com.nestmusic.music.constants.GridItemsSizeKey
+import com.nestmusic.music.constants.GridThumbnailHeight
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.YouTubeGridItem
+import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.ui.component.shimmer.GridItemPlaceHolder
+import com.nestmusic.music.ui.component.shimmer.ListItemPlaceHolder
+import com.nestmusic.music.ui.component.shimmer.ShimmerHost
+import com.nestmusic.music.ui.menu.YouTubeAlbumMenu
+import com.nestmusic.music.ui.menu.YouTubeArtistMenu
+import com.nestmusic.music.ui.menu.YouTubePlaylistMenu
+import com.nestmusic.music.ui.menu.YouTubeSongMenu
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.viewmodels.ArtistItemsViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable

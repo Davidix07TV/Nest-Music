@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.screens.podcast
+package com.nestmusic.music.ui.screens.podcast
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -68,23 +68,23 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.innertube.models.PodcastItem
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.innertube.models.PodcastItem
 import timber.log.Timber
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.db.entities.PodcastEntity
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.YouTubeListItem
-import com.metrolist.music.ui.menu.YouTubeSongMenu
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.viewmodels.OnlinePodcastViewModel
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.db.entities.PodcastEntity
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.ui.menu.YouTubeSongMenu
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.viewmodels.OnlinePodcastViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

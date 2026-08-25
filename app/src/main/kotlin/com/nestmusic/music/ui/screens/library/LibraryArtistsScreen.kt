@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -48,31 +48,31 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.ArtistFilter
-import com.metrolist.music.constants.ArtistFilterKey
-import com.metrolist.music.constants.ArtistSortDescendingKey
-import com.metrolist.music.constants.ArtistSortType
-import com.metrolist.music.constants.ArtistSortTypeKey
-import com.metrolist.music.constants.ArtistViewTypeKey
-import com.metrolist.music.constants.CONTENT_TYPE_ARTIST
-import com.metrolist.music.constants.CONTENT_TYPE_HEADER
-import com.metrolist.music.constants.GridItemSize
-import com.metrolist.music.constants.GridItemsSizeKey
-import com.metrolist.music.constants.GridThumbnailHeight
-import com.metrolist.music.constants.LibraryViewType
-import com.metrolist.music.constants.YtmSyncKey
-import com.metrolist.music.ui.component.ChipsRow
-import com.metrolist.music.ui.component.LibraryArtistGridItem
-import com.metrolist.music.ui.component.LibraryArtistListItem
-import com.metrolist.music.ui.component.LibrarySearchEmptyPlaceholder
-import com.metrolist.music.ui.component.LibrarySearchHeader
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.SortHeader
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.LibraryArtistsViewModel
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ArtistFilter
+import com.nestmusic.music.constants.ArtistFilterKey
+import com.nestmusic.music.constants.ArtistSortDescendingKey
+import com.nestmusic.music.constants.ArtistSortType
+import com.nestmusic.music.constants.ArtistSortTypeKey
+import com.nestmusic.music.constants.ArtistViewTypeKey
+import com.nestmusic.music.constants.CONTENT_TYPE_ARTIST
+import com.nestmusic.music.constants.CONTENT_TYPE_HEADER
+import com.nestmusic.music.constants.GridItemSize
+import com.nestmusic.music.constants.GridItemsSizeKey
+import com.nestmusic.music.constants.GridThumbnailHeight
+import com.nestmusic.music.constants.LibraryViewType
+import com.nestmusic.music.constants.YtmSyncKey
+import com.nestmusic.music.ui.component.ChipsRow
+import com.nestmusic.music.ui.component.LibraryArtistGridItem
+import com.nestmusic.music.ui.component.LibraryArtistListItem
+import com.nestmusic.music.ui.component.LibrarySearchEmptyPlaceholder
+import com.nestmusic.music.ui.component.LibrarySearchHeader
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.SortHeader
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.LibraryArtistsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

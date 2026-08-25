@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -51,16 +51,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.db.entities.RecognitionHistory
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.SearchRoutes
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.db.entities.RecognitionHistory
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.SearchRoutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter

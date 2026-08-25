@@ -1,18 +1,18 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.Album
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.MusicResponsiveListItemRenderer
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.innertube.models.oddElements
-import com.metrolist.innertube.models.splitBySeparator
-import com.metrolist.innertube.utils.parseTime
+import com.nestmusic.innertube.models.Album
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.MusicResponsiveListItemRenderer
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.innertube.models.oddElements
+import com.nestmusic.innertube.models.splitBySeparator
+import com.nestmusic.innertube.utils.parseTime
 
 object SearchSuggestionPage {
     fun fromMusicResponsiveListItemRenderer(renderer: MusicResponsiveListItemRenderer): YTItem? {

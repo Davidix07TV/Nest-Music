@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -71,31 +71,31 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.playback.queues.LocalAlbumRadio
-import com.metrolist.music.ui.component.ClickableArtistText
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.NavigationTitle
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.YouTubeGridItem
-import com.metrolist.music.ui.menu.AlbumMenu
-import com.metrolist.music.ui.menu.SelectionSongMenu
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.ui.menu.YouTubeAlbumMenu
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.AlbumViewModel
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.playback.queues.LocalAlbumRadio
+import com.nestmusic.music.ui.component.ClickableArtistText
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.NavigationTitle
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.YouTubeGridItem
+import com.nestmusic.music.ui.menu.AlbumMenu
+import com.nestmusic.music.ui.menu.SelectionSongMenu
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.ui.menu.YouTubeAlbumMenu
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.AlbumViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -247,7 +247,7 @@ fun AlbumScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Metadata - Year first, then song count â€¢ duration
+                    // Metadata - Year first, then song count • duration
                     val totalDuration = albumWithSongs.songs.sumOf { it.song.duration }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -262,7 +262,7 @@ fun AlbumScreen(
                             )
                         }
 
-                        // Song Count â€¢ Duration
+                        // Song Count • Duration
                         Text(
                             text =
                                 buildString {

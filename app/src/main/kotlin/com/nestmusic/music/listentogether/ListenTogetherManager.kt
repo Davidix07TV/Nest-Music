@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -10,21 +10,21 @@ import android.os.SystemClock
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.music.constants.ListenTogetherSyncVolumeKey
-import com.metrolist.music.extensions.currentMetadata
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.models.MediaMetadata.Album
-import com.metrolist.music.models.MediaMetadata.Artist
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.PlayerConnection
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.getArtistSeparator
-import com.metrolist.music.utils.joinToArtistString
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.music.constants.ListenTogetherSyncVolumeKey
+import com.nestmusic.music.extensions.currentMetadata
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.models.MediaMetadata.Album
+import com.nestmusic.music.models.MediaMetadata.Artist
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.PlayerConnection
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.getArtistSeparator
+import com.nestmusic.music.utils.joinToArtistString
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -989,7 +989,7 @@ class ListenTogetherManager
             if (serverTrack?.id == expectedTrackId) {
                 Timber
                     .tag(TAG)
-                    .w("Guest: wrong local track â€” reloading ${serverTrack.title} from room state")
+                    .w("Guest: wrong local track — reloading ${serverTrack.title} from room state")
                 applyPlaybackState(
                     currentTrack = serverTrack,
                     isPlaying = wantPlaying,
@@ -1001,7 +1001,7 @@ class ListenTogetherManager
                 Timber
                     .tag(TAG)
                     .w(
-                        "Guest: track mismatch (PLAY/PAUSE expected id=$expectedTrackId, room has ${serverTrack?.id}) â€” requestSync",
+                        "Guest: track mismatch (PLAY/PAUSE expected id=$expectedTrackId, room has ${serverTrack?.id}) — requestSync",
                     )
                 client.requestSync()
             }
@@ -1040,7 +1040,7 @@ class ListenTogetherManager
                         ) {
                             Timber
                                 .tag(TAG)
-                                .w("Guest: PLAY targets $playTarget but was buffering $bufferingTrackId â€” switching")
+                                .w("Guest: PLAY targets $playTarget but was buffering $bufferingTrackId — switching")
                             pendingSyncState = null
                             bufferCompleteReceivedForTrack = null
                             bufferingTrackId = null

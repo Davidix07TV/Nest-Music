@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -66,37 +66,37 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalNavController
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.LocalSyncUtils
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.db.entities.Event
-import com.metrolist.music.db.entities.PlaylistSong
-import com.metrolist.music.db.entities.PodcastEntity
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.LocalBottomSheetPageState
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.TextFieldDialog
-import com.metrolist.music.ui.utils.ShowMediaInfo
-import com.metrolist.music.viewmodels.CachePlaylistViewModel
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.LocalSyncUtils
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.db.entities.Event
+import com.nestmusic.music.db.entities.PlaylistSong
+import com.nestmusic.music.db.entities.PodcastEntity
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.LocalBottomSheetPageState
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.TextFieldDialog
+import com.nestmusic.music.ui.utils.ShowMediaInfo
+import com.nestmusic.music.viewmodels.CachePlaylistViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -580,7 +580,7 @@ fun SongMenu(
                                 onClick = {
                                     val durationMs = if (song.song.duration > 0) song.song.duration.toLong() * 1000 else 180000L
                                     val trackInfo =
-                                        com.metrolist.music.listentogether.TrackInfo(
+                                        com.nestmusic.music.listentogether.TrackInfo(
                                             id = song.id,
                                             title = song.song.title,
                                             artist = orderedArtists.joinToString(", ") { it.name },

@@ -1,12 +1,12 @@
-﻿package com.nestmusic.music.eq
+package com.nestmusic.music.eq
 
 
 import android.annotation.SuppressLint
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
-import com.metrolist.music.eq.audio.CustomEqualizerAudioProcessor
-import com.metrolist.music.eq.data.ParametricEQ
-import com.metrolist.music.eq.data.SavedEQProfile
+import com.nestmusic.music.eq.audio.CustomEqualizerAudioProcessor
+import com.nestmusic.music.eq.data.ParametricEQ
+import com.nestmusic.music.eq.data.SavedEQProfile
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -88,83 +88,83 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.metrolist.music.LocalNavController
+import com.nestmusic.music.LocalNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.innertube.utils.completed
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.AutoRadioQueueKey
-import com.metrolist.music.constants.GridItemSize
-import com.metrolist.music.constants.GridItemsSizeKey
-import com.metrolist.music.constants.GridThumbnailHeight
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.constants.RandomizeHomeOrderKey
-import com.metrolist.music.constants.SmallGridThumbnailHeight
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.Artist
-import com.metrolist.music.db.entities.LocalItem
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.db.entities.PlaylistSongMap
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.LocalAlbumRadio
-import com.metrolist.music.playback.queues.YouTubeAlbumRadio
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.AlbumGridItem
-import com.metrolist.music.ui.component.ArtistGridItem
-import com.metrolist.music.ui.component.ChipsRow
-import com.metrolist.music.ui.component.HideOnScrollFAB
-import com.metrolist.music.ui.component.LocalBottomSheetPageState
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.NavigationTitle
-import com.metrolist.music.ui.component.RandomizeGridItem
-import com.metrolist.music.ui.component.SongGridItem
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.SpeedDialGridItem
-import com.metrolist.music.ui.component.YouTubeGridItem
-import com.metrolist.music.ui.component.YouTubeListItem
-import com.metrolist.music.ui.component.shimmer.GridItemPlaceHolder
-import com.metrolist.music.ui.component.shimmer.ShimmerHost
-import com.metrolist.music.ui.component.shimmer.TextPlaceholder
-import com.metrolist.music.ui.menu.AlbumMenu
-import com.metrolist.music.ui.menu.ArtistMenu
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.ui.menu.YouTubeAlbumMenu
-import com.metrolist.music.ui.menu.YouTubeArtistMenu
-import com.metrolist.music.ui.menu.YouTubePlaylistMenu
-import com.metrolist.music.ui.menu.YouTubeSongMenu
-import com.metrolist.music.ui.utils.SnapLayoutInfoProvider
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.joinByBullet
-import com.metrolist.music.utils.joinToArtistString
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.CommunityPlaylistItem
-import com.metrolist.music.viewmodels.HomeViewModel
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.innertube.utils.completed
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AutoRadioQueueKey
+import com.nestmusic.music.constants.GridItemSize
+import com.nestmusic.music.constants.GridItemsSizeKey
+import com.nestmusic.music.constants.GridThumbnailHeight
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.constants.RandomizeHomeOrderKey
+import com.nestmusic.music.constants.SmallGridThumbnailHeight
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.Artist
+import com.nestmusic.music.db.entities.LocalItem
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.db.entities.PlaylistSongMap
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.LocalAlbumRadio
+import com.nestmusic.music.playback.queues.YouTubeAlbumRadio
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.AlbumGridItem
+import com.nestmusic.music.ui.component.ArtistGridItem
+import com.nestmusic.music.ui.component.ChipsRow
+import com.nestmusic.music.ui.component.HideOnScrollFAB
+import com.nestmusic.music.ui.component.LocalBottomSheetPageState
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.NavigationTitle
+import com.nestmusic.music.ui.component.RandomizeGridItem
+import com.nestmusic.music.ui.component.SongGridItem
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.SpeedDialGridItem
+import com.nestmusic.music.ui.component.YouTubeGridItem
+import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.ui.component.shimmer.GridItemPlaceHolder
+import com.nestmusic.music.ui.component.shimmer.ShimmerHost
+import com.nestmusic.music.ui.component.shimmer.TextPlaceholder
+import com.nestmusic.music.ui.menu.AlbumMenu
+import com.nestmusic.music.ui.menu.ArtistMenu
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.ui.menu.YouTubeAlbumMenu
+import com.nestmusic.music.ui.menu.YouTubeArtistMenu
+import com.nestmusic.music.ui.menu.YouTubePlaylistMenu
+import com.nestmusic.music.ui.menu.YouTubeSongMenu
+import com.nestmusic.music.ui.utils.SnapLayoutInfoProvider
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.music.utils.joinByBullet
+import com.nestmusic.music.utils.joinToArtistString
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.CommunityPlaylistItem
+import com.nestmusic.music.viewmodels.HomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -496,7 +496,7 @@ fun CommunityPlaylistCard(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DailyDiscoverCard(
-    dailyDiscover: com.metrolist.music.viewmodels.DailyDiscoverItem,
+    dailyDiscover: com.nestmusic.music.viewmodels.DailyDiscoverItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -611,7 +611,7 @@ fun DailyDiscoverCard(
                         text =
                             stringResource(
                                 messageRes,
-                                "${dailyDiscover.seed.title} • ${dailyDiscover.seed.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name }}",
+                                "${dailyDiscover.seed.title} � ${dailyDiscover.seed.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name }}",
                             ),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,

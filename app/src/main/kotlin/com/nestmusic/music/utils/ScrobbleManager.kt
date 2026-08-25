@@ -1,12 +1,12 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
 package com.nestmusic.music.utils
 
-import com.metrolist.lastfm.LastFM
-import com.metrolist.music.models.MediaMetadata
+import com.nestmusic.lastfm.LastFM
+import com.nestmusic.music.models.MediaMetadata
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

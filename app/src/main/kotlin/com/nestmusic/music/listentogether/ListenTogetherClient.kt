@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -23,19 +23,19 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListenTogetherAutoApprovalKey
-import com.metrolist.music.constants.ListenTogetherAutoApproveSuggestionsKey
-import com.metrolist.music.constants.ListenTogetherIsHostKey
-import com.metrolist.music.constants.ListenTogetherRoomCodeKey
-import com.metrolist.music.constants.ListenTogetherServerUrlKey
-import com.metrolist.music.constants.ListenTogetherSessionTimestampKey
-import com.metrolist.music.constants.ListenTogetherSessionTokenKey
-import com.metrolist.music.constants.ListenTogetherUserIdKey
-import com.metrolist.music.utils.NetworkConnectivityObserver
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.safeDataStoreEdit
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListenTogetherAutoApprovalKey
+import com.nestmusic.music.constants.ListenTogetherAutoApproveSuggestionsKey
+import com.nestmusic.music.constants.ListenTogetherIsHostKey
+import com.nestmusic.music.constants.ListenTogetherRoomCodeKey
+import com.nestmusic.music.constants.ListenTogetherServerUrlKey
+import com.nestmusic.music.constants.ListenTogetherSessionTimestampKey
+import com.nestmusic.music.constants.ListenTogetherSessionTokenKey
+import com.nestmusic.music.constants.ListenTogetherUserIdKey
+import com.nestmusic.music.utils.NetworkConnectivityObserver
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.safeDataStoreEdit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -240,10 +240,10 @@ class ListenTogetherClient
 
             // Notification constants
             private const val NOTIFICATION_CHANNEL_ID = "listen_together_channel"
-            const val ACTION_APPROVE_JOIN = "com.metrolist.music.LISTEN_TOGETHER_APPROVE_JOIN"
-            const val ACTION_REJECT_JOIN = "com.metrolist.music.LISTEN_TOGETHER_REJECT_JOIN"
-            const val ACTION_APPROVE_SUGGESTION = "com.metrolist.music.LISTEN_TOGETHER_APPROVE_SUGGESTION"
-            const val ACTION_REJECT_SUGGESTION = "com.metrolist.music.LISTEN_TOGETHER_REJECT_SUGGESTION"
+            const val ACTION_APPROVE_JOIN = "com.nestmusic.music.LISTEN_TOGETHER_APPROVE_JOIN"
+            const val ACTION_REJECT_JOIN = "com.nestmusic.music.LISTEN_TOGETHER_REJECT_JOIN"
+            const val ACTION_APPROVE_SUGGESTION = "com.nestmusic.music.LISTEN_TOGETHER_APPROVE_SUGGESTION"
+            const val ACTION_REJECT_SUGGESTION = "com.nestmusic.music.LISTEN_TOGETHER_REJECT_SUGGESTION"
             const val EXTRA_USER_ID = "extra_user_id"
             const val EXTRA_SUGGESTION_ID = "extra_suggestion_id"
             const val EXTRA_NOTIFICATION_ID = "extra_notification_id"
@@ -296,7 +296,7 @@ class ListenTogetherClient
         val events: SharedFlow<ListenTogetherEvent> = _events.asSharedFlow()
         private val eventQueue = Channel<ListenTogetherEvent>(Channel.UNLIMITED)
 
-        // Used from [loadPersistedSession] launched in init — must be declared before init (Kotlin
+        // Used from [loadPersistedSession] launched in init � must be declared before init (Kotlin
         // initialization order + IO thread can run the coroutine before later properties run).
         private val json =
             Json {
@@ -477,7 +477,7 @@ class ListenTogetherClient
          */
         private fun loadBlockedUsernames() {
             try {
-                val blockedJson = context.dataStore.get(com.metrolist.music.constants.ListenTogetherBlockedUsersKey, "")
+                val blockedJson = context.dataStore.get(com.nestmusic.music.constants.ListenTogetherBlockedUsersKey, "")
                 val blockedList =
                     if (blockedJson.isNotEmpty()) {
                         json.decodeFromString<List<String>>(blockedJson)
@@ -498,7 +498,7 @@ class ListenTogetherClient
             try {
                 val blockedJson = json.encodeToString(_blockedUsernames.value.toList())
                 context.safeDataStoreEdit { preferences ->
-                    preferences[com.metrolist.music.constants.ListenTogetherBlockedUsersKey] = blockedJson
+                    preferences[com.nestmusic.music.constants.ListenTogetherBlockedUsersKey] = blockedJson
                 }
             } catch (e: Exception) {
                 log(LogLevel.ERROR, "Failed to save blocked usernames", e.message)

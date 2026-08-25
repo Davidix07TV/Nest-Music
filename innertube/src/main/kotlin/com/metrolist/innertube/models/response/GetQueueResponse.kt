@@ -1,6 +1,6 @@
-package com.metrolist.innertube.models.response
+package com.nestmusic.innertube.models.response
 
-import com.metrolist.innertube.models.PlaylistPanelRenderer
+import com.nestmusic.innertube.models.PlaylistPanelRenderer
 import kotlinx.serialization.Serializable
 
 @Serializable

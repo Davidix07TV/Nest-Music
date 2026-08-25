@@ -1,18 +1,18 @@
-package com.metrolist.innertube.models.response
+package com.nestmusic.innertube.models.response
 
-import com.metrolist.innertube.models.Button
-import com.metrolist.innertube.models.Continuation
-import com.metrolist.innertube.models.GridRenderer
-import com.metrolist.innertube.models.Menu
-import com.metrolist.innertube.models.MusicDetailHeaderRenderer
-import com.metrolist.innertube.models.MusicEditablePlaylistDetailHeaderRenderer
-import com.metrolist.innertube.models.MusicShelfRenderer
-import com.metrolist.innertube.models.ResponseContext
-import com.metrolist.innertube.models.Runs
-import com.metrolist.innertube.models.SectionListRenderer
-import com.metrolist.innertube.models.SubscriptionButton
-import com.metrolist.innertube.models.Tabs
-import com.metrolist.innertube.models.ThumbnailRenderer
+import com.nestmusic.innertube.models.Button
+import com.nestmusic.innertube.models.Continuation
+import com.nestmusic.innertube.models.GridRenderer
+import com.nestmusic.innertube.models.Menu
+import com.nestmusic.innertube.models.MusicDetailHeaderRenderer
+import com.nestmusic.innertube.models.MusicEditablePlaylistDetailHeaderRenderer
+import com.nestmusic.innertube.models.MusicShelfRenderer
+import com.nestmusic.innertube.models.ResponseContext
+import com.nestmusic.innertube.models.Runs
+import com.nestmusic.innertube.models.SectionListRenderer
+import com.nestmusic.innertube.models.SubscriptionButton
+import com.nestmusic.innertube.models.Tabs
+import com.nestmusic.innertube.models.ThumbnailRenderer
 import kotlinx.serialization.Serializable
 
 @Serializable

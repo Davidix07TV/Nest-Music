@@ -1,7 +1,7 @@
-﻿package com.nestmusic.music.listentogether
+package com.nestmusic.music.listentogether
 
 import com.google.protobuf.ByteString
-import com.metrolist.music.listentogether.proto.Listentogether
+import com.nestmusic.music.listentogether.proto.Listentogether
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

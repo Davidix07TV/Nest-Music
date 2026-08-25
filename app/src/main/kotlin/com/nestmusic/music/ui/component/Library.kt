@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -13,17 +13,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.music.LocalNavController
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.Artist
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.ui.menu.AlbumMenu
-import com.metrolist.music.ui.menu.ArtistMenu
-import com.metrolist.music.ui.menu.PlaylistMenu
-import com.metrolist.music.ui.menu.YouTubePlaylistMenu
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.Artist
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.ui.menu.AlbumMenu
+import com.nestmusic.music.ui.menu.ArtistMenu
+import com.nestmusic.music.ui.menu.PlaylistMenu
+import com.nestmusic.music.ui.menu.YouTubePlaylistMenu
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

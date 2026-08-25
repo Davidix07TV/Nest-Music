@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -127,63 +127,63 @@ import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.navigation.NavController
 import androidx.palette.graphics.Palette
-import com.metrolist.music.LocalNavController
+import com.nestmusic.music.LocalNavController
 import coil3.compose.AsyncImage
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CropAlbumArtKey
-import com.metrolist.music.constants.DarkModeKey
-import com.metrolist.music.constants.HidePlayerThumbnailKey
-import com.metrolist.music.constants.HideStatusBarOnFullscreenKey
-import com.metrolist.music.constants.KeepScreenOn
-import com.metrolist.music.constants.PlayerBackgroundStyle
-import com.metrolist.music.constants.PlayerBackgroundStyleKey
-import com.metrolist.music.constants.PlayerButtonsStyle
-import com.metrolist.music.constants.PlayerButtonsStyleKey
-import com.metrolist.music.constants.PlayerHorizontalPadding
-import com.metrolist.music.constants.QueuePeekHeight
-import com.metrolist.music.constants.SleepTimerDefaultKey
-import com.metrolist.music.constants.SleepTimerFadeOutKey
-import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
-import com.metrolist.music.constants.SliderStyle
-import com.metrolist.music.constants.SliderStyleKey
-import com.metrolist.music.constants.SquigglySliderKey
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.constants.UseNewPlayerDesignKey
-import com.metrolist.music.db.entities.LyricsEntity
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.extensions.togglePlayPause
-import com.metrolist.music.extensions.toggleRepeatMode
-import com.metrolist.music.listentogether.RoomRole
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.ui.component.BottomSheet
-import com.metrolist.music.ui.component.BottomSheetState
-import com.metrolist.music.ui.component.LocalBottomSheetPageState
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.Lyrics
-import com.metrolist.music.ui.component.PlayerSliderTrack
-import com.metrolist.music.ui.component.ResizableIconButton
-import com.metrolist.music.ui.component.SquigglySlider
-import com.metrolist.music.ui.component.WavySlider
-import com.metrolist.music.ui.component.rememberBottomSheetState
-import com.metrolist.music.ui.menu.PlayerMenu
-import com.metrolist.music.ui.screens.settings.DarkMode
-import com.metrolist.music.ui.theme.PlayerColorExtractor
-import com.metrolist.music.ui.theme.PlayerSliderColors
-import com.metrolist.music.ui.utils.ShowMediaInfo
-import com.metrolist.music.ui.utils.ShowOffsetDialog
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.utils.safeDataStoreEdit
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CropAlbumArtKey
+import com.nestmusic.music.constants.DarkModeKey
+import com.nestmusic.music.constants.HidePlayerThumbnailKey
+import com.nestmusic.music.constants.HideStatusBarOnFullscreenKey
+import com.nestmusic.music.constants.KeepScreenOn
+import com.nestmusic.music.constants.PlayerBackgroundStyle
+import com.nestmusic.music.constants.PlayerBackgroundStyleKey
+import com.nestmusic.music.constants.PlayerButtonsStyle
+import com.nestmusic.music.constants.PlayerButtonsStyleKey
+import com.nestmusic.music.constants.PlayerHorizontalPadding
+import com.nestmusic.music.constants.QueuePeekHeight
+import com.nestmusic.music.constants.SleepTimerDefaultKey
+import com.nestmusic.music.constants.SleepTimerFadeOutKey
+import com.nestmusic.music.constants.SleepTimerStopAfterCurrentSongKey
+import com.nestmusic.music.constants.SliderStyle
+import com.nestmusic.music.constants.SliderStyleKey
+import com.nestmusic.music.constants.SquigglySliderKey
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.constants.UseNewPlayerDesignKey
+import com.nestmusic.music.db.entities.LyricsEntity
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.extensions.togglePlayPause
+import com.nestmusic.music.extensions.toggleRepeatMode
+import com.nestmusic.music.listentogether.RoomRole
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.ui.component.BottomSheet
+import com.nestmusic.music.ui.component.BottomSheetState
+import com.nestmusic.music.ui.component.LocalBottomSheetPageState
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.Lyrics
+import com.nestmusic.music.ui.component.PlayerSliderTrack
+import com.nestmusic.music.ui.component.ResizableIconButton
+import com.nestmusic.music.ui.component.SquigglySlider
+import com.nestmusic.music.ui.component.WavySlider
+import com.nestmusic.music.ui.component.rememberBottomSheetState
+import com.nestmusic.music.ui.menu.PlayerMenu
+import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.theme.PlayerColorExtractor
+import com.nestmusic.music.ui.theme.PlayerSliderColors
+import com.nestmusic.music.ui.utils.ShowMediaInfo
+import com.nestmusic.music.ui.utils.ShowOffsetDialog
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.utils.safeDataStoreEdit
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -193,10 +193,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 import kotlin.math.roundToInt
-import com.metrolist.music.ui.component.Icon as MIcon
-import com.metrolist.music.constants.SleepTimerDefaultKey
-import com.metrolist.music.constants.SleepTimerFadeOutKey
-import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
+import com.nestmusic.music.ui.component.Icon as MIcon
+import com.nestmusic.music.constants.SleepTimerDefaultKey
+import com.nestmusic.music.constants.SleepTimerFadeOutKey
+import com.nestmusic.music.constants.SleepTimerStopAfterCurrentSongKey
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1200,7 +1200,7 @@ fun BottomSheetPlayer(
                                 FilledIconButton(
                                     onClick = {
                                         menuState.show {
-                                            com.metrolist.music.ui.menu.LyricsMenu(
+                                            com.nestmusic.music.ui.menu.LyricsMenu(
                                                 lyricsProvider = { currentLyrics },
                                                 songProvider = { currentSong?.song },
                                                 mediaMetadataProvider = { mediaMetadata },
@@ -1326,7 +1326,7 @@ fun BottomSheetPlayer(
                                         .background(textButtonColor)
                                         .clickable {
                                             menuState.show {
-                                                com.metrolist.music.ui.menu.LyricsMenu(
+                                                com.nestmusic.music.ui.menu.LyricsMenu(
                                                     lyricsProvider = { currentLyrics },
                                                     songProvider = { currentSong?.song },
                                                     mediaMetadataProvider = { mediaMetadata },
@@ -2036,7 +2036,7 @@ fun InlineLyricsView(
                     val entryPoint =
                         EntryPointAccessors.fromApplication(
                             context.applicationContext,
-                            com.metrolist.music.di.LyricsHelperEntryPoint::class.java,
+                            com.nestmusic.music.di.LyricsHelperEntryPoint::class.java,
                         )
                     val lyricsHelper = entryPoint.lyricsHelper()
                     val fetchedLyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
@@ -2076,7 +2076,7 @@ fun InlineLyricsView(
                 val entryPoint =
                     EntryPointAccessors.fromApplication(
                         context.applicationContext,
-                        com.metrolist.music.di.LyricsHelperEntryPoint::class.java,
+                        com.nestmusic.music.di.LyricsHelperEntryPoint::class.java,
                     )
                 val lyricsHelper = entryPoint.lyricsHelper()
                 val fetched = lyricsHelper.getLyrics(nextMetadata)

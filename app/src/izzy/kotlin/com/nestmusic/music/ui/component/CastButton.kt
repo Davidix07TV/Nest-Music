@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.component
+package com.nestmusic.music.ui.component
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

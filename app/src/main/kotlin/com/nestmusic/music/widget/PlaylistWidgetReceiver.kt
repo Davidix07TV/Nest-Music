@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -9,8 +9,8 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import com.metrolist.music.MainActivity
-import com.metrolist.music.playback.MusicService
+import com.nestmusic.music.MainActivity
+import com.nestmusic.music.playback.MusicService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -129,8 +129,8 @@ class PlaylistWidgetReceiver : AppWidgetProvider() {
 
     companion object {
         private const val TAG = "PlaylistWidgetReceiver"
-        const val ACTION_PLAY_TARGET = "com.metrolist.music.widget.playlists.PLAY_TARGET"
-        const val ACTION_UPDATE_WIDGET = "com.metrolist.music.widget.playlists.UPDATE_WIDGET"
+        const val ACTION_PLAY_TARGET = "com.nestmusic.music.widget.playlists.PLAY_TARGET"
+        const val ACTION_UPDATE_WIDGET = "com.nestmusic.music.widget.playlists.UPDATE_WIDGET"
 
         const val EXTRA_TARGET_TYPE = "playlist_widget_target_type"
         const val EXTRA_TARGET_ID = "playlist_widget_target_id"

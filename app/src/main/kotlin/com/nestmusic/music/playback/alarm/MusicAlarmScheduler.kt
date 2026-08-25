@@ -1,11 +1,11 @@
-﻿package com.nestmusic.music.playback.alarm
+package com.nestmusic.music.playback.alarm
 
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.metrolist.music.playback.MusicService
+import com.nestmusic.music.playback.MusicService
 import java.util.Calendar
 
 object MusicAlarmScheduler {

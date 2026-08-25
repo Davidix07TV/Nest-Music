@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -39,22 +39,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.MediaInfo
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.LoudnessLevel
-import com.metrolist.music.constants.LoudnessLevelKey
-import com.metrolist.music.db.entities.FormatEntity
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.utils.cipher.CipherDeobfuscator
-import com.metrolist.music.utils.cipher.PlayerDatesStore
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.component.shimmer.ShimmerHost
-import com.metrolist.music.ui.component.shimmer.TextPlaceholder
-import com.metrolist.music.utils.rememberEnumPreference
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.MediaInfo
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.LoudnessLevel
+import com.nestmusic.music.constants.LoudnessLevelKey
+import com.nestmusic.music.db.entities.FormatEntity
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.utils.cipher.CipherDeobfuscator
+import com.nestmusic.music.utils.cipher.PlayerDatesStore
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.component.shimmer.ShimmerHost
+import com.nestmusic.music.ui.component.shimmer.TextPlaceholder
+import com.nestmusic.music.utils.rememberEnumPreference
 import androidx.compose.ui.platform.LocalLocale
 
 @Composable

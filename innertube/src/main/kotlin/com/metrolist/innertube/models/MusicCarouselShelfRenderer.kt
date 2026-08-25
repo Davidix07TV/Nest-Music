@@ -1,4 +1,4 @@
-package com.metrolist.innertube.models
+package com.nestmusic.innertube.models
 
 import kotlinx.serialization.Serializable
 

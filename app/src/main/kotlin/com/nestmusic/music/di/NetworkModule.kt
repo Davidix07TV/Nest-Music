@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,7 +6,7 @@
 package com.nestmusic.music.di
 
 import android.content.Context
-import com.metrolist.music.utils.NetworkConnectivityObserver
+import com.nestmusic.music.utils.NetworkConnectivityObserver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

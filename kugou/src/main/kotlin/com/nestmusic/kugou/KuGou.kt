@@ -1,9 +1,9 @@
-﻿package com.nestmusic.kugou
+package com.nestmusic.kugou
 
-import com.metrolist.kugou.models.DownloadLyricsResponse
-import com.metrolist.kugou.models.Keyword
-import com.metrolist.kugou.models.SearchLyricsResponse
-import com.metrolist.kugou.models.SearchSongResponse
+import com.nestmusic.kugou.models.DownloadLyricsResponse
+import com.nestmusic.kugou.models.Keyword
+import com.nestmusic.kugou.models.SearchLyricsResponse
+import com.nestmusic.kugou.models.SearchSongResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.compression.ContentEncoding
@@ -153,14 +153,14 @@ object KuGou {
         }.body<DownloadLyricsResponse>()
 
     private fun normalizeTitle(title: String) =
-        title.replace("\\(.*\\)".toRegex(), "").replace("（.*）".toRegex(), "")
-            .replace("「.*」".toRegex(), "").replace("『.*』".toRegex(), "")
-            .replace("<.*>".toRegex(), "").replace("《.*》".toRegex(), "")
-            .replace("〈.*〉".toRegex(), "").replace("＜.*＞".toRegex(), "")
+        title.replace("\\(.*\\)".toRegex(), "").replace("(.*)".toRegex(), "")
+            .replace("?.*?".toRegex(), "").replace("?.*?".toRegex(), "")
+            .replace("<.*>".toRegex(), "").replace("�.*�".toRegex(), "")
+            .replace("<.*>".toRegex(), "").replace("<.*>".toRegex(), "")
 
     private fun normalizeArtist(artist: String) =
-        artist.replace(", ", "、").replace(" & ", "、").replace(".", "").replace("和", "、")
-            .replace("\\(.*\\)".toRegex(), "").replace("（.*）".toRegex(), "")
+        artist.replace(", ", "?").replace(" & ", "?").replace(".", "").replace("?", "?")
+            .replace("\\(.*\\)".toRegex(), "").replace("(.*)".toRegex(), "")
 
     fun generateKeyword(title: String, artist: String, album: String? = null) =
         Keyword(normalizeTitle(title), normalizeArtist(artist), album)
@@ -192,7 +192,7 @@ object KuGou {
 
     @Suppress("RegExpRedundantEscape")
     private val ACCEPTED_REGEX = "\\[(\\d\\d):(\\d\\d)\\.(\\d{2,3})\\].*".toRegex()
-    private val BANNED_REGEX = ".+].+[:：].+".toRegex()
+    private val BANNED_REGEX = ".+].+[::].+".toRegex()
 
     private const val DURATION_TOLERANCE = 8
 }

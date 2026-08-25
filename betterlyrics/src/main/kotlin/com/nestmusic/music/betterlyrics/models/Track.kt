@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.betterlyrics.models
+package com.nestmusic.music.betterlyrics.models
 
 import kotlinx.serialization.Serializable
 

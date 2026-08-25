@@ -1,9 +1,9 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.innertube.models.filterExplicit
-import com.metrolist.innertube.models.filterVideoSongs
-import com.metrolist.innertube.models.filterYoutubeShorts
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.innertube.models.filterExplicit
+import com.nestmusic.innertube.models.filterVideoSongs
+import com.nestmusic.innertube.models.filterYoutubeShorts
 
 data class BrowseResult(
     val title: String?,

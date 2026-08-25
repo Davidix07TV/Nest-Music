@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.discord
+package com.nestmusic.music.discord
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header

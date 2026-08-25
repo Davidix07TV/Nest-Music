@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.utils.potoken
+package com.nestmusic.music.utils.potoken
 
 class PoTokenException(message: String) : Exception(message)
 

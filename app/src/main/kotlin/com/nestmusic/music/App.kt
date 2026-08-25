@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -20,22 +20,22 @@ import coil3.memory.MemoryCache
 import coil3.request.CachePolicy
 import coil3.request.allowHardware
 import coil3.request.crossfade
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.ArtistConjunctions
-import com.metrolist.innertube.models.YouTubeLocale
-import com.metrolist.kugou.KuGou
-import com.metrolist.lastfm.LastFM
-import com.metrolist.music.BuildConfig
-import com.metrolist.music.constants.*
-import com.metrolist.music.di.ApplicationScope
-import com.metrolist.music.extensions.toEnum
-import com.metrolist.music.extensions.toInetSocketAddress
-import com.metrolist.music.utils.CrashHandler
-import com.metrolist.music.utils.YTPlayerUtils
-import com.metrolist.music.utils.cipher.CipherDeobfuscator
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.safeDataStoreEdit
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.ArtistConjunctions
+import com.nestmusic.innertube.models.YouTubeLocale
+import com.nestmusic.kugou.KuGou
+import com.nestmusic.lastfm.LastFM
+import com.nestmusic.music.BuildConfig
+import com.nestmusic.music.constants.*
+import com.nestmusic.music.di.ApplicationScope
+import com.nestmusic.music.extensions.toEnum
+import com.nestmusic.music.extensions.toInetSocketAddress
+import com.nestmusic.music.utils.CrashHandler
+import com.nestmusic.music.utils.YTPlayerUtils
+import com.nestmusic.music.utils.cipher.CipherDeobfuscator
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.safeDataStoreEdit
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,7 +92,7 @@ class App :
             cachedCoilCacheSize = dataStore.data.map { it[MaxImageCacheSizeKey] ?: 512 }.first()
         }
 
-        // تهيئة إعدادات التطبيق عند الإقلاع
+        // ????? ??????? ??????? ??? ???????
         applicationScope.launch {
             // Apply settings (incl. YouTube.proxy) FIRST: the cipher/PoToken OkHttpClients are built
             // once and cached, so warming them before the proxy is set would snapshot a null proxy and
@@ -100,7 +100,7 @@ class App :
             initializeSettings()
 
             // Warm the cipher WebView off the first-play critical path. It needs no session, so kick it
-            // as soon as settings settle (don't gate it behind visitorData — that's the bigger cold
+            // as soon as settings settle (don't gate it behind visitorData � that's the bigger cold
             // cost). Best-effort; on failure the WebView is created lazily on first play.
             launch(Dispatchers.IO) {
                 delay(1500)
@@ -340,7 +340,7 @@ class App :
                 settings.remove(AccountChannelHandleKey)
             }
             if (!cleared) {
-                Timber.e("forgetAccount: Failed to clear DataStore preferences — proceeding with in-memory cleanup only")
+                Timber.e("forgetAccount: Failed to clear DataStore preferences � proceeding with in-memory cleanup only")
             } else {
                 Timber.d("forgetAccount: DataStore preferences cleared")
             }

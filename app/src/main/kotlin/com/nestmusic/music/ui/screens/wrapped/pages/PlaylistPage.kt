@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.screens.wrapped.pages
+package com.nestmusic.music.ui.screens.wrapped.pages
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -36,14 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.metrolist.music.R
-import com.metrolist.music.ui.screens.wrapped.LocalWrappedManager
-import com.metrolist.music.ui.screens.wrapped.PlaylistCreationState
-import com.metrolist.music.ui.screens.wrapped.WrappedConstants
-import com.metrolist.music.ui.screens.wrapped.components.AnimatedBackground
-import com.metrolist.music.ui.screens.wrapped.components.AutoResizingText
-import com.metrolist.music.ui.screens.wrapped.components.ShapeType
-import com.metrolist.music.ui.theme.bbh_bartle
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.screens.wrapped.LocalWrappedManager
+import com.nestmusic.music.ui.screens.wrapped.PlaylistCreationState
+import com.nestmusic.music.ui.screens.wrapped.WrappedConstants
+import com.nestmusic.music.ui.screens.wrapped.components.AnimatedBackground
+import com.nestmusic.music.ui.screens.wrapped.components.AutoResizingText
+import com.nestmusic.music.ui.screens.wrapped.components.ShapeType
+import com.nestmusic.music.ui.theme.bbh_bartle
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 

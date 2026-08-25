@@ -1,10 +1,10 @@
-﻿package com.nestmusic.music.db.daos
+package com.nestmusic.music.db.daos
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.metrolist.music.db.entities.SpeedDialItem
+import com.nestmusic.music.db.entities.SpeedDialItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao

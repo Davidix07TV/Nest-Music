@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.playback.alarm
+package com.nestmusic.music.playback.alarm
 
 import android.content.BroadcastReceiver
 import android.content.Context

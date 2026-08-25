@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -29,20 +29,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.ArtistSongSortType
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.db.entities.Artist
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.ArtistListItem
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ArtistSongSortType
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.db.entities.Artist
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.ArtistListItem
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

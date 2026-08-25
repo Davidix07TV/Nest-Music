@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -29,15 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
-import com.metrolist.music.BuildConfig
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.component.ReleaseNotesCard
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.Updater
+import com.nestmusic.music.BuildConfig
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.component.ReleaseNotesCard
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.Updater
 import androidx.compose.runtime.remember
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +117,7 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Android Auto Section — only shown if Android Auto is installed
+        // Android Auto Section � only shown if Android Auto is installed
         if (hasAndroidAuto) {
             Material3SettingsGroup(
                 title = "Android Auto",
@@ -223,7 +223,7 @@ fun SettingsScreen(
                         )
                     )
                 }
-                val showChangelog = com.metrolist.music.LocalChangelogState.current
+                val showChangelog = com.nestmusic.music.LocalChangelogState.current
                 add(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.newspaper),

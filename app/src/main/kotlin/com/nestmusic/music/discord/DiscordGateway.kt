@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.discord
+package com.nestmusic.music.discord
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope

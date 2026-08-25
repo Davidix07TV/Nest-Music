@@ -1,12 +1,12 @@
-package com.metrolist.innertube.models.response
+package com.nestmusic.innertube.models.response
 
-import com.metrolist.innertube.models.ResponseContext
-import com.metrolist.innertube.models.Thumbnails
+import com.nestmusic.innertube.models.ResponseContext
+import com.nestmusic.innertube.models.Thumbnails
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * PlayerResponse with [com.metrolist.innertube.models.YouTubeClient.WEB_REMIX] client
+ * PlayerResponse with [com.nestmusic.innertube.models.YouTubeClient.WEB_REMIX] client
  */
 @Serializable
 data class PlayerResponse(

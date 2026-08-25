@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -42,9 +42,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import com.metrolist.music.R
-import com.metrolist.music.ui.theme.MetrolistTheme
-import com.metrolist.music.utils.CrashHandler
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.theme.MetrolistTheme
+import com.nestmusic.music.utils.CrashHandler
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date

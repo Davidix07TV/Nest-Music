@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.utils
+package com.nestmusic.music.utils
 
 import android.content.ComponentName
 import android.content.Context
@@ -7,8 +7,8 @@ import android.content.pm.PackageManager
 object IconUtils {
     fun setIcon(context: Context, enabled: Boolean) {
         val pm = context.packageManager
-        val dynamic = ComponentName(context, "com.metrolist.music.MainActivityAlias")
-        val static = ComponentName(context, "com.metrolist.music.MainActivityStatic")
+        val dynamic = ComponentName(context, "com.nestmusic.music.MainActivityAlias")
+        val static = ComponentName(context, "com.nestmusic.music.MainActivityStatic")
 
         pm.setComponentEnabledSetting(
             dynamic,

@@ -1,9 +1,9 @@
-﻿package com.nestmusic.shazamkit
+package com.nestmusic.shazamkit
 
-import com.metrolist.shazamkit.models.RecognitionResult
-import com.metrolist.shazamkit.models.ShazamRequestJson
+import com.nestmusic.shazamkit.models.RecognitionResult
+import com.nestmusic.shazamkit.models.ShazamRequestJson
 import timber.log.Timber
-import com.metrolist.shazamkit.models.ShazamResponseJson
+import com.nestmusic.shazamkit.models.ShazamResponseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO

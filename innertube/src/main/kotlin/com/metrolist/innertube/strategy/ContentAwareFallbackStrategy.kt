@@ -1,6 +1,6 @@
-package com.metrolist.innertube.strategy
+package com.nestmusic.innertube.strategy
 
-import com.metrolist.innertube.models.YouTubeClient
+import com.nestmusic.innertube.models.YouTubeClient
 
 data class ContentHints(
     val isExplicit: Boolean? = null,

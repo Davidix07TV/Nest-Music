@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -16,24 +16,24 @@ import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
-import com.metrolist.music.constants.SleepTimerCustomDaysKey
-import com.metrolist.music.constants.SleepTimerDayTimesKey
-import com.metrolist.music.constants.SleepTimerDefaultKey
-import com.metrolist.music.constants.SleepTimerEnabledKey
-import com.metrolist.music.constants.SleepTimerEndTimeKey
-import com.metrolist.music.constants.SleepTimerRepeatKey
-import com.metrolist.music.constants.SleepTimerStartTimeKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.extensions.currentMetadata
-import com.metrolist.music.extensions.getCurrentQueueIndex
-import com.metrolist.music.extensions.getQueueWindows
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.extensions.togglePlayPause
-import com.metrolist.music.playback.MusicService.MusicBinder
-import com.metrolist.music.playback.queues.Queue
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
+import com.nestmusic.music.constants.SleepTimerCustomDaysKey
+import com.nestmusic.music.constants.SleepTimerDayTimesKey
+import com.nestmusic.music.constants.SleepTimerDefaultKey
+import com.nestmusic.music.constants.SleepTimerEnabledKey
+import com.nestmusic.music.constants.SleepTimerEndTimeKey
+import com.nestmusic.music.constants.SleepTimerRepeatKey
+import com.nestmusic.music.constants.SleepTimerStartTimeKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.extensions.currentMetadata
+import com.nestmusic.music.extensions.getCurrentQueueIndex
+import com.nestmusic.music.extensions.getQueueWindows
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.extensions.togglePlayPause
+import com.nestmusic.music.playback.MusicService.MusicBinder
+import com.nestmusic.music.playback.queues.Queue
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -469,15 +469,15 @@ class PlayerConnection(
     private fun checkAndStartAutomaticSleepTimer(): Boolean {
         return try {
             val sleepTimerEnabled = service.applicationContext.dataStore.get(SleepTimerEnabledKey) ?: false
-            Timber.tag(TAG).d("✓ Sleep Timer Check: enabled=$sleepTimerEnabled")
+            Timber.tag(TAG).d("? Sleep Timer Check: enabled=$sleepTimerEnabled")
 
             if (!sleepTimerEnabled) {
-                Timber.tag(TAG).d("✗ Sleep Timer disabled - skipping")
+                Timber.tag(TAG).d("? Sleep Timer disabled - skipping")
                 return false
             }
 
             if (service.sleepTimer?.isActive == true) {
-                Timber.tag(TAG).d("✗ Sleep Timer already active - skipping")
+                Timber.tag(TAG).d("? Sleep Timer already active - skipping")
                 return false
             }
 
@@ -533,7 +533,7 @@ class PlayerConnection(
                 }
 
             if (!isDayAllowed) {
-                Timber.tag(TAG).d("✗ Day not allowed for Sleep Timer")
+                Timber.tag(TAG).d("? Day not allowed for Sleep Timer")
                 return false
             }
 
@@ -553,7 +553,7 @@ class PlayerConnection(
             val startTime = LocalTime.parse(startStr, timeFormatter)
             val endTime = LocalTime.parse(endStr, timeFormatter)
 
-            // Support overnight ranges (e.g. 22:00–06:00) in addition to normal ranges
+            // Support overnight ranges (e.g. 22:00�06:00) in addition to normal ranges
             val isTimeInRange =
                 if (endTime.isAfter(startTime)) {
                     currentTime.isAfter(startTime) && currentTime.isBefore(endTime)
@@ -569,7 +569,7 @@ class PlayerConnection(
                 return true
             }
 
-            Timber.tag(TAG).d("✗ Time not in range")
+            Timber.tag(TAG).d("? Time not in range")
             return false
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Sleep Timer error")

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,13 +6,13 @@
 package com.nestmusic.music.lyrics
 
 import android.content.Context
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.LyricsEntity
-import com.metrolist.music.db.entities.SongEntity
-import com.metrolist.music.api.DeepLService
-import com.metrolist.music.api.MistralService
-import com.metrolist.music.api.OpenRouterService
-import com.metrolist.music.api.OpenRouterStreamingService
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.LyricsEntity
+import com.nestmusic.music.db.entities.SongEntity
+import com.nestmusic.music.api.DeepLService
+import com.nestmusic.music.api.MistralService
+import com.nestmusic.music.api.OpenRouterService
+import com.nestmusic.music.api.OpenRouterStreamingService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -198,12 +198,12 @@ object LyricsTranslationHelper {
                     // Validate inputs
                     val effectiveApiKey = if (provider == "DeepL") deeplApiKey else apiKey
                     if (effectiveApiKey.isBlank()) {
-                        _status.value = TranslationStatus.Error(context.getString(com.metrolist.music.R.string.ai_error_api_key_required))
+                        _status.value = TranslationStatus.Error(context.getString(com.nestmusic.music.R.string.ai_error_api_key_required))
                         return@launch
                     }
 
                     if (lyrics.isEmpty()) {
-                        _status.value = TranslationStatus.Error(context.getString(com.metrolist.music.R.string.ai_error_no_lyrics))
+                        _status.value = TranslationStatus.Error(context.getString(com.nestmusic.music.R.string.ai_error_no_lyrics))
                         return@launch
                     }
 
@@ -214,7 +214,7 @@ object LyricsTranslationHelper {
                         }
 
                     if (nonEmptyEntries.isEmpty()) {
-                        _status.value = TranslationStatus.Error(context.getString(com.metrolist.music.R.string.ai_error_lyrics_empty))
+                        _status.value = TranslationStatus.Error(context.getString(com.nestmusic.music.R.string.ai_error_lyrics_empty))
                         return@launch
                     }
 
@@ -265,7 +265,7 @@ object LyricsTranslationHelper {
 
                     // Validate language for all modes
                     if (targetLanguage.isBlank()) {
-                        _status.value = TranslationStatus.Error(context.getString(com.metrolist.music.R.string.ai_error_language_required))
+                        _status.value = TranslationStatus.Error(context.getString(com.nestmusic.music.R.string.ai_error_language_required))
                         return@launch
                     }
 
@@ -444,7 +444,7 @@ object LyricsTranslationHelper {
                                 return@onFailure
                             }
 
-                            val errorMessage = error.message ?: context.getString(com.metrolist.music.R.string.ai_error_unknown)
+                            val errorMessage = error.message ?: context.getString(com.nestmusic.music.R.string.ai_error_unknown)
 
                             // Show error in UI
                             _status.value = TranslationStatus.Error(errorMessage)
@@ -452,7 +452,7 @@ object LyricsTranslationHelper {
                 } catch (e: Exception) {
                     // Ignore cancellation exceptions or if composition is no longer active
                     if (e !is kotlinx.coroutines.CancellationException && isCompositionActive) {
-                        val errorMessage = e.message ?: context.getString(com.metrolist.music.R.string.ai_error_translation_failed)
+                        val errorMessage = e.message ?: context.getString(com.nestmusic.music.R.string.ai_error_translation_failed)
                         _status.value = TranslationStatus.Error(errorMessage)
                     }
                 }

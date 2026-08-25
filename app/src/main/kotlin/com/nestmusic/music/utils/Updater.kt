@@ -1,11 +1,11 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
 package com.nestmusic.music.utils
 
-import com.metrolist.music.BuildConfig
+import com.nestmusic.music.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText

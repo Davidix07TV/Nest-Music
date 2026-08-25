@@ -1,6 +1,6 @@
-﻿package com.nestmusic.music.eq.audio
+package com.nestmusic.music.eq.audio
 
-import com.metrolist.music.eq.data.FilterType
+import com.nestmusic.music.eq.data.FilterType
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.pow

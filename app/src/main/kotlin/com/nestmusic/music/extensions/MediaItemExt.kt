@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -9,11 +9,11 @@ import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.ui.utils.resize
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.ui.utils.resize
 
 val MediaItem.metadata: MediaMetadata?
     get() = localConfiguration?.tag as? MediaMetadata

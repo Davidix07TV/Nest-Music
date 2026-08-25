@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -19,8 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.metrolist.music.R
-import com.metrolist.music.utils.Updater
+import com.nestmusic.music.R
+import com.nestmusic.music.utils.Updater
 
 @Composable
 fun ReleaseNotesCard() {

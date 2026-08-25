@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -30,19 +30,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.component.YouTubeListItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.YouTubeListItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -21,29 +21,29 @@ import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import com.metrolist.music.db.daos.SpeedDialDao
-import com.metrolist.music.db.entities.AlbumArtistMap
-import com.metrolist.music.db.entities.AlbumEntity
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.db.entities.Event
-import com.metrolist.music.db.entities.FormatEntity
-import com.metrolist.music.db.entities.LyricsEntity
-import com.metrolist.music.db.entities.PlayCountEntity
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.db.entities.PlaylistSongMap
-import com.metrolist.music.db.entities.PlaylistSongMapPreview
-import com.metrolist.music.db.entities.PodcastEntity
-import com.metrolist.music.db.entities.RecognitionHistory
-import com.metrolist.music.db.entities.RelatedSongMap
-import com.metrolist.music.db.entities.SearchHistory
-import com.metrolist.music.db.entities.SetVideoIdEntity
-import com.metrolist.music.db.entities.SongAlbumMap
-import com.metrolist.music.db.entities.SongArtistMap
-import com.metrolist.music.db.entities.SongEntity
-import com.metrolist.music.db.entities.SortedSongAlbumMap
-import com.metrolist.music.db.entities.SortedSongArtistMap
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.extensions.toSQLiteQuery
+import com.nestmusic.music.db.daos.SpeedDialDao
+import com.nestmusic.music.db.entities.AlbumArtistMap
+import com.nestmusic.music.db.entities.AlbumEntity
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.db.entities.Event
+import com.nestmusic.music.db.entities.FormatEntity
+import com.nestmusic.music.db.entities.LyricsEntity
+import com.nestmusic.music.db.entities.PlayCountEntity
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.db.entities.PlaylistSongMap
+import com.nestmusic.music.db.entities.PlaylistSongMapPreview
+import com.nestmusic.music.db.entities.PodcastEntity
+import com.nestmusic.music.db.entities.RecognitionHistory
+import com.nestmusic.music.db.entities.RelatedSongMap
+import com.nestmusic.music.db.entities.SearchHistory
+import com.nestmusic.music.db.entities.SetVideoIdEntity
+import com.nestmusic.music.db.entities.SongAlbumMap
+import com.nestmusic.music.db.entities.SongArtistMap
+import com.nestmusic.music.db.entities.SongEntity
+import com.nestmusic.music.db.entities.SortedSongAlbumMap
+import com.nestmusic.music.db.entities.SortedSongArtistMap
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.extensions.toSQLiteQuery
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
@@ -567,9 +567,9 @@ val MIGRATION_1_2 =
 val MIGRATION_21_24 =
     object : Migration(21, 24) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            // Combine all changes from 21→22→23→24
+            // Combine all changes from 21?22?23?24
 
-            // From 21→22: Add columns
+            // From 21?22: Add columns
             try {
                 db.execSQL("ALTER TABLE song ADD COLUMN libraryAddToken TEXT DEFAULT ''")
             } catch (e: Exception) {
@@ -591,7 +591,7 @@ val MIGRATION_21_24 =
                 Timber.tag("Migration").w("Column isDownloaded may already exist")
             }
 
-            // From 23→24: Add isUploaded
+            // From 23?24: Add isUploaded
             var hasIsUploaded = false
             db.query("PRAGMA table_info('song')").use { cursor ->
                 val nameIndex = cursor.getColumnIndex("name")
@@ -613,7 +613,7 @@ val MIGRATION_21_24 =
 val MIGRATION_22_24 =
     object : Migration(22, 24) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            // From 23→24: Add isUploaded
+            // From 23?24: Add isUploaded
             var hasIsUploaded = false
             db.query("PRAGMA table_info('song')").use { cursor ->
                 val nameIndex = cursor.getColumnIndex("name")
@@ -798,7 +798,7 @@ class Migration21To22 : AutoMigrationSpec {
 
 class Migration22To23 : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
-        // No changes needed for 22→23
+        // No changes needed for 22?23
     }
 }
 

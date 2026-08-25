@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.recognition
+package com.nestmusic.music.recognition
 
 import android.util.Base64
 import timber.log.Timber
@@ -38,7 +38,7 @@ internal object ShazamSignatureGenerator {
     private const val BAND_3500_5500 = 3
 
     /**
-     * Hanning window: w[i] = 0.5 * (1 - cos(2π*(i+1)/2049)) for i=0..2047.
+     * Hanning window: w[i] = 0.5 * (1 - cos(2p*(i+1)/2049)) for i=0..2047.
      *
      * This matches the precomputed HANNIG_MATRIX values in the C++ hanning.h header.
      */
@@ -80,14 +80,14 @@ internal object ShazamSignatureGenerator {
         // Accumulated samples count (for signature header)
         private var numSamples = 0
 
-        // Band → list of peaks (bands 0..3)
+        // Band ? list of peaks (bands 0..3)
         private val bandPeaks = Array(4) { mutableListOf<FrequencyPeak>() }
         private var totalPeaks = 0
 
         fun process(pcm: ShortArray): String {
             var offset = 0
             while (offset + 128 <= pcm.size) {
-                // Match C++ stopping condition: stop when BOTH time≥max AND peaks≥max
+                // Match C++ stopping condition: stop when BOTH time=max AND peaks=max
                 val elapsedSec = numSamples.toDouble() / SAMPLE_RATE
                 if (elapsedSec >= MAX_TIME_SECONDS && totalPeaks >= MAX_PEAKS) break
 
@@ -109,7 +109,7 @@ internal object ShazamSignatureGenerator {
         }
 
         private fun doFFT() {
-            // Build windowed excerpt from ring buffer (oldest → newest)
+            // Build windowed excerpt from ring buffer (oldest ? newest)
             val windowed = DoubleArray(FFT_SIZE) { i ->
                 samplesRing[(samplesPos + i) % FFT_SIZE].toDouble() * HANNING[i]
             }
@@ -318,7 +318,7 @@ internal object ShazamSignatureGenerator {
      * Cooley-Tukey radix-2 DIT algorithm.
      *
      * Returns FFT_OUTPUT_SIZE (1025) magnitude values:
-     *   magnitude[k] = max((re[k]² + im[k]²) / 2^17, 1e-10)
+     *   magnitude[k] = max((re[k]� + im[k]�) / 2^17, 1e-10)
      *
      * This matches the FFTW3 r2c output format used in the C++ vibra library.
      */
@@ -346,7 +346,7 @@ internal object ShazamSignatureGenerator {
         var len = 2
         while (len <= n) {
             val halfLen = len ushr 1
-            val ang = -PI / halfLen       // = -2π / len
+            val ang = -PI / halfLen       // = -2p / len
             val wBaseRe = cos(ang)
             val wBaseIm = kotlin.math.sin(ang)
             var i = 0

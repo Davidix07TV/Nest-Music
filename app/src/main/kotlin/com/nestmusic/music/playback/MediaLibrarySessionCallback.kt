@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -27,28 +27,28 @@ import coil3.imageLoader
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.filterExplicit
-import com.metrolist.innertube.models.filterVideoSongs
-import com.metrolist.music.R
-import com.metrolist.music.constants.AndroidAutoSearchLocalLimitKey
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.MediaSessionConstants
-import com.metrolist.music.constants.SongSortType
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.extensions.toggleRepeatMode
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.getArtistSeparator
-import com.metrolist.music.utils.joinToArtistString
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.filterExplicit
+import com.nestmusic.innertube.models.filterVideoSongs
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AndroidAutoSearchLocalLimitKey
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.MediaSessionConstants
+import com.nestmusic.music.constants.SongSortType
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.extensions.toggleRepeatMode
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.getArtistSeparator
+import com.nestmusic.music.utils.joinToArtistString
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,14 +61,14 @@ import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import javax.inject.Inject
-import com.metrolist.music.constants.AndroidAutoSectionsOrderKey
-import com.metrolist.music.constants.AndroidAutoYouTubePlaylistsKey
-import com.metrolist.music.constants.AutoRadioQueueKey
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.screens.settings.AndroidAutoSection
-import com.metrolist.music.ui.screens.settings.deserializeSections
-import com.metrolist.music.ui.screens.settings.serializeSections
+import com.nestmusic.music.constants.AndroidAutoSectionsOrderKey
+import com.nestmusic.music.constants.AndroidAutoYouTubePlaylistsKey
+import com.nestmusic.music.constants.AutoRadioQueueKey
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.screens.settings.AndroidAutoSection
+import com.nestmusic.music.ui.screens.settings.deserializeSections
+import com.nestmusic.music.ui.screens.settings.serializeSections
 import kotlinx.coroutines.withContext
 
 class MediaLibrarySessionCallback
@@ -299,7 +299,7 @@ constructor(
                             emptyList()
                         } else {
                             try {
-                                val allSections = mutableListOf<com.metrolist.innertube.pages.HomePage.Section>()
+                                val allSections = mutableListOf<com.nestmusic.innertube.pages.HomePage.Section>()
                                 var continuation: String? = null
                                 val maxPages = 4
 

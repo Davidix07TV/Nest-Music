@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -102,53 +102,53 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.utils.completed
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.LocalSyncUtils
-import com.metrolist.music.R
-import com.metrolist.music.constants.DarkModeKey
-import com.metrolist.music.constants.PlaylistEditLockKey
-import com.metrolist.music.constants.PlaylistSongSortDescendingKey
-import com.metrolist.music.constants.PlaylistSongSortType
-import com.metrolist.music.constants.PlaylistSongSortTypeKey
-import com.metrolist.music.constants.SwipeToRemoveSongKey
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.PlaylistSong
-import com.metrolist.music.db.entities.PlaylistSongMap
-import com.metrolist.music.extensions.move
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.ActionPromptDialog
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.DraggableScrollbar
-import com.metrolist.music.ui.component.EmptyPlaceholder
-import com.metrolist.music.ui.component.ExpandableText
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.OverlayEditButton
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.SortHeader
-import com.metrolist.music.ui.component.TextFieldDialog
-import com.metrolist.music.ui.menu.CustomThumbnailMenu
-import com.metrolist.music.ui.menu.LocalPlaylistMenu
-import com.metrolist.music.ui.menu.SelectionSongMenu
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.ui.screens.settings.DarkMode
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.utils.reportException
-import com.metrolist.music.viewmodels.LocalPlaylistViewModel
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.utils.completed
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.LocalSyncUtils
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.DarkModeKey
+import com.nestmusic.music.constants.PlaylistEditLockKey
+import com.nestmusic.music.constants.PlaylistSongSortDescendingKey
+import com.nestmusic.music.constants.PlaylistSongSortType
+import com.nestmusic.music.constants.PlaylistSongSortTypeKey
+import com.nestmusic.music.constants.SwipeToRemoveSongKey
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.PlaylistSong
+import com.nestmusic.music.db.entities.PlaylistSongMap
+import com.nestmusic.music.extensions.move
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.ActionPromptDialog
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.DraggableScrollbar
+import com.nestmusic.music.ui.component.EmptyPlaceholder
+import com.nestmusic.music.ui.component.ExpandableText
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.OverlayEditButton
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.SortHeader
+import com.nestmusic.music.ui.component.TextFieldDialog
+import com.nestmusic.music.ui.menu.CustomThumbnailMenu
+import com.nestmusic.music.ui.menu.LocalPlaylistMenu
+import com.nestmusic.music.ui.menu.SelectionSongMenu
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.utils.reportException
+import com.nestmusic.music.viewmodels.LocalPlaylistViewModel
 import com.yalantis.ucrop.UCrop
 import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.Dispatchers
@@ -562,7 +562,7 @@ fun LocalPlaylistScreen(
                     val currentItem by rememberUpdatedState(song)
 
                     fun deleteFromPlaylist() {
-                        // Capture values before deletion â€” DB entry will be gone afterwards
+                        // Capture values before deletion — DB entry will be gone afterwards
                         val browseId = playlist?.playlist?.browseId
                         val setVideoId = currentItem.map.setVideoId
                         val songId = currentItem.map.songId
@@ -899,7 +899,7 @@ fun LocalPlaylistHeader(
     val overrideThumbnail = remember { mutableStateOf<String?>(null) }
     var isCustomThumbnail: Boolean =
         playlist.thumbnails.firstOrNull()?.let {
-            it.contains("studio_square_thumbnail") || it.contains("content://com.metrolist.music")
+            it.contains("studio_square_thumbnail") || it.contains("content://com.nestmusic.music")
         } ?: false
 
     val result = remember { mutableStateOf<Uri?>(null) }
@@ -1246,7 +1246,7 @@ fun LocalPlaylistHeader(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Metadata - Song Count â€¢ Duration
+        // Metadata - Song Count • Duration
         val songCount =
             if (playlist.songCount == 0 && playlist.playlist.remoteSongCount != null) {
                 playlist.playlist.remoteSongCount

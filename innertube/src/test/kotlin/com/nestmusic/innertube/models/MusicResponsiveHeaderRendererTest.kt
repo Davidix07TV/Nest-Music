@@ -1,4 +1,4 @@
-﻿package com.nestmusic.innertube.models
+package com.nestmusic.innertube.models
 
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertTrue

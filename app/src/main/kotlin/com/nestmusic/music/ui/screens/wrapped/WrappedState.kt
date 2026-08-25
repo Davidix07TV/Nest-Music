@@ -1,14 +1,14 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
 package com.nestmusic.music.ui.screens.wrapped
 
-import com.metrolist.innertube.models.AccountInfo
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.Artist
-import com.metrolist.music.db.entities.SongWithStats
+import com.nestmusic.innertube.models.AccountInfo
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.Artist
+import com.nestmusic.music.db.entities.SongWithStats
 
 data class WrappedState(
     val accountInfo: AccountInfo? = null,

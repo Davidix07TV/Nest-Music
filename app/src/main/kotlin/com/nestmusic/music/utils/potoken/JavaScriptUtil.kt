@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.utils.potoken
+package com.nestmusic.music.utils.potoken
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull

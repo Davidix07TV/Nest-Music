@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -70,21 +70,21 @@ import androidx.media3.common.Player
 import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CropAlbumArtKey
-import com.metrolist.music.constants.HidePlayerThumbnailKey
-import com.metrolist.music.constants.PlayerBackgroundStyle
-import com.metrolist.music.constants.PlayerBackgroundStyleKey
-import com.metrolist.music.constants.PlayerHorizontalPadding
-import com.metrolist.music.constants.SeekExtraSeconds
-import com.metrolist.music.constants.SwipeThumbnailKey
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.listentogether.RoomRole
-import com.metrolist.music.ui.component.CastButton
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CropAlbumArtKey
+import com.nestmusic.music.constants.HidePlayerThumbnailKey
+import com.nestmusic.music.constants.PlayerBackgroundStyle
+import com.nestmusic.music.constants.PlayerBackgroundStyleKey
+import com.nestmusic.music.constants.PlayerHorizontalPadding
+import com.nestmusic.music.constants.SeekExtraSeconds
+import com.nestmusic.music.constants.SwipeThumbnailKey
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.listentogether.RoomRole
+import com.nestmusic.music.ui.component.CastButton
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.delay
 
 /**
@@ -495,7 +495,7 @@ private fun ThumbnailItem(
     textBackgroundColor: Color,
     layoutDirection: LayoutDirection,
     onSeek: (String, Boolean) -> Unit,
-    playerConnection: com.metrolist.music.playback.PlayerConnection,
+    playerConnection: com.nestmusic.music.playback.PlayerConnection,
     context: android.content.Context,
     isLandscape: Boolean = false,
     isListenTogetherGuest: Boolean = false,

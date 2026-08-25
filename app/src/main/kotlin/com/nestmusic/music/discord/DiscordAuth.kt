@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.discord
+package com.nestmusic.music.discord
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -6,10 +6,10 @@ import android.content.Intent
 import android.util.Base64
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import com.metrolist.music.BuildConfig
-import com.metrolist.music.discord.DiscordDefaults.DISCORD_OAUTH_AUTHORIZE
-import com.metrolist.music.discord.DiscordDefaults.DISCORD_OAUTH_TOKEN
-import com.metrolist.music.discord.DiscordDefaults.DISCORD_SCOPES
+import com.nestmusic.music.BuildConfig
+import com.nestmusic.music.discord.DiscordDefaults.DISCORD_OAUTH_AUTHORIZE
+import com.nestmusic.music.discord.DiscordDefaults.DISCORD_OAUTH_TOKEN
+import com.nestmusic.music.discord.DiscordDefaults.DISCORD_SCOPES
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -100,7 +100,7 @@ class DiscordAuth(
                 redirectUri = REDIRECT_URI,
             )
         } finally {
-            // no cleanup needed — no local server
+            // no cleanup needed � no local server
         }
     }
 

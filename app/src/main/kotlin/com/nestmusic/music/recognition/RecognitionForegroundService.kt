@@ -1,4 +1,4 @@
-ï»¿package com.nestmusic.music.recognition
+package com.nestmusic.music.recognition
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -13,10 +13,10 @@ import android.os.IBinder
 import timber.log.Timber
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.metrolist.music.MainActivity
-import com.metrolist.music.R
-import com.metrolist.shazamkit.models.RecognitionResult
-import com.metrolist.shazamkit.models.RecognitionStatus
+import com.nestmusic.music.MainActivity
+import com.nestmusic.music.R
+import com.nestmusic.shazamkit.models.RecognitionResult
+import com.nestmusic.shazamkit.models.RecognitionStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -163,7 +163,7 @@ class RecognitionForegroundService : Service() {
             }
 
             is RecognitionStatus.Success -> {
-                Timber.tag(TAG).i("Status: Success â€” '%s' by %s", status.result.title, status.result.artist)
+                Timber.tag(TAG).i("Status: Success — '%s' by %s", status.result.title, status.result.artist)
                 handleSuccess(status.result)
             }
 
@@ -186,7 +186,7 @@ class RecognitionForegroundService : Service() {
             is RecognitionStatus.Error -> {
                 if (terminalStateHandled) return
                 terminalStateHandled = true
-                Timber.tag(TAG).w("Status: Error â€” %s", status.message)
+                Timber.tag(TAG).w("Status: Error — %s", status.message)
                 updateNotification(
                     title = getString(R.string.recognize_music),
                     contentText = getString(R.string.recognition_notification_failed),

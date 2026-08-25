@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -9,15 +9,15 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.filterVideoSongs
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.filterVideoSongs
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -29,9 +29,9 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import com.metrolist.music.constants.SongSortType
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.Album
+import com.nestmusic.music.constants.SongSortType
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.Album
 import javax.inject.Inject
 
 @HiltViewModel
@@ -174,7 +174,7 @@ class OnlinePlaylistViewModel @Inject constructor(
                     id = song.song.id,
                     title = song.song.title,
                     artists = song.artists.map { Artist(it.id, it.name) },
-                    album = song.album?.let { com.metrolist.innertube.models.Album(it.id, it.title) },
+                    album = song.album?.let { com.nestmusic.innertube.models.Album(it.id, it.title) },
                     duration = song.song.duration,
                     thumbnail = song.song.thumbnailUrl ?: "",
                     explicit = song.song.explicit,

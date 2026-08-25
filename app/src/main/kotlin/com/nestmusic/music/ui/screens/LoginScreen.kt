@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -30,19 +30,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.AccountChannelHandleKey
-import com.metrolist.music.constants.AccountEmailKey
-import com.metrolist.music.constants.AccountNameKey
-import com.metrolist.music.constants.DataSyncIdKey
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.VisitorDataKey
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.reportException
-import com.metrolist.music.utils.safeDataStoreEdit
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AccountChannelHandleKey
+import com.nestmusic.music.constants.AccountEmailKey
+import com.nestmusic.music.constants.AccountNameKey
+import com.nestmusic.music.constants.DataSyncIdKey
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.VisitorDataKey
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.reportException
+import com.nestmusic.music.utils.safeDataStoreEdit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

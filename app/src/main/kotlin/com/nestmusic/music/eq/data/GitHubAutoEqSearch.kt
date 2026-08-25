@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.eq.data
+package com.nestmusic.music.eq.data
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers

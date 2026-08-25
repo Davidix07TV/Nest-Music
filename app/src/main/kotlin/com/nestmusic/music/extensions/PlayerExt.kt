@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -13,7 +13,7 @@ import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.Timeline
 import androidx.media3.common.TrackSelectionParameters
-import com.metrolist.music.models.MediaMetadata
+import com.nestmusic.music.models.MediaMetadata
 import java.util.ArrayDeque
 
 fun Player.togglePlayPause() {

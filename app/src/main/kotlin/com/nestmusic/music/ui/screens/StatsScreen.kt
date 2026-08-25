@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -61,39 +61,39 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CONTENT_TYPE_ARTIST
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.StatPeriod
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.ArtistListItem
-import com.metrolist.music.ui.component.ChoiceChipsRow
-import com.metrolist.music.ui.component.EmptyPlaceholder
-import com.metrolist.music.ui.component.HideOnScrollFAB
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalAlbumsGrid
-import com.metrolist.music.ui.component.LocalArtistsGrid
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.LocalSongsGrid
-import com.metrolist.music.ui.component.NavigationTitle
-import com.metrolist.music.ui.component.PlaylistGridItem
-import com.metrolist.music.ui.component.TimeTransfer
-import com.metrolist.music.ui.menu.AlbumMenu
-import com.metrolist.music.ui.menu.ArtistMenu
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.joinByBullet
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.StatsViewModel
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CONTENT_TYPE_ARTIST
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.StatPeriod
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.ArtistListItem
+import com.nestmusic.music.ui.component.ChoiceChipsRow
+import com.nestmusic.music.ui.component.EmptyPlaceholder
+import com.nestmusic.music.ui.component.HideOnScrollFAB
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalAlbumsGrid
+import com.nestmusic.music.ui.component.LocalArtistsGrid
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.LocalSongsGrid
+import com.nestmusic.music.ui.component.NavigationTitle
+import com.nestmusic.music.ui.component.PlaylistGridItem
+import com.nestmusic.music.ui.component.TimeTransfer
+import com.nestmusic.music.ui.menu.AlbumMenu
+import com.nestmusic.music.ui.menu.ArtistMenu
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.joinByBullet
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.StatsViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -201,7 +201,7 @@ fun StatsScreen(
             if (prevOptionOrdinal == null) prevOptionOrdinal = selectedOption
             if (prevIndexChips == null) prevIndexChips = indexChips
             viewModel.selectedOption.value = OptionStats.CONTINUOUS // "throughout time" in your VM
-            viewModel.indexChips.value = StatPeriod.ALL.ordinal // optional: ensure itâ€™s actually â€œnow -> throughout timeâ€
+            viewModel.indexChips.value = StatPeriod.ALL.ordinal // optional: ensure it’s actually “now -> throughout time”
         }
     }
 

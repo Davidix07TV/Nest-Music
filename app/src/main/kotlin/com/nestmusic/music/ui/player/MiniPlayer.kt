@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  *
@@ -82,35 +82,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.Player
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CropAlbumArtKey
-import com.metrolist.music.constants.DarkModeKey
-import com.metrolist.music.constants.MiniPlayerHeight
-import com.metrolist.music.constants.PureBlackMiniPlayerKey
-import com.metrolist.music.constants.SwipeSensitivityKey
-import com.metrolist.music.constants.SwipeThumbnailKey
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.constants.UseNewMiniPlayerDesignKey
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.listentogether.ListenTogetherManager
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.playback.CastConnectionHandler
-import com.metrolist.music.playback.PlayerConnection
-import com.metrolist.music.ui.screens.settings.DarkMode
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.joinToArtistString
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CropAlbumArtKey
+import com.nestmusic.music.constants.DarkModeKey
+import com.nestmusic.music.constants.MiniPlayerHeight
+import com.nestmusic.music.constants.PureBlackMiniPlayerKey
+import com.nestmusic.music.constants.SwipeSensitivityKey
+import com.nestmusic.music.constants.SwipeThumbnailKey
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.constants.UseNewMiniPlayerDesignKey
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.listentogether.ListenTogetherManager
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.playback.CastConnectionHandler
+import com.nestmusic.music.playback.PlayerConnection
+import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.music.utils.joinToArtistString
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
-import com.metrolist.music.ui.component.Icon as MIcon
+import com.nestmusic.music.ui.component.Icon as MIcon
 import androidx.compose.ui.draw.blur
-import com.metrolist.music.constants.MiniPlayerBackgroundStyle
-import com.metrolist.music.constants.MiniPlayerBackgroundStyleKey
+import com.nestmusic.music.constants.MiniPlayerBackgroundStyle
+import com.nestmusic.music.constants.MiniPlayerBackgroundStyleKey
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
@@ -121,9 +121,9 @@ import coil3.request.allowHardware
 import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.metrolist.music.ui.theme.PlayerColorExtractor
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.menu.AddToPlaylistDialog
+import com.nestmusic.music.ui.theme.PlayerColorExtractor
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.menu.AddToPlaylistDialog
 
 /**
  * Stable wrapper for progress state - reads values only during draw phase

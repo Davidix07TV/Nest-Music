@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.screens.equalizer.wizard
+package com.nestmusic.music.ui.screens.equalizer.wizard
 
 /**
  * UI State for Wizard Screen

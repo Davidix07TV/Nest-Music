@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -23,9 +23,9 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.crossfade
 import coil3.toBitmap
-import com.metrolist.music.MainActivity
-import com.metrolist.music.R
-import com.metrolist.music.db.MusicDatabase
+import com.nestmusic.music.MainActivity
+import com.nestmusic.music.R
+import com.nestmusic.music.db.MusicDatabase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

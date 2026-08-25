@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -9,13 +9,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.LyricsEntity
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.lyrics.LyricsHelper
-import com.metrolist.music.lyrics.LyricsResult
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.utils.NetworkConnectivityObserver
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.LyricsEntity
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.lyrics.LyricsHelper
+import com.nestmusic.music.lyrics.LyricsResult
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.utils.NetworkConnectivityObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

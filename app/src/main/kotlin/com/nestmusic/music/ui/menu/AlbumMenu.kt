@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -65,33 +65,33 @@ import androidx.media3.exoplayer.offline.Download.STATE_STOPPED
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalNavController
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.AlbumListItem
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.ListItem
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.menu.ExportDialog
-import com.metrolist.music.utils.PlaylistExporter
-import com.metrolist.music.utils.getExportFileUri
-import com.metrolist.music.utils.saveToPublicDocuments
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.AlbumListItem
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.ListItem
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.menu.ExportDialog
+import com.nestmusic.music.utils.PlaylistExporter
+import com.nestmusic.music.utils.getExportFileUri
+import com.nestmusic.music.utils.saveToPublicDocuments
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -595,9 +595,9 @@ fun AlbumMenu(
                     onShare = { format ->
                         val playlistSongs =
                             songs.map { s ->
-                                com.metrolist.music.db.entities.PlaylistSong(
+                                com.nestmusic.music.db.entities.PlaylistSong(
                                     map =
-                                        com.metrolist.music.db.entities.PlaylistSongMap(
+                                        com.nestmusic.music.db.entities.PlaylistSongMap(
                                             songId = s.id,
                                             playlistId = album.id,
                                             position = 0,
@@ -630,9 +630,9 @@ fun AlbumMenu(
                     onSave = { format ->
                         val playlistSongs =
                             songs.map { s ->
-                                com.metrolist.music.db.entities.PlaylistSong(
+                                com.nestmusic.music.db.entities.PlaylistSong(
                                     map =
-                                        com.metrolist.music.db.entities.PlaylistSongMap(
+                                        com.nestmusic.music.db.entities.PlaylistSongMap(
                                             songId = s.id,
                                             playlistId = album.id,
                                             position = 0,

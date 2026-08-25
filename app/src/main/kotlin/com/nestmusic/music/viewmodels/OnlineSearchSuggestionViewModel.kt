@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -8,22 +8,22 @@ package com.nestmusic.music.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.innertube.models.filterExplicit
-import com.metrolist.innertube.models.filterVideoSongs
-import com.metrolist.innertube.utils.YouTubeUrlParser
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.SearchHistory
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.innertube.models.filterExplicit
+import com.nestmusic.innertube.models.filterVideoSongs
+import com.nestmusic.innertube.utils.YouTubeUrlParser
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.SearchHistory
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi

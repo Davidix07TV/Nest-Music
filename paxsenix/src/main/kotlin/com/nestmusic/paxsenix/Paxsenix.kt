@@ -1,11 +1,11 @@
 ﻿package com.nestmusic.paxsenix
 
 import android.content.Context
-import com.metrolist.music.betterlyrics.TTMLParser
-import com.metrolist.paxsenix.models.AppleMusicSearchResponse
-import com.metrolist.paxsenix.models.LyricsResponse
+import com.nestmusic.music.betterlyrics.TTMLParser
+import com.nestmusic.paxsenix.models.AppleMusicSearchResponse
+import com.nestmusic.paxsenix.models.LyricsResponse
 
-import com.metrolist.paxsenix.models.SearchResult
+import com.nestmusic.paxsenix.models.SearchResult
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -89,7 +89,6 @@ object Paxsenix {
     private val titleCleanupPatterns = listOf(
         Regex("""\s*\(.*?(official|video|audio|lyrics|lyric|visualizer|hd|hq|4k|remaster|remix|live|acoustic|version|edit|extended|radio|clean|explicit).*?\)""", RegexOption.IGNORE_CASE),
         Regex("""\s*\[.*?(official|video|audio|lyrics|lyric|visualizer|hd|hq|4k|remaster|remix|live|acoustic|version|edit|extended|radio|clean|explicit).*?\]""", RegexOption.IGNORE_CASE),
-        Regex("""\s*【.*?】"""),
         Regex("""\s*\|.*$"""),
         Regex("""\s*-\s*(official|video|audio|lyrics|lyric|visualizer).*$""", RegexOption.IGNORE_CASE),
         Regex("""\s*\(feat\..*?\)""", RegexOption.IGNORE_CASE),

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -7,7 +7,7 @@ package com.nestmusic.music.utils
 
 import android.content.Context
 import android.content.res.Configuration
-import com.metrolist.music.R
+import com.nestmusic.music.R
 import java.util.Locale
 
 fun getArtistSeparator(context: Context): String = " ${context.getString(R.string.and)} "

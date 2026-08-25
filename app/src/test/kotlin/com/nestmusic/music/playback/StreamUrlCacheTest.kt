@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.playback
+package com.nestmusic.music.playback
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

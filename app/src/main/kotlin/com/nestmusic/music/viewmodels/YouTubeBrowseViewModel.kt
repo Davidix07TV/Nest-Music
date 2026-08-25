@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -9,15 +9,15 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.filterYoutubeShorts
-import com.metrolist.innertube.pages.BrowseResult
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.HideYoutubeShortsKey
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.filterYoutubeShorts
+import com.nestmusic.innertube.pages.BrowseResult
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.HideYoutubeShortsKey
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

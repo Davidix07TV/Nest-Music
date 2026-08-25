@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.playback
+package com.nestmusic.music.playback
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +44,7 @@ class CastConnectionHandler(
     fun initialize(): Boolean = false
     fun disconnect() {}
     fun loadCurrentMedia() {}
-    fun loadMedia(metadata: com.metrolist.music.models.MediaMetadata) {}
+    fun loadMedia(metadata: com.nestmusic.music.models.MediaMetadata) {}
     fun play() {}
     fun pause() {}
     fun seekTo(position: Long) {}

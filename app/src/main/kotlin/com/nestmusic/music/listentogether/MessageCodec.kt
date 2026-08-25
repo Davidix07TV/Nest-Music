@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,7 +6,7 @@
 package com.nestmusic.music.listentogether
 
 import com.google.protobuf.MessageLite
-import com.metrolist.music.listentogether.proto.Listentogether
+import com.nestmusic.music.listentogether.proto.Listentogether
 import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

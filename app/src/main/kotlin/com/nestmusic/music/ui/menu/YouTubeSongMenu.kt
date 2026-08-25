@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -56,35 +56,35 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import coil3.compose.AsyncImage
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalNavController
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.LocalSyncUtils
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.db.entities.SongEntity
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.LocalBottomSheetPageState
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.utils.ShowMediaInfo
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.joinByBullet
-import com.metrolist.music.utils.makeTimeString
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.LocalSyncUtils
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.db.entities.SongEntity
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.LocalBottomSheetPageState
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.utils.ShowMediaInfo
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.music.utils.joinByBullet
+import com.nestmusic.music.utils.makeTimeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -363,7 +363,7 @@ fun YouTubeSongMenu(
                             },
                             onClick = {
                                 val durationMs = if (song.duration != null && song.duration!! > 0) song.duration!! * 1000L else 180000L
-                                val trackInfo = com.metrolist.music.listentogether.TrackInfo(
+                                val trackInfo = com.nestmusic.music.listentogether.TrackInfo(
                                     id = song.id,
                                     title = song.title,
                                     artist = artists.joinToString(", ") { it.name },

@@ -1,13 +1,13 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
 package com.nestmusic.music.extensions
 
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.Song
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.Song
 
 fun <T> List<T>.reversed(reversed: Boolean) = if (reversed) asReversed() else this
 

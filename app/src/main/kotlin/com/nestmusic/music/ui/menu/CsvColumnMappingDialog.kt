@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -43,9 +43,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.metrolist.music.R
-import com.metrolist.music.viewmodels.ConvertedSongLog
-import com.metrolist.music.viewmodels.CsvImportState
+import com.nestmusic.music.R
+import com.nestmusic.music.viewmodels.ConvertedSongLog
+import com.nestmusic.music.viewmodels.CsvImportState
 
 @Composable
 fun CsvColumnMappingDialog(

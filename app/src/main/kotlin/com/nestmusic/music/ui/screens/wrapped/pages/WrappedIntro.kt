@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -50,8 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.metrolist.music.R
-import com.metrolist.music.ui.theme.bbhBartle
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.theme.bbhBartle
 import kotlinx.coroutines.delay
 
 private const val FADE_IN_DURATION = 1000

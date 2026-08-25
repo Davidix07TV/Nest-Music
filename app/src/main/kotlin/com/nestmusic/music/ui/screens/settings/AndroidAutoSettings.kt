@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -42,20 +42,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.AndroidAutoSearchLocalLimitKey
-import com.metrolist.music.constants.AndroidAutoSectionsOrderKey
-import com.metrolist.music.constants.AndroidAutoTargetPlaylistKey
-import com.metrolist.music.constants.AndroidAutoYouTubePlaylistsKey
-import com.metrolist.music.constants.MediaSessionConstants
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.component.PreferenceEntry
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AndroidAutoSearchLocalLimitKey
+import com.nestmusic.music.constants.AndroidAutoSectionsOrderKey
+import com.nestmusic.music.constants.AndroidAutoTargetPlaylistKey
+import com.nestmusic.music.constants.AndroidAutoYouTubePlaylistsKey
+import com.nestmusic.music.constants.MediaSessionConstants
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.component.PreferenceEntry
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.flow.map
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState

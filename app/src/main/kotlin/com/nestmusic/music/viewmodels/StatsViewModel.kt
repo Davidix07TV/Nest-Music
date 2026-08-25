@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -10,21 +10,21 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.Artist
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.LastMonthlyMostPlaylistSyncKey
-import com.metrolist.music.constants.LastWeeklyMostPlaylistSyncKey
-import com.metrolist.music.constants.ShowMostStatsPlaylistsKey
-import com.metrolist.music.constants.StatPeriod
-import com.metrolist.music.constants.statToPeriod
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.ui.screens.OptionStats
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.safeDataStoreEdit
-import com.metrolist.music.utils.reportException
-import com.metrolist.music.R
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.LastMonthlyMostPlaylistSyncKey
+import com.nestmusic.music.constants.LastWeeklyMostPlaylistSyncKey
+import com.nestmusic.music.constants.ShowMostStatsPlaylistsKey
+import com.nestmusic.music.constants.StatPeriod
+import com.nestmusic.music.constants.statToPeriod
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.ui.screens.OptionStats
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.safeDataStoreEdit
+import com.nestmusic.music.utils.reportException
+import com.nestmusic.music.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

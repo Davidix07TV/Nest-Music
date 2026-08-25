@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.recognition
+package com.nestmusic.music.recognition
 
 import android.Manifest
 import android.app.Activity
@@ -7,7 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.core.content.ContextCompat
-import com.metrolist.music.MainActivity
+import com.nestmusic.music.MainActivity
 
 class RecognitionLaunchActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

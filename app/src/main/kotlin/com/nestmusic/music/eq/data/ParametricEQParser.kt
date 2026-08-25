@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.eq.data
+package com.nestmusic.music.eq.data
 
 import timber.log.Timber
 import java.io.File

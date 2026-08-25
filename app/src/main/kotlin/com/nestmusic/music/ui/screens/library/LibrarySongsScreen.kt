@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -61,36 +61,36 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CONTENT_TYPE_HEADER
-import com.metrolist.music.constants.CONTENT_TYPE_SONG
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.SongFilter
-import com.metrolist.music.constants.SongFilterKey
-import com.metrolist.music.constants.SongSortDescendingKey
-import com.metrolist.music.constants.SongSortType
-import com.metrolist.music.constants.SongSortTypeKey
-import com.metrolist.music.constants.YtmSyncKey
-import com.metrolist.music.extensions.matchesNormalizedQuery
-import com.metrolist.music.extensions.normalizeForSearch
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.ChipsRow
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.HideOnScrollFAB
-import com.metrolist.music.ui.component.LibrarySearchEmptyPlaceholder
-import com.metrolist.music.ui.component.LibrarySearchHeader
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.SortHeader
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.ui.utils.isScrollingUp
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.LibrarySongsViewModel
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CONTENT_TYPE_HEADER
+import com.nestmusic.music.constants.CONTENT_TYPE_SONG
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.SongFilter
+import com.nestmusic.music.constants.SongFilterKey
+import com.nestmusic.music.constants.SongSortDescendingKey
+import com.nestmusic.music.constants.SongSortType
+import com.nestmusic.music.constants.SongSortTypeKey
+import com.nestmusic.music.constants.YtmSyncKey
+import com.nestmusic.music.extensions.matchesNormalizedQuery
+import com.nestmusic.music.extensions.normalizeForSearch
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.ChipsRow
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.HideOnScrollFAB
+import com.nestmusic.music.ui.component.LibrarySearchEmptyPlaceholder
+import com.nestmusic.music.ui.component.LibrarySearchHeader
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.SortHeader
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.ui.utils.isScrollingUp
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.LibrarySongsViewModel
 import timber.log.Timber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

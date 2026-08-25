@@ -1,4 +1,4 @@
-ï»¿package com.nestmusic.music.utils.cipher
+package com.nestmusic.music.utils.cipher
 
 import android.content.Context
 import android.webkit.ConsoleMessage
@@ -66,7 +66,7 @@ class CipherWebView private constructor(
 
     /**
      * Set once the WebView's renderer process has died (or an evaluate timed out, which on a
-     * wedged renderer is indistinguishable). A dead instance must be discarded and recreated â€”
+     * wedged renderer is indistinguishable). A dead instance must be discarded and recreated —
      * per Android docs a WebView whose render process is gone cannot be reused.
      */
     @Volatile
@@ -151,7 +151,7 @@ class CipherWebView private constructor(
      * The renderer died (or is treated as dead after a timeout): fail every pending continuation
      * with [CipherRendererGoneException] so create()/decipher fail fast instead of hanging forever
      * on JS-bridge callbacks that will never come (and so CipherDeobfuscator's mutex is released),
-     * then destroy the WebView â€” it cannot be reused after a render-process crash.
+     * then destroy the WebView — it cannot be reused after a render-process crash.
      */
     private fun onRendererGone(reason: String) {
         isDead = true
@@ -162,7 +162,7 @@ class CipherWebView private constructor(
         destroyWebView()
     }
 
-    // Single-shot take â€” synchronized because JS-bridge callbacks arrive on a WebView-internal
+    // Single-shot take — synchronized because JS-bridge callbacks arrive on a WebView-internal
     // thread while onRenderProcessGone/timeouts run on the main thread.
     @Synchronized
     private fun takeInitContinuation(): Continuation<CipherWebView>? =
@@ -455,9 +455,9 @@ function discoverAndInit() {
                 }
             }
         } catch (e: TimeoutCancellationException) {
-            // A renderer that never answers evaluateJavascript is wedged/dead â€” safety net for
+            // A renderer that never answers evaluateJavascript is wedged/dead — safety net for
             // providers where onRenderProcessGone doesn't fire.
-            Timber.tag(TAG).e("Sig deobfuscation timed out after ${EVAL_TIMEOUT_MS}ms â€” treating renderer as gone")
+            Timber.tag(TAG).e("Sig deobfuscation timed out after ${EVAL_TIMEOUT_MS}ms — treating renderer as gone")
             failAsRendererGone("Sig deobfuscation timed out after ${EVAL_TIMEOUT_MS}ms")
         }
     }
@@ -503,7 +503,7 @@ function discoverAndInit() {
                 }
             }
         } catch (e: TimeoutCancellationException) {
-            Timber.tag(TAG).e("N-transform timed out after ${EVAL_TIMEOUT_MS}ms â€” treating renderer as gone")
+            Timber.tag(TAG).e("N-transform timed out after ${EVAL_TIMEOUT_MS}ms — treating renderer as gone")
             failAsRendererGone("N-transform timed out after ${EVAL_TIMEOUT_MS}ms")
         }
     }
@@ -527,7 +527,7 @@ function discoverAndInit() {
 
     private fun throwIfDead() {
         if (isDead) {
-            throw CipherRendererGoneException("CipherWebView renderer is gone â€” instance must be recreated")
+            throw CipherRendererGoneException("CipherWebView renderer is gone — instance must be recreated")
         }
     }
 
@@ -548,7 +548,7 @@ function discoverAndInit() {
     private fun destroyWebView() {
         if (destroyed) return
         destroyed = true
-        // After a render-process crash some WebView methods can throw â€” never let teardown crash.
+        // After a render-process crash some WebView methods can throw — never let teardown crash.
         runCatching {
             webView.clearHistory()
             webView.clearCache(true)
@@ -581,7 +581,7 @@ function discoverAndInit() {
         private const val EVAL_TIMEOUT_MS = 15_000L
 
         /**
-         * Builds the export-injected player.js. This scans and copies a ~2.8 MB string â€” it MUST run
+         * Builds the export-injected player.js. This scans and copies a ~2.8 MB string — it MUST run
          * off the main thread (create() calls it on Dispatchers.IO before any WebView work), or every
          * WebView (re)build would freeze the UI thread for the duration.
          */
@@ -710,7 +710,7 @@ function discoverAndInit() {
                     }
                 }
             } catch (e: TimeoutCancellationException) {
-                Timber.tag(TAG).e("CipherWebView init timed out after ${CREATE_TIMEOUT_MS}ms â€” treating renderer as gone")
+                Timber.tag(TAG).e("CipherWebView init timed out after ${CREATE_TIMEOUT_MS}ms — treating renderer as gone")
                 destroyQuietly(created)
                 throw CipherRendererGoneException("CipherWebView init timed out after ${CREATE_TIMEOUT_MS}ms")
             } catch (e: Exception) {

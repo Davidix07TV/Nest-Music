@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.screens.equalizer.wizard
+package com.nestmusic.music.ui.screens.equalizer.wizard
 
 import androidx.compose.animation.*
 import androidx.compose.animation.togetherWith
@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.res.stringResource
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
 
 /**
  * EQ Wizard - Device Setup Flow
- * Two steps: Model → Variants
+ * Two steps: Model ? Variants
  */
 @Composable
 fun WizardScreen(

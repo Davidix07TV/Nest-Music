@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -12,30 +12,30 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.filterExplicit
-import com.metrolist.innertube.models.filterVideoSongs
-import com.metrolist.innertube.models.filterYoutubeShorts
-import com.metrolist.innertube.pages.ArtistPage
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.HideYoutubeShortsKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.db.entities.deserializeArtistPage
-import com.metrolist.music.db.entities.serializeArtistPage
-import com.metrolist.music.db.entities.toArtistPage
-import com.metrolist.music.extensions.filterExplicit
-import com.metrolist.music.extensions.filterExplicitAlbums
-import com.metrolist.music.utils.SyncUtils
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.filterExplicit
+import com.nestmusic.innertube.models.filterVideoSongs
+import com.nestmusic.innertube.models.filterYoutubeShorts
+import com.nestmusic.innertube.pages.ArtistPage
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.HideYoutubeShortsKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.db.entities.deserializeArtistPage
+import com.nestmusic.music.db.entities.serializeArtistPage
+import com.nestmusic.music.db.entities.toArtistPage
+import com.nestmusic.music.extensions.filterExplicit
+import com.nestmusic.music.extensions.filterExplicitAlbums
+import com.nestmusic.music.utils.SyncUtils
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import com.metrolist.music.extensions.filterVideoSongs as filterVideoSongsLocal
+import com.nestmusic.music.extensions.filterVideoSongs as filterVideoSongsLocal
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -154,7 +154,7 @@ class ArtistViewModel @Inject constructor(
                         emptyMap()
                     }
 
-                    fun com.metrolist.innertube.models.Artist.resolve() =
+                    fun com.nestmusic.innertube.models.Artist.resolve() =
                         if (id == null) resolvedIdMap[name]?.let { copy(id = it) } ?: this else this
 
                     // Resolve artist IDs and fetch durations from more endpoint

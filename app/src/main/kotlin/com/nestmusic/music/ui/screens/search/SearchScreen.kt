@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -51,23 +51,23 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.SavedStateHandle
-import com.metrolist.music.LocalNavController
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.innertube.utils.YouTubeUrlParser
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalIsPlayerExpanded
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.PauseSearchHistoryKey
-import com.metrolist.music.constants.SearchSource
-import com.metrolist.music.constants.SearchSourceKey
-import com.metrolist.music.db.entities.SearchHistory
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.HideOnScrollFAB
-import com.metrolist.music.utils.SearchRoutes
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.innertube.utils.YouTubeUrlParser
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalIsPlayerExpanded
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.PauseSearchHistoryKey
+import com.nestmusic.music.constants.SearchSource
+import com.nestmusic.music.constants.SearchSourceKey
+import com.nestmusic.music.db.entities.SearchHistory
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.HideOnScrollFAB
+import com.nestmusic.music.utils.SearchRoutes
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

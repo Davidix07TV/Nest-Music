@@ -1,4 +1,4 @@
-ï»¿package com.nestmusic.music.utils.cipher
+package com.nestmusic.music.utils.cipher
 
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -8,7 +8,7 @@ import org.junit.Test
 /**
  * The unknown-hash self-heal (forceRefresh) and the stream-rejection refresh
  * (refreshAfterStreamRejection) MUST use independent cooldown stamps. A stream rejection fires on
- * any 403 â€” including unrelated/expired-URL ones â€” so if it shared forceRefresh's cooldown it could
+ * any 403 — including unrelated/expired-URL ones — so if it shared forceRefresh's cooldown it could
  * delay a real player-rotation self-heal by up to 5 minutes (and vice versa). These are the exact
  * gate functions the two refresh paths call, so this proves the separation without any network.
  */

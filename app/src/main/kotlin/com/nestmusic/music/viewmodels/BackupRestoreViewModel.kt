@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -13,9 +13,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.innertube.utils.sha1
-import com.metrolist.music.R
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.innertube.utils.sha1
+import com.nestmusic.music.R
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -24,23 +24,23 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import com.metrolist.music.constants.DataSyncIdKey
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.VisitorDataKey
-import com.metrolist.music.db.InternalDatabase
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SongEntity
-import com.metrolist.music.extensions.div
-import com.metrolist.music.extensions.tryOrNull
-import com.metrolist.music.extensions.zipInputStream
-import com.metrolist.music.extensions.zipOutputStream
-import com.metrolist.music.playback.MusicService
-import com.metrolist.music.playback.MusicService.Companion.PERSISTENT_AUTOMIX_FILE
-import com.metrolist.music.playback.MusicService.Companion.PERSISTENT_PLAYER_STATE_FILE
-import com.metrolist.music.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
-import com.metrolist.music.utils.reportException
+import com.nestmusic.music.constants.DataSyncIdKey
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.VisitorDataKey
+import com.nestmusic.music.db.InternalDatabase
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SongEntity
+import com.nestmusic.music.extensions.div
+import com.nestmusic.music.extensions.tryOrNull
+import com.nestmusic.music.extensions.zipInputStream
+import com.nestmusic.music.extensions.zipOutputStream
+import com.nestmusic.music.playback.MusicService
+import com.nestmusic.music.playback.MusicService.Companion.PERSISTENT_AUTOMIX_FILE
+import com.nestmusic.music.playback.MusicService.Companion.PERSISTENT_PLAYER_STATE_FILE
+import com.nestmusic.music.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -158,10 +158,10 @@ class BackupRestoreViewModel @Inject constructor(
                                     FileOutputStream(restoreDbPath).use { inputStream.copyTo(it) }
                                 }
                                 "${InternalDatabase.DB_NAME}-wal" -> {
-                                    // Skip WAL â€” we'll open cleanly
+                                    // Skip WAL — we'll open cleanly
                                 }
                                 "${InternalDatabase.DB_NAME}-shm" -> {
-                                    // Skip SHM â€” we'll open cleanly
+                                    // Skip SHM — we'll open cleanly
                                 }
                                 else -> Timber.tag("RESTORE").i("Skipping unexpected entry: ${entry.name}")
                             }
@@ -193,7 +193,7 @@ class BackupRestoreViewModel @Inject constructor(
                         }
                         return@launch
                     }
-                    // Read current database version dynamically â€” this matches whatever Room
+                    // Read current database version dynamically — this matches whatever Room
                     // annotation says, even when the schema version changes in future builds.
                     currentDbVersion = database.openHelper.writableDatabase.version
                     if (backupDbVersion > currentDbVersion) {
@@ -209,7 +209,7 @@ class BackupRestoreViewModel @Inject constructor(
 
                 // === Proceed with restore ===
 
-                // 1. Stop service first â€” ensures no pending DB writes during swap
+                // 1. Stop service first — ensures no pending DB writes during swap
                 context.stopService(Intent(context, MusicService::class.java))
                 try {
                     kotlinx.coroutines.withTimeout(5000) {
@@ -219,10 +219,10 @@ class BackupRestoreViewModel @Inject constructor(
                     Timber.e(e, "Timeout waiting for MusicService to shutdown")
                 }
 
-                // 2. Close the database â€” all operations should be done by now
+                // 2. Close the database — all operations should be done by now
                 database.close()
 
-                // 3. Swap DB files â€” staged copy to avoid corrupting the live DB
+                // 3. Swap DB files — staged copy to avoid corrupting the live DB
                 var dbSwapSucceeded = true
                 if (foundDb) {
                     try {
@@ -310,7 +310,7 @@ class BackupRestoreViewModel @Inject constructor(
                     context.filesDir.resolve(PERSISTENT_AUTOMIX_FILE).delete()
                     context.filesDir.resolve(PERSISTENT_PLAYER_STATE_FILE).delete()
 
-                    // 4. Restart â€” Room will open the swapped DB and run migrations if needed
+                    // 4. Restart — Room will open the swapped DB and run migrations if needed
                     val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     }

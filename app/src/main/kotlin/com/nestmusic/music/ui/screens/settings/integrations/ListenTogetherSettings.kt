@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -75,27 +75,27 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListenTogetherAutoApprovalKey
-import com.metrolist.music.constants.ListenTogetherAutoApproveSuggestionsKey
-import com.metrolist.music.constants.ListenTogetherServerUrlKey
-import com.metrolist.music.constants.ListenTogetherSyncVolumeKey
-import com.metrolist.music.constants.ListenTogetherUsernameKey
-import com.metrolist.music.listentogether.ConnectionState
-import com.metrolist.music.listentogether.ListenTogetherEvent
-import com.metrolist.music.listentogether.ListenTogetherServer
-import com.metrolist.music.listentogether.ListenTogetherServers
-import com.metrolist.music.listentogether.LogEntry
-import com.metrolist.music.listentogether.LogLevel
-import com.metrolist.music.listentogether.RoomRole
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.IntegrationCard
-import com.metrolist.music.ui.component.IntegrationCardItem
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.ListenTogetherViewModel
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListenTogetherAutoApprovalKey
+import com.nestmusic.music.constants.ListenTogetherAutoApproveSuggestionsKey
+import com.nestmusic.music.constants.ListenTogetherServerUrlKey
+import com.nestmusic.music.constants.ListenTogetherSyncVolumeKey
+import com.nestmusic.music.constants.ListenTogetherUsernameKey
+import com.nestmusic.music.listentogether.ConnectionState
+import com.nestmusic.music.listentogether.ListenTogetherEvent
+import com.nestmusic.music.listentogether.ListenTogetherServer
+import com.nestmusic.music.listentogether.ListenTogetherServers
+import com.nestmusic.music.listentogether.LogEntry
+import com.nestmusic.music.listentogether.LogLevel
+import com.nestmusic.music.listentogether.RoomRole
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.IntegrationCard
+import com.nestmusic.music.ui.component.IntegrationCardItem
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.ListenTogetherViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -78,29 +78,29 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.VarispeedKey
-import com.metrolist.music.listentogether.ConnectionState
-import com.metrolist.music.listentogether.ListenTogetherEvent
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.ui.component.BottomSheetState
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.component.VolumeSlider
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.VarispeedKey
+import com.nestmusic.music.listentogether.ConnectionState
+import com.nestmusic.music.listentogether.ListenTogetherEvent
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.ui.component.BottomSheetState
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.VolumeSlider
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.log2
@@ -160,8 +160,8 @@ fun PlayerMenu(
     }
 
     val listenTogetherManager = LocalListenTogetherManager.current
-    val listenTogetherRoleState = listenTogetherManager?.role?.collectAsStateWithLifecycle(initialValue = com.metrolist.music.listentogether.RoomRole.NONE)
-    val isListenTogetherGuest = listenTogetherRoleState?.value == com.metrolist.music.listentogether.RoomRole.GUEST
+    val listenTogetherRoleState = listenTogetherManager?.role?.collectAsStateWithLifecycle(initialValue = com.nestmusic.music.listentogether.RoomRole.NONE)
+    val isListenTogetherGuest = listenTogetherRoleState?.value == com.nestmusic.music.listentogether.RoomRole.GUEST
     val pendingSuggestions by listenTogetherManager?.pendingSuggestions?.collectAsStateWithLifecycle(initialValue = emptyList())
         ?: remember { mutableStateOf(emptyList()) }
 
@@ -774,7 +774,7 @@ fun TempoPitchDialog(onDismiss: () -> Unit) {
         playerConnection.player.playbackParameters =
             PlaybackParameters(tempo, 2f.pow(transposeValue.toFloat() / 12))
     }
-    val listenTogetherManager = com.metrolist.music.LocalListenTogetherManager.current
+    val listenTogetherManager = com.nestmusic.music.LocalListenTogetherManager.current
     val isInRoom = listenTogetherManager?.isInRoom ?: false
 
     AlertDialog(
@@ -841,7 +841,7 @@ fun SpeedDialog(onDismiss: () -> Unit) {
         playerConnection.player.playbackParameters =
             PlaybackParameters(speed, speed)
     }
-    val listenTogetherManager = com.metrolist.music.LocalListenTogetherManager.current
+    val listenTogetherManager = com.nestmusic.music.LocalListenTogetherManager.current
 
     AlertDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -945,7 +945,7 @@ fun ListenTogetherDialog(
     if (!visible) return
 
     val context = LocalContext.current
-    val listenTogetherManager = com.metrolist.music.LocalListenTogetherManager.current
+    val listenTogetherManager = com.nestmusic.music.LocalListenTogetherManager.current
     val joiningRoomTemplate = stringResource(R.string.joining_room)
 
     // Handle case where manager is not available
@@ -1002,7 +1002,7 @@ fun ListenTogetherDialog(
     val pendingSuggestions by listenTogetherManager.pendingSuggestions.collectAsStateWithLifecycle()
 
     // Load saved username
-    var savedUsername by rememberPreference(com.metrolist.music.constants.ListenTogetherUsernameKey, "")
+    var savedUsername by rememberPreference(com.nestmusic.music.constants.ListenTogetherUsernameKey, "")
     var roomCodeInput by rememberSaveable { mutableStateOf("") }
     var usernameInput by rememberSaveable { mutableStateOf(savedUsername) }
 

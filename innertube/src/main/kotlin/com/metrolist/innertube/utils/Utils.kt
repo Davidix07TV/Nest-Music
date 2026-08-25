@@ -1,8 +1,8 @@
-package com.metrolist.innertube.utils
+package com.nestmusic.innertube.utils
 
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.pages.LibraryPage
-import com.metrolist.innertube.pages.PlaylistPage
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.pages.LibraryPage
+import com.nestmusic.innertube.pages.PlaylistPage
 import java.security.MessageDigest
 
 @JvmName("completedLibrary")

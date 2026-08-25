@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.playback
+package com.nestmusic.music.playback
 
 import android.content.Context
 import android.net.Uri
@@ -18,9 +18,9 @@ import com.google.android.gms.cast.framework.SessionManager
 import com.google.android.gms.cast.framework.SessionManagerListener
 import com.google.android.gms.cast.framework.media.RemoteMediaClient
 import com.google.android.gms.common.images.WebImage
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.models.MediaMetadata as AppMediaMetadata
-import com.metrolist.music.ui.utils.resize
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.models.MediaMetadata as AppMediaMetadata
+import com.nestmusic.music.ui.utils.resize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

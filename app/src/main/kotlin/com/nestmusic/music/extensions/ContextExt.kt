@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -8,11 +8,11 @@ package com.nestmusic.music.extensions
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.YtmSyncKey
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.YtmSyncKey
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
 import kotlinx.coroutines.runBlocking
 
 fun Context.isSyncEnabled(): Boolean {

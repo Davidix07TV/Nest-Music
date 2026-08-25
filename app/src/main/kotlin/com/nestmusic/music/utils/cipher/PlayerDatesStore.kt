@@ -1,7 +1,7 @@
-ï»¿package com.nestmusic.music.utils.cipher
+package com.nestmusic.music.utils.cipher
 
 import android.content.Context
-import com.metrolist.innertube.YouTube
+import com.nestmusic.innertube.YouTube
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -14,15 +14,15 @@ import java.net.URL
  * Cosmetic "when did we add cipher support for this player" dates, shown in the song-details
  * sheet next to the player hash.
  *
- * Pulled **purely from a remote file** on the cipher repo â€” `player_dates.json` is NOT bundled
+ * Pulled **purely from a remote file** on the cipher repo — `player_dates.json` is NOT bundled
  * in the APK, so adding a date is just a push to that file and already-installed apps pick it
  * up with no APK update. A small on-disk cache makes it instant/offline on later launches.
  *
  * Deliberately decoupled from [PlayerConfigStore] and the decipher path: it is a separate file
  * old apps never fetch (so it cannot affect them), it is parsed tolerantly, and every failure
- * (no network, bad JSON, no cache yet) just yields an unknown date â€” playback is never touched.
+ * (no network, bad JSON, no cache yet) just yields an unknown date — playback is never touched.
  *
- * File shape â€” a flat map, no schemaVersion, no validation:
+ * File shape — a flat map, no schemaVersion, no validation:
  *   { "959dabb2": "2026-06-12", "445213fb": "2026-06-10", ... }
  */
 object PlayerDatesStore {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -27,13 +27,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.R
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.extensions.isSyncEnabled
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.extensions.isSyncEnabled
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -45,27 +45,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CONTENT_TYPE_LIST
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.Artist
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.AlbumListItem
-import com.metrolist.music.ui.component.ArtistListItem
-import com.metrolist.music.ui.component.ChipsRow
-import com.metrolist.music.ui.component.EmptyPlaceholder
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.PlaylistListItem
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.viewmodels.LocalFilter
-import com.metrolist.music.viewmodels.LocalSearchViewModel
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CONTENT_TYPE_LIST
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.Artist
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.AlbumListItem
+import com.nestmusic.music.ui.component.ArtistListItem
+import com.nestmusic.music.ui.component.ChipsRow
+import com.nestmusic.music.ui.component.EmptyPlaceholder
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.PlaylistListItem
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.viewmodels.LocalFilter
+import com.nestmusic.music.viewmodels.LocalSearchViewModel
 import kotlinx.coroutines.flow.drop
 
 @OptIn(ExperimentalFoundationApi::class)

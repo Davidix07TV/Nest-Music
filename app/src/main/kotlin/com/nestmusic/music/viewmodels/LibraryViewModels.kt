@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -13,48 +13,48 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.utils.completed
-import com.metrolist.music.constants.AlbumFilter
-import com.metrolist.music.constants.AlbumFilterKey
-import com.metrolist.music.constants.AlbumSortDescendingKey
-import com.metrolist.music.constants.AlbumSortType
-import com.metrolist.music.constants.AlbumSortTypeKey
-import com.metrolist.music.constants.ArtistFilter
-import com.metrolist.music.constants.ArtistFilterKey
-import com.metrolist.music.constants.ArtistSongSortDescendingKey
-import com.metrolist.music.constants.ArtistSongSortType
-import com.metrolist.music.constants.ArtistSongSortTypeKey
-import com.metrolist.music.constants.ArtistSortDescendingKey
-import com.metrolist.music.constants.ArtistSortType
-import com.metrolist.music.constants.ArtistSortTypeKey
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.HideYoutubeShortsKey
-import com.metrolist.music.constants.LibraryFilter
-import com.metrolist.music.constants.PlaylistSortDescendingKey
-import com.metrolist.music.constants.PlaylistSortType
-import com.metrolist.music.constants.PlaylistSortTypeKey
-import com.metrolist.music.constants.SongFilter
-import com.metrolist.music.constants.SongFilterKey
-import com.metrolist.music.constants.SongSortDescendingKey
-import com.metrolist.music.constants.SongSortType
-import com.metrolist.music.constants.SongSortTypeKey
-import com.metrolist.music.constants.TopSize
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.extensions.filterExplicit
-import com.metrolist.music.extensions.filterExplicitAlbums
-import com.metrolist.music.extensions.filterVideoSongs
-import com.metrolist.music.extensions.filterYoutubeShorts
-import com.metrolist.music.extensions.matchesNormalizedQuery
-import com.metrolist.music.extensions.normalizeForSearch
-import com.metrolist.music.extensions.toEnum
-import com.metrolist.music.playback.DownloadUtil
-import com.metrolist.music.utils.PodcastRefreshTrigger
-import com.metrolist.music.utils.SyncUtils
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.utils.completed
+import com.nestmusic.music.constants.AlbumFilter
+import com.nestmusic.music.constants.AlbumFilterKey
+import com.nestmusic.music.constants.AlbumSortDescendingKey
+import com.nestmusic.music.constants.AlbumSortType
+import com.nestmusic.music.constants.AlbumSortTypeKey
+import com.nestmusic.music.constants.ArtistFilter
+import com.nestmusic.music.constants.ArtistFilterKey
+import com.nestmusic.music.constants.ArtistSongSortDescendingKey
+import com.nestmusic.music.constants.ArtistSongSortType
+import com.nestmusic.music.constants.ArtistSongSortTypeKey
+import com.nestmusic.music.constants.ArtistSortDescendingKey
+import com.nestmusic.music.constants.ArtistSortType
+import com.nestmusic.music.constants.ArtistSortTypeKey
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.HideYoutubeShortsKey
+import com.nestmusic.music.constants.LibraryFilter
+import com.nestmusic.music.constants.PlaylistSortDescendingKey
+import com.nestmusic.music.constants.PlaylistSortType
+import com.nestmusic.music.constants.PlaylistSortTypeKey
+import com.nestmusic.music.constants.SongFilter
+import com.nestmusic.music.constants.SongFilterKey
+import com.nestmusic.music.constants.SongSortDescendingKey
+import com.nestmusic.music.constants.SongSortType
+import com.nestmusic.music.constants.SongSortTypeKey
+import com.nestmusic.music.constants.TopSize
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.extensions.filterExplicit
+import com.nestmusic.music.extensions.filterExplicitAlbums
+import com.nestmusic.music.extensions.filterVideoSongs
+import com.nestmusic.music.extensions.filterYoutubeShorts
+import com.nestmusic.music.extensions.matchesNormalizedQuery
+import com.nestmusic.music.extensions.normalizeForSearch
+import com.nestmusic.music.extensions.toEnum
+import com.nestmusic.music.playback.DownloadUtil
+import com.nestmusic.music.utils.PodcastRefreshTrigger
+import com.nestmusic.music.utils.SyncUtils
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -465,11 +465,11 @@ constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     // SE "Episodes for Later" playlist fetched from YT Music (like AccountScreen)
-    private val _sePlaylist = MutableStateFlow<com.metrolist.innertube.models.PlaylistItem?>(null)
+    private val _sePlaylist = MutableStateFlow<com.nestmusic.innertube.models.PlaylistItem?>(null)
     val sePlaylist = _sePlaylist.asStateFlow()
 
     // RDPN "New Episodes" playlist fetched from YouTube Music (real thumbnail + episode count)
-    private val _rdpnPlaylist = MutableStateFlow<com.metrolist.innertube.models.PlaylistItem?>(null)
+    private val _rdpnPlaylist = MutableStateFlow<com.nestmusic.innertube.models.PlaylistItem?>(null)
     val rdpnPlaylist = _rdpnPlaylist.asStateFlow()
 
     // Podcast host channels fetched from YT Music library/podcast_channels
@@ -529,7 +529,7 @@ constructor(
     private suspend fun fetchSePlaylist() {
         YouTube.library("FEmusic_liked_playlists").completed().onSuccess {
             _sePlaylist.value = it.items
-                .filterIsInstance<com.metrolist.innertube.models.PlaylistItem>()
+                .filterIsInstance<com.nestmusic.innertube.models.PlaylistItem>()
                 .find { it.id == "SE" }
         }.onFailure {
             timber.log.Timber.e(it, "[PODCAST] Failed to fetch SE playlist")

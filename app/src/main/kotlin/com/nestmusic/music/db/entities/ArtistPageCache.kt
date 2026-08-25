@@ -1,13 +1,13 @@
-﻿package com.nestmusic.music.db.entities
+package com.nestmusic.music.db.entities
 
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.innertube.pages.ArtistSection
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.innertube.pages.ArtistSection
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -130,7 +130,7 @@ fun serializeArtistPage(
     subscriberCountText: String?,
     monthlyListenerCount: String?,
     isSubscribed: Boolean,
-    artist: com.metrolist.innertube.models.ArtistItem? = null,
+    artist: com.nestmusic.innertube.models.ArtistItem? = null,
 ): String {
     val cached = CachedArtistPage(
         artist = artist?.let { CachedArtistItem(it.id, it.title, it.thumbnail, it.channelId, it.isProfile) },
@@ -154,10 +154,10 @@ fun deserializeArtistPage(jsonString: String): CachedArtistPage {
     return json.decodeFromString(jsonString)
 }
 
-fun CachedArtistPage.toArtistPage(): com.metrolist.innertube.pages.ArtistPage {
-    return com.metrolist.innertube.pages.ArtistPage(
+fun CachedArtistPage.toArtistPage(): com.nestmusic.innertube.pages.ArtistPage {
+    return com.nestmusic.innertube.pages.ArtistPage(
         artist = artist?.let { cached ->
-            com.metrolist.innertube.models.ArtistItem(
+            com.nestmusic.innertube.models.ArtistItem(
                 id = cached.id,
                 title = cached.title,
                 thumbnail = cached.thumbnail,
@@ -167,7 +167,7 @@ fun CachedArtistPage.toArtistPage(): com.metrolist.innertube.pages.ArtistPage {
                 radioEndpoint = null,
                 isProfile = cached.isProfile,
             )
-        } ?: com.metrolist.innertube.models.ArtistItem(
+        } ?: com.nestmusic.innertube.models.ArtistItem(
             id = "",
             title = "",
             thumbnail = null,
@@ -179,7 +179,7 @@ fun CachedArtistPage.toArtistPage(): com.metrolist.innertube.pages.ArtistPage {
                 title = section.title,
                 items = section.items.map { it.toYTItem() },
                 moreEndpoint = section.moreBrowseId?.let { browseId ->
-                    com.metrolist.innertube.models.BrowseEndpoint(
+                    com.nestmusic.innertube.models.BrowseEndpoint(
                         browseId = browseId,
                         params = section.moreParams,
                     )
@@ -200,8 +200,8 @@ private fun CachedItem.toYTItem(): YTItem {
             title = title,
             thumbnail = thumbnail,
             explicit = explicit,
-            artists = artists.map { com.metrolist.innertube.models.Artist(it.name, it.id) },
-            album = album?.let { com.metrolist.innertube.models.Album(it.name, it.id) },
+            artists = artists.map { com.nestmusic.innertube.models.Artist(it.name, it.id) },
+            album = album?.let { com.nestmusic.innertube.models.Album(it.name, it.id) },
             duration = duration,
             setVideoId = videoId,
         )
@@ -212,14 +212,14 @@ private fun CachedItem.toYTItem(): YTItem {
             title = title,
             thumbnail = thumbnail,
             explicit = explicit,
-            artists = artists.map { com.metrolist.innertube.models.Artist(it.name, it.id) }.ifEmpty { null },
+            artists = artists.map { com.nestmusic.innertube.models.Artist(it.name, it.id) }.ifEmpty { null },
             year = year,
         )
         is CachedItem.Playlist -> PlaylistItem(
             id = id,
             title = title,
             thumbnail = thumbnail.takeIf { it.isNotBlank() },
-            author = author?.let { com.metrolist.innertube.models.Artist(it.name, it.id) },
+            author = author?.let { com.nestmusic.innertube.models.Artist(it.name, it.id) },
             songCountText = songCountText,
             playEndpoint = null,
             shuffleEndpoint = null,
@@ -239,7 +239,7 @@ private fun CachedItem.toYTItem(): YTItem {
             id = id,
             title = title,
             thumbnail = thumbnail.takeIf { it.isNotBlank() },
-            author = author?.let { com.metrolist.innertube.models.Artist(it.name, it.id) },
+            author = author?.let { com.nestmusic.innertube.models.Artist(it.name, it.id) },
             episodeCountText = episodeCountText,
             playEndpoint = null,
             shuffleEndpoint = null,
@@ -250,8 +250,8 @@ private fun CachedItem.toYTItem(): YTItem {
             title = title,
             thumbnail = thumbnail,
             explicit = explicit,
-            author = author?.let { com.metrolist.innertube.models.Artist(it.name, it.id) },
-            podcast = album?.let { com.metrolist.innertube.models.Album(it.name, it.id) },
+            author = author?.let { com.nestmusic.innertube.models.Artist(it.name, it.id) },
+            podcast = album?.let { com.nestmusic.innertube.models.Album(it.name, it.id) },
             duration = duration,
             endpoint = null,
         )

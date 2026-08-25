@@ -1,6 +1,6 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.AlbumItem
 
 data class ExplorePage(
     val newReleaseAlbums: List<AlbumItem>,

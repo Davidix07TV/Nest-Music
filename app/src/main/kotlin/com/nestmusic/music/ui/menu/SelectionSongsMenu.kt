@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -46,24 +46,24 @@ import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.LocalSyncUtils
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.PlaylistSongMap
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.LocalSyncUtils
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.PlaylistSongMap
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,7 +85,7 @@ fun SelectionSongMenu(
     val playerConnection = LocalPlayerConnection.current ?: return
     val syncUtils = LocalSyncUtils.current
     val deletedNSongsTemplate = stringResource(R.string.deleted_n_songs)
-    val listenTogetherManager = com.metrolist.music.LocalListenTogetherManager.current
+    val listenTogetherManager = com.nestmusic.music.LocalListenTogetherManager.current
     val isGuest = listenTogetherManager?.isInRoom == true && listenTogetherManager.isHost == false
 
     val allInLibrary by remember {
@@ -673,7 +673,7 @@ fun SelectionMediaMetadataMenu(
     val downloadUtil = LocalDownloadUtil.current
     val coroutineScope = rememberCoroutineScope()
     val playerConnection = LocalPlayerConnection.current ?: return
-    val listenTogetherManager = com.metrolist.music.LocalListenTogetherManager.current
+    val listenTogetherManager = com.nestmusic.music.LocalListenTogetherManager.current
     val isGuest = listenTogetherManager?.isInRoom == true && listenTogetherManager.isHost == false
 
     val allLiked by remember(songSelection) {

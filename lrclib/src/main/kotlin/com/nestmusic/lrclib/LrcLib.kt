@@ -1,8 +1,8 @@
 ﻿package com.nestmusic.lrclib
 
-import com.metrolist.lrclib.models.Track
-import com.metrolist.lrclib.models.bestMatchingFor
-import com.metrolist.lrclib.models.bestMatchingForRelaxed
+import com.nestmusic.lrclib.models.Track
+import com.nestmusic.lrclib.models.bestMatchingFor
+import com.nestmusic.lrclib.models.bestMatchingForRelaxed
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -40,7 +40,6 @@ object LrcLib {
     private val titleCleanupPatterns = listOf(
         Regex("""\s*\(.*?(official|video|audio|lyrics|lyric|visualizer|hd|hq|4k|remaster|remix|live|acoustic|version|edit|extended|radio|clean|explicit).*?\)""", RegexOption.IGNORE_CASE),
         Regex("""\s*\[.*?(official|video|audio|lyrics|lyric|visualizer|hd|hq|4k|remaster|remix|live|acoustic|version|edit|extended|radio|clean|explicit).*?\]""", RegexOption.IGNORE_CASE),
-        Regex("""\s*【.*?】"""),
         Regex("""\s*\|.*$"""),
         Regex("""\s*-\s*(official|video|audio|lyrics|lyric|visualizer).*$""", RegexOption.IGNORE_CASE),
         Regex("""\s*\(feat\..*?\)""", RegexOption.IGNORE_CASE),
@@ -152,7 +151,7 @@ object LrcLib {
                 }?.let(LrcLib::Lyrics)
             }
             else -> {
-                // Try with relaxed duration matching (±5 seconds instead of ±2)
+                // Try with relaxed duration matching (�5 seconds instead of �2)
                 tracks.bestMatchingForRelaxed(duration)?.let { track ->
                     track.syncedLyrics ?: track.plainLyrics
                 }?.let(LrcLib::Lyrics)
@@ -205,7 +204,7 @@ object LrcLib {
                     count++
                     track.syncedLyrics.let(callback)
                 } else {
-                    // Relaxed duration matching (±5 seconds)
+                    // Relaxed duration matching (�5 seconds)
                     if (track.syncedLyrics != null && abs(track.duration.toInt() - duration) <= 5) {
                         count++
                         track.syncedLyrics.let(callback)

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -84,44 +84,44 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.AiProviderKey
-import com.metrolist.music.constants.AiSystemPromptKey
-import com.metrolist.music.constants.DeeplApiKey
-import com.metrolist.music.constants.DeeplFormalityKey
-import com.metrolist.music.constants.LyricsClickKey
-import com.metrolist.music.constants.LyricsRomanizeAsMainKey
-import com.metrolist.music.constants.LyricsRomanizeCyrillicByLineKey
-import com.metrolist.music.constants.LyricsRomanizeList
-import com.metrolist.music.constants.LyricsTextPositionKey
-import com.metrolist.music.constants.OpenRouterApiKey
-import com.metrolist.music.constants.OpenRouterBaseUrlKey
-import com.metrolist.music.constants.OpenRouterDefaultBaseUrl
-import com.metrolist.music.constants.OpenRouterDefaultModel
-import com.metrolist.music.constants.OpenRouterModelKey
-import com.metrolist.music.constants.PlayerBackgroundStyle
-import com.metrolist.music.constants.PlayerBackgroundStyleKey
-import com.metrolist.music.constants.RespectAgentPositioningKey
-import com.metrolist.music.constants.ShowIntervalIndicatorKey
-import com.metrolist.music.constants.TranslateLanguageKey
-import com.metrolist.music.constants.TranslateModeKey
-import com.metrolist.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
-import com.metrolist.music.lyrics.LyricsResyncHelper
-import com.metrolist.music.lyrics.LyricsTranslationHelper
-import com.metrolist.music.lyrics.LyricsUtils.findActiveLineIndices
-import com.metrolist.music.lyrics.lyricsTextLooksSynced
-import com.metrolist.music.ui.component.shimmer.ShimmerHost
-import com.metrolist.music.ui.component.shimmer.TextPlaceholder
-import com.metrolist.music.ui.screens.settings.LyricsPosition
-import com.metrolist.music.ui.screens.settings.defaultList
-import com.metrolist.music.ui.utils.fadingEdge
-import com.metrolist.music.utils.ComposeToImage
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.LyricsViewModel
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AiProviderKey
+import com.nestmusic.music.constants.AiSystemPromptKey
+import com.nestmusic.music.constants.DeeplApiKey
+import com.nestmusic.music.constants.DeeplFormalityKey
+import com.nestmusic.music.constants.LyricsClickKey
+import com.nestmusic.music.constants.LyricsRomanizeAsMainKey
+import com.nestmusic.music.constants.LyricsRomanizeCyrillicByLineKey
+import com.nestmusic.music.constants.LyricsRomanizeList
+import com.nestmusic.music.constants.LyricsTextPositionKey
+import com.nestmusic.music.constants.OpenRouterApiKey
+import com.nestmusic.music.constants.OpenRouterBaseUrlKey
+import com.nestmusic.music.constants.OpenRouterDefaultBaseUrl
+import com.nestmusic.music.constants.OpenRouterDefaultModel
+import com.nestmusic.music.constants.OpenRouterModelKey
+import com.nestmusic.music.constants.PlayerBackgroundStyle
+import com.nestmusic.music.constants.PlayerBackgroundStyleKey
+import com.nestmusic.music.constants.RespectAgentPositioningKey
+import com.nestmusic.music.constants.ShowIntervalIndicatorKey
+import com.nestmusic.music.constants.TranslateLanguageKey
+import com.nestmusic.music.constants.TranslateModeKey
+import com.nestmusic.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
+import com.nestmusic.music.lyrics.LyricsResyncHelper
+import com.nestmusic.music.lyrics.LyricsTranslationHelper
+import com.nestmusic.music.lyrics.LyricsUtils.findActiveLineIndices
+import com.nestmusic.music.lyrics.lyricsTextLooksSynced
+import com.nestmusic.music.ui.component.shimmer.ShimmerHost
+import com.nestmusic.music.ui.component.shimmer.TextPlaceholder
+import com.nestmusic.music.ui.screens.settings.LyricsPosition
+import com.nestmusic.music.ui.screens.settings.defaultList
+import com.nestmusic.music.ui.utils.fadingEdge
+import com.nestmusic.music.utils.ComposeToImage
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.LyricsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
@@ -184,7 +184,7 @@ fun ExperimentalLyrics(
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
     val translationStatus by LyricsTranslationHelper.status.collectAsStateWithLifecycle()
     val currentLyricsEntity by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
-    var lastValidLyricsEntity by remember { mutableStateOf<com.metrolist.music.db.entities.LyricsEntity?>(null) }
+    var lastValidLyricsEntity by remember { mutableStateOf<com.nestmusic.music.db.entities.LyricsEntity?>(null) }
     
     LaunchedEffect(currentLyricsEntity) {
         if (currentLyricsEntity != null) {

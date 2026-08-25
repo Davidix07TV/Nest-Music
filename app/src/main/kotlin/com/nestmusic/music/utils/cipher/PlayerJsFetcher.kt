@@ -1,6 +1,6 @@
-ï»¿package com.nestmusic.music.utils.cipher
+package com.nestmusic.music.utils.cipher
 
-import com.metrolist.innertube.YouTube
+import com.nestmusic.innertube.YouTube
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -108,7 +108,7 @@ object PlayerJsFetcher {
             val cacheDir = getCacheDir()
             if (cacheDir.exists()) {
                 // Only the player.js cache (player_*.js + current_hash.txt) belongs to this fetcher.
-                // The dir is shared with PlayerConfigStore (configs_remote.json/.meta) â€” do NOT wipe
+                // The dir is shared with PlayerConfigStore (configs_remote.json/.meta) — do NOT wipe
                 // those, or every decipher retry destroys the config ETag and forces a full
                 // non-conditional re-download of the config file.
                 val files = cacheDir.listFiles()?.filter {
@@ -153,7 +153,7 @@ object PlayerJsFetcher {
             Timber.tag(TAG).d("Cache age: ${ageHours}h (TTL: ${CACHE_TTL_MS / (1000 * 60 * 60)}h)")
 
             // Check TTL (in-range: a future timestamp from a backward clock step counts as
-            // expired, not fresh â€” see PlayerConfigStore.withinWindow).
+            // expired, not fresh — see PlayerConfigStore.withinWindow).
             if (!PlayerConfigStore.withinWindow(System.currentTimeMillis(), timestamp, CACHE_TTL_MS)) {
                 Timber.tag(TAG).d("Cache expired (hash=$hash, age=${ageHours}h)")
                 return null

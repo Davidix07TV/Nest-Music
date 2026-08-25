@@ -1,13 +1,13 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.Album
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.MusicMultiRowListItemRenderer
-import com.metrolist.innertube.models.MusicResponsiveListItemRenderer
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.splitBySeparator
-import com.metrolist.innertube.utils.parseTime
+import com.nestmusic.innertube.models.Album
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.MusicMultiRowListItemRenderer
+import com.nestmusic.innertube.models.MusicResponsiveListItemRenderer
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.splitBySeparator
+import com.nestmusic.innertube.utils.parseTime
 
 data class PodcastPage(
     val podcast: PodcastItem,

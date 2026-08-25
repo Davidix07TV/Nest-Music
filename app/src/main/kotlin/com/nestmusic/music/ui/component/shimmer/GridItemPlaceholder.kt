@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -21,12 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.metrolist.music.constants.GridItemSize
-import com.metrolist.music.constants.GridItemsSizeKey
-import com.metrolist.music.constants.GridThumbnailHeight
-import com.metrolist.music.constants.SmallGridThumbnailHeight
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.utils.rememberEnumPreference
+import com.nestmusic.music.constants.GridItemSize
+import com.nestmusic.music.constants.GridItemsSizeKey
+import com.nestmusic.music.constants.GridThumbnailHeight
+import com.nestmusic.music.constants.SmallGridThumbnailHeight
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.utils.rememberEnumPreference
 
 @Composable
 fun GridItemPlaceHolder(

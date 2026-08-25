@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -15,13 +15,13 @@ import androidx.media3.datasource.cache.ContentMetadataMutations
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
-import com.metrolist.music.constants.MaxSongCacheSizeKey
-import com.metrolist.music.db.InternalDatabase
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.listentogether.ListenTogetherClient
-import com.metrolist.music.listentogether.ListenTogetherManager
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
+import com.nestmusic.music.constants.MaxSongCacheSizeKey
+import com.nestmusic.music.db.InternalDatabase
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.listentogether.ListenTogetherClient
+import com.nestmusic.music.listentogether.ListenTogetherManager
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

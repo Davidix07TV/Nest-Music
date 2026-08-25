@@ -1,8 +1,8 @@
-﻿package com.nestmusic.lastfm
+package com.nestmusic.lastfm
 
-import com.metrolist.lastfm.models.Authentication
-import com.metrolist.lastfm.models.LastFmError
-import com.metrolist.lastfm.models.TokenResponse
+import com.nestmusic.lastfm.models.Authentication
+import com.nestmusic.lastfm.models.LastFmError
+import com.nestmusic.lastfm.models.TokenResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp

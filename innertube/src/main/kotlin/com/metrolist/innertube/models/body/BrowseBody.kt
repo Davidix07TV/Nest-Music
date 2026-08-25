@@ -1,7 +1,7 @@
-package com.metrolist.innertube.models.body
+package com.nestmusic.innertube.models.body
 
-import com.metrolist.innertube.models.Context
-import com.metrolist.innertube.models.Continuation
+import com.nestmusic.innertube.models.Context
+import com.nestmusic.innertube.models.Continuation
 import kotlinx.serialization.Serializable
 
 @Serializable

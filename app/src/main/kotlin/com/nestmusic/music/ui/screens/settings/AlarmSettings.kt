@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.screens.settings
+package com.nestmusic.music.ui.screens.settings
 
 import android.app.AlarmManager
 import android.content.ActivityNotFoundException
@@ -51,15 +51,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.playback.alarm.MusicAlarmEntry
-import com.metrolist.music.playback.alarm.MusicAlarmScheduler
-import com.metrolist.music.playback.alarm.MusicAlarmStore
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.playback.alarm.MusicAlarmEntry
+import com.nestmusic.music.playback.alarm.MusicAlarmScheduler
+import com.nestmusic.music.playback.alarm.MusicAlarmStore
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -213,7 +213,7 @@ fun AlarmSettingsSection(showTitle: Boolean = true) {
                             }
                         val description = buildString {
                             append(playlistTitle)
-                            append(" • ")
+                            append(" � ")
                             append(if (alarm.randomSong) randomEnabledText else randomDisabledText)
                             append("\n")
                             append(stringResource(R.string.alarm_next_prefix, triggerText))

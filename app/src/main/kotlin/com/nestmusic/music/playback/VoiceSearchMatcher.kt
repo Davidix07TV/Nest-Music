@@ -1,6 +1,6 @@
-﻿package com.nestmusic.music.playback
+package com.nestmusic.music.playback
 
-import com.metrolist.music.db.entities.Song
+import com.nestmusic.music.db.entities.Song
 
 object VoiceSearchMatcher {
     const val STRONG_MATCH_THRESHOLD = 0.60

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -38,7 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.metrolist.music.utils.reportException
+import com.nestmusic.music.utils.reportException
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,28 +53,28 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.music.BuildConfig
-import com.metrolist.music.R
-import com.metrolist.music.constants.AccountChannelHandleKey
-import com.metrolist.music.constants.AccountEmailKey
-import com.metrolist.music.constants.AccountNameKey
-import com.metrolist.music.constants.DataSyncIdKey
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.UseLoginForBrowse
-import com.metrolist.music.constants.VisitorDataKey
-import com.metrolist.music.constants.YtmSyncKey
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.InfoLabel
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.component.PreferenceEntry
-import com.metrolist.music.ui.component.TextFieldDialog
-import com.metrolist.music.utils.Updater
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.AccountSettingsViewModel
-import com.metrolist.music.viewmodels.HomeViewModel
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.music.BuildConfig
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AccountChannelHandleKey
+import com.nestmusic.music.constants.AccountEmailKey
+import com.nestmusic.music.constants.AccountNameKey
+import com.nestmusic.music.constants.DataSyncIdKey
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.UseLoginForBrowse
+import com.nestmusic.music.constants.VisitorDataKey
+import com.nestmusic.music.constants.YtmSyncKey
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.InfoLabel
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.component.PreferenceEntry
+import com.nestmusic.music.ui.component.TextFieldDialog
+import com.nestmusic.music.utils.Updater
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.AccountSettingsViewModel
+import com.nestmusic.music.viewmodels.HomeViewModel
 
 @Composable
 fun AccountSettings(
@@ -235,7 +235,7 @@ fun AccountSettings(
                 maxLines = 20,
                 isInputValid = { fullText ->
                     // Extract the cookie value from the formatted template line,
-                    // then validate it separately — avoids the bug where parseCookieString
+                    // then validate it separately � avoids the bug where parseCookieString
                     // received the entire multi-line template and failed to find "SAPISID"
                     // as a key because the "***INNERTUBE COOKIE*** =" prefix shadowed it.
                     val cookieLine = fullText.lines()

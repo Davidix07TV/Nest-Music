@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -57,9 +57,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.R
-import com.metrolist.music.ui.screens.settings.AccountSettings
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.screens.settings.AccountSettings
 import kotlinx.coroutines.delay
 
 @Composable

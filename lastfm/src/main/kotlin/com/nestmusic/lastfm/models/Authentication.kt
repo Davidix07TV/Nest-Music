@@ -1,4 +1,4 @@
-﻿package com.nestmusic.lastfm.models
+package com.nestmusic.lastfm.models
 
 import kotlinx.serialization.Serializable
 

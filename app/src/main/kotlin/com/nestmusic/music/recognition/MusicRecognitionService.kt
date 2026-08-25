@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Music Recognition Feature
  * 
  * This feature is based on the original MusicRecognizer project by Aleksey Saenko.
@@ -17,9 +17,9 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.core.content.ContextCompat
-import com.metrolist.shazamkit.Shazam
-import com.metrolist.shazamkit.models.RecognitionResult
-import com.metrolist.shazamkit.models.RecognitionStatus
+import com.nestmusic.shazamkit.Shazam
+import com.nestmusic.shazamkit.models.RecognitionResult
+import com.nestmusic.shazamkit.models.RecognitionStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,4 +1,4 @@
-﻿package com.nestmusic.kugou.models
+package com.nestmusic.kugou.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -16,7 +16,7 @@ data class SearchLyricsResponse(
     data class Candidate(
         val id: Long,
         @SerialName("product_from")
-        val productFrom: String, // Consider choosing '官方推荐歌词'
+        val productFrom: String, // Consider choosing '??????'
         val duration: Long,
         val accesskey: String,
     )

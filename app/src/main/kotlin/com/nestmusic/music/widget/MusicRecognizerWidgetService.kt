@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -25,12 +25,12 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.crossfade
 import coil3.toBitmap
-import com.metrolist.music.MainActivity
-import com.metrolist.music.R
-import com.metrolist.music.db.DatabaseDao
-import com.metrolist.music.db.entities.RecognitionHistory
-import com.metrolist.music.recognition.MusicRecognitionService
-import com.metrolist.shazamkit.models.RecognitionStatus
+import com.nestmusic.music.MainActivity
+import com.nestmusic.music.R
+import com.nestmusic.music.db.DatabaseDao
+import com.nestmusic.music.db.entities.RecognitionHistory
+import com.nestmusic.music.recognition.MusicRecognitionService
+import com.nestmusic.shazamkit.models.RecognitionStatus
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -90,7 +90,7 @@ class MusicRecognizerWidgetService : Service() {
         return START_NOT_STICKY
     }
 
-    // ─── Foreground notification ──────────────────────────────────────────────
+    // --- Foreground notification ----------------------------------------------
 
     private fun startForegroundNotification() {
         val openAppIntent = PendingIntent.getActivity(
@@ -130,7 +130,7 @@ class MusicRecognizerWidgetService : Service() {
         }
     }
 
-    // ─── Recognition flow ─────────────────────────────────────────────────────
+    // --- Recognition flow -----------------------------------------------------
 
     private fun startRecognition() {
         Timber.tag(TAG).d("Starting widget music recognition")
@@ -200,7 +200,7 @@ class MusicRecognizerWidgetService : Service() {
                         }
                     }
                     is RecognitionStatus.NoMatch -> {
-                        Timber.tag(TAG).i("Widget recognition: no match — %s", result.message)
+                        Timber.tag(TAG).i("Widget recognition: no match � %s", result.message)
                         prefs.edit()
                             .putInt(PREF_STATE, STATE_NO_MATCH)
                             .putString(PREF_ERROR_MESSAGE, result.message)
@@ -288,7 +288,7 @@ class MusicRecognizerWidgetService : Service() {
         return output
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
+    // --- Helpers -------------------------------------------------------------
 
     private fun stopRecognitionAndService() {
         Timber.tag(TAG).d("Stopping recognition and service")
@@ -341,11 +341,11 @@ class MusicRecognizerWidgetService : Service() {
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
-    // ─── Constants ────────────────────────────────────────────────────────────
+    // --- Constants ------------------------------------------------------------
 
     companion object {
-        const val ACTION_START_RECOGNITION = "com.metrolist.music.widget.recognizer.START"
-        const val ACTION_STOP_RECOGNITION = "com.metrolist.music.widget.recognizer.STOP"
+        const val ACTION_START_RECOGNITION = "com.nestmusic.music.widget.recognizer.START"
+        const val ACTION_STOP_RECOGNITION = "com.nestmusic.music.widget.recognizer.STOP"
 
         const val PREFS_NAME = "recognizer_widget_prefs"
         const val PREF_STATE = "state"

@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.utils.potoken
+package com.nestmusic.music.utils.potoken
 
 class PoTokenResult(
     val playerRequestPoToken: String,

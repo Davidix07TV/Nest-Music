@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -7,12 +7,12 @@ package com.nestmusic.music.lyrics
 
 import android.content.Context
 import android.util.LruCache
-import com.metrolist.music.constants.LyricsProviderOrderKey
-import com.metrolist.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.utils.NetworkConnectivityObserver
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.reportException
+import com.nestmusic.music.constants.LyricsProviderOrderKey
+import com.nestmusic.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.utils.NetworkConnectivityObserver
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope

@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -8,21 +8,21 @@ package com.nestmusic.music.utils
 import android.net.ConnectivityManager
 import android.net.Uri
 import androidx.media3.common.PlaybackException
-import com.metrolist.innertube.NewPipeExtractor
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.YouTubeClient
-import com.metrolist.innertube.models.YouTubeClient.Companion.WEB_REMIX
-import com.metrolist.innertube.models.response.PlayerResponse
-import com.metrolist.innertube.strategy.ContentAwareFallbackStrategy
-import com.metrolist.innertube.strategy.ContentHints
-import com.metrolist.music.constants.AudioQuality
-import com.metrolist.music.utils.YTPlayerUtils.MAIN_CLIENT
-import com.metrolist.music.utils.YTPlayerUtils.validateStatus
-import com.metrolist.music.utils.cipher.CipherDeobfuscator
-import com.metrolist.music.utils.cipher.FunctionNameExtractor
-import com.metrolist.music.utils.cipher.PlayerJsFetcher
-import com.metrolist.music.utils.potoken.PoTokenGenerator
-import com.metrolist.music.utils.potoken.PoTokenResult
+import com.nestmusic.innertube.NewPipeExtractor
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.YouTubeClient
+import com.nestmusic.innertube.models.YouTubeClient.Companion.WEB_REMIX
+import com.nestmusic.innertube.models.response.PlayerResponse
+import com.nestmusic.innertube.strategy.ContentAwareFallbackStrategy
+import com.nestmusic.innertube.strategy.ContentHints
+import com.nestmusic.music.constants.AudioQuality
+import com.nestmusic.music.utils.YTPlayerUtils.MAIN_CLIENT
+import com.nestmusic.music.utils.YTPlayerUtils.validateStatus
+import com.nestmusic.music.utils.cipher.CipherDeobfuscator
+import com.nestmusic.music.utils.cipher.FunctionNameExtractor
+import com.nestmusic.music.utils.cipher.PlayerJsFetcher
+import com.nestmusic.music.utils.potoken.PoTokenGenerator
+import com.nestmusic.music.utils.potoken.PoTokenResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -80,7 +80,7 @@ object YTPlayerUtils {
     private val MAIN_CLIENT: YouTubeClient = WEB_REMIX
     private val fallbackStrategy = ContentAwareFallbackStrategy()
 
-    /** Client names disabled by the user in Settings â†’ Stream sources. Updated reactively by MusicService. */
+    /** Client names disabled by the user in Settings ? Stream sources. Updated reactively by MusicService. */
     @Volatile
     var disabledStreamClients: Set<String> = emptySet()
 
@@ -90,7 +90,7 @@ object YTPlayerUtils {
     private const val POTOKEN_WARMUP_VIDEO_ID = "jNQXAC9IVRw"
 
     /**
-     * Best-effort warm-up of the PoToken/BotGuard generator (BotGuard cold-start is ~2â€“5s) so the
+     * Best-effort warm-up of the PoToken/BotGuard generator (BotGuard cold-start is ~2–5s) so the
      * first real playback skips it. Requires a session (visitorData); the caller should gate this on
      * visitorData being ready. The cipher WebView warm-up is separate (CipherDeobfuscator.prewarm)
      * since it needs no session. Failure is swallowed; playback falls back to lazy init unchanged.
@@ -363,7 +363,7 @@ object YTPlayerUtils {
                             Timber.tag(TAG).d("  Final URL length (with pot): ${streamUrl.length}")
                         }
                     } catch (e: kotlinx.coroutines.CancellationException) {
-                        throw e // request superseded/cancelled â€” abort cleanly, don't validate an un-transformed URL
+                        throw e // request superseded/cancelled — abort cleanly, don't validate an un-transformed URL
                     } catch (e: Exception) {
                         Timber.tag(TAG).e(e, "N-transform or pot append failed: ${e.message}")
                         Timber.tag(TAG).e("Stack trace: ${e.stackTraceToString().take(500)}")
@@ -435,7 +435,7 @@ object YTPlayerUtils {
                 if (currentClient.clientName == "WEB_REMIX" &&
                     !isUgcOrPodcast
                 ) {
-                    Timber.tag(logTag).d("WEB_REMIX â€” skipping HEAD validation, letting ExoPlayer try directly")
+                    Timber.tag(logTag).d("WEB_REMIX — skipping HEAD validation, letting ExoPlayer try directly")
                     Timber.tag(TAG).i("Playback: client=${currentClient.clientName}, videoId=$videoId")
                     successClient = currentClient
                     break
@@ -451,10 +451,10 @@ object YTPlayerUtils {
                 } else {
                     Timber.tag(logTag).d("Stream validation failed for client: ${currentClient.clientName}")
                     // A cipher client failing validation can mean a wrong-but-non-throwing signature
-                    // from a stale/wrong player config â€” caught here at resolution, so it never
+                    // from a stale/wrong player config — caught here at resolution, so it never
                     // reaches ExoPlayer and MusicService's 403 handler never fires. Ask the cipher to
                     // re-fetch its config (rate-limited, off this coroutine); if it changes, the
-                    // cipher rebuilds its WebView and the next resolution returns to this client â€” no
+                    // cipher rebuilds its WebView and the next resolution returns to this client — no
                     // app restart. This is what covers WEB_CREATOR/TVHTML5/WEB-only users.
                     if (needsNTransform) {
                         cipherRefreshScope.launch {
@@ -737,7 +737,7 @@ object YTPlayerUtils {
                     }
                     cipherSts != null -> {
                         // Non-fatal: the cipher player's STS already covers us, so NewPipe is just
-                        // a fallback here â€” don't report its failure as an exception (avoids noise).
+                        // a fallback here — don't report its failure as an exception (avoids noise).
                         Timber.tag(logTag).w("NewPipe STS unavailable, using cipher player STS: ${error.message}")
                     }
                     else -> {

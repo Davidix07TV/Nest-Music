@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -51,25 +51,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
-import com.metrolist.lastfm.LastFM
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.EnableLastFMScrobblingKey
-import com.metrolist.music.constants.LastFMSessionKey
-import com.metrolist.music.constants.LastFMUseNowPlaying
-import com.metrolist.music.constants.LastFMUseSendLikes
-import com.metrolist.music.constants.LastFMUsernameKey
-import com.metrolist.music.constants.ScrobbleDelayPercentKey
-import com.metrolist.music.constants.ScrobbleDelaySecondsKey
-import com.metrolist.music.constants.ScrobbleMinSongDurationKey
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.utils.reportException
+import com.nestmusic.lastfm.LastFM
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.EnableLastFMScrobblingKey
+import com.nestmusic.music.constants.LastFMSessionKey
+import com.nestmusic.music.constants.LastFMUseNowPlaying
+import com.nestmusic.music.constants.LastFMUseSendLikes
+import com.nestmusic.music.constants.LastFMUsernameKey
+import com.nestmusic.music.constants.ScrobbleDelayPercentKey
+import com.nestmusic.music.constants.ScrobbleDelaySecondsKey
+import com.nestmusic.music.constants.ScrobbleMinSongDurationKey
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.utils.reportException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt

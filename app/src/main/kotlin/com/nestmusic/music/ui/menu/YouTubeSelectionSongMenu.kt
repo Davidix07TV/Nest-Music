@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -36,20 +36,20 @@ import androidx.core.net.toUri
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.LocalSyncUtils
-import com.metrolist.music.R
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.LocalSyncUtils
+import com.nestmusic.music.R
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -70,7 +70,7 @@ fun YouTubeSelectionSongMenu(
         mutableStateOf(false)
     }
 
-    val listenTogetherManager = com.metrolist.music.LocalListenTogetherManager.current
+    val listenTogetherManager = com.nestmusic.music.LocalListenTogetherManager.current
     val isGuest = listenTogetherManager?.isInRoom == true && listenTogetherManager.isHost == false
 
     var downloadState by remember {
@@ -130,9 +130,9 @@ fun YouTubeSelectionSongMenu(
                     .map { song ->
                         // Convert SongItem to Song entity
                         val metadata = song.toMediaMetadata()
-                        com.metrolist.music.db.entities.Song(
+                        com.nestmusic.music.db.entities.Song(
                             song =
-                                com.metrolist.music.db.entities.SongEntity(
+                                com.nestmusic.music.db.entities.SongEntity(
                                     id = metadata.id,
                                     title = metadata.title,
                                     duration = metadata.duration,
@@ -148,14 +148,14 @@ fun YouTubeSelectionSongMenu(
                                 ),
                             artists =
                                 metadata.artists.map { artist ->
-                                    com.metrolist.music.db.entities.ArtistEntity(
+                                    com.nestmusic.music.db.entities.ArtistEntity(
                                         id = artist.id ?: "",
                                         name = artist.name,
                                     )
                                 },
                             album =
                                 metadata.album?.let { album ->
-                                    com.metrolist.music.db.entities.AlbumEntity(
+                                    com.nestmusic.music.db.entities.AlbumEntity(
                                         id = album.id,
                                         title = album.title,
                                         thumbnailUrl = metadata.thumbnailUrl, // Use song's thumbnail as album thumbnail
@@ -425,7 +425,7 @@ fun YouTubeSelectionSongMenu(
                                         insert(metadata)
                                         // Create SongEntity with toggled like status
                                         val songEntity =
-                                            com.metrolist.music.db.entities.SongEntity(
+                                            com.nestmusic.music.db.entities.SongEntity(
                                                 id = metadata.id,
                                                 title = metadata.title,
                                                 duration = metadata.duration,

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -61,10 +61,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.metrolist.music.lyrics.LyricsEntry
-import com.metrolist.music.lyrics.WordTimestamp
-import com.metrolist.music.playback.PlayerConnection
-import com.metrolist.music.ui.screens.settings.LyricsPosition
+import com.nestmusic.music.lyrics.LyricsEntry
+import com.nestmusic.music.lyrics.WordTimestamp
+import com.nestmusic.music.playback.PlayerConnection
+import com.nestmusic.music.ui.screens.settings.LyricsPosition
 import kotlinx.coroutines.isActive
 import kotlin.math.abs
 import kotlin.math.cos

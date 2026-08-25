@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -78,33 +78,33 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.LocalSyncUtils
-import com.metrolist.music.R
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.db.entities.PlaylistSongMap
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.queues.YouTubePlaylistQueue
-import com.metrolist.music.ui.component.ExpandableText
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.YouTubeListItem
-import com.metrolist.music.ui.menu.YouTubePlaylistMenu
-import com.metrolist.music.ui.menu.YouTubeSelectionSongMenu
-import com.metrolist.music.ui.menu.YouTubeSongMenu
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.OnlinePlaylistViewModel
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.LocalSyncUtils
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.db.entities.PlaylistSongMap
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.queues.YouTubePlaylistQueue
+import com.nestmusic.music.ui.component.ExpandableText
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.ui.menu.YouTubePlaylistMenu
+import com.nestmusic.music.ui.menu.YouTubeSelectionSongMenu
+import com.nestmusic.music.ui.menu.YouTubeSongMenu
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.OnlinePlaylistViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

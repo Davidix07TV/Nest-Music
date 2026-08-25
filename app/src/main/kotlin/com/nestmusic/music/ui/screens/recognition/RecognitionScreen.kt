@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -80,14 +80,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.RecognitionHistory
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.SearchRoutes
-import com.metrolist.shazamkit.models.RecognitionResult
-import com.metrolist.shazamkit.models.RecognitionStatus
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.RecognitionHistory
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.SearchRoutes
+import com.nestmusic.shazamkit.models.RecognitionResult
+import com.nestmusic.shazamkit.models.RecognitionStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -106,23 +106,23 @@ fun RecognitionScreen(
     // recognition that must not be cancelled; Success/NoMatch/Error are results pending
     // display and history saving.
     LaunchedEffect(Unit) {
-        if (com.metrolist.music.recognition.MusicRecognitionService.recognitionStatus.value
+        if (com.nestmusic.music.recognition.MusicRecognitionService.recognitionStatus.value
                 is RecognitionStatus.Ready
         ) {
-            com.metrolist.music.recognition.MusicRecognitionService
+            com.nestmusic.music.recognition.MusicRecognitionService
                 .reset()
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            com.metrolist.music.recognition.MusicRecognitionService
+            com.nestmusic.music.recognition.MusicRecognitionService
                 .reset()
         }
     }
 
     // Observe recognition status from service for real-time updates (Listening -> Processing -> Result)
-    val recognitionStatus by com.metrolist.music.recognition.MusicRecognitionService.recognitionStatus
+    val recognitionStatus by com.nestmusic.music.recognition.MusicRecognitionService.recognitionStatus
         .collectAsStateWithLifecycle()
 
     var hasPermission by remember {
@@ -139,7 +139,7 @@ fun RecognitionScreen(
             hasPermission = isGranted
             if (isGranted) {
                 coroutineScope.launch {
-                    com.metrolist.music.recognition.MusicRecognitionService
+                    com.nestmusic.music.recognition.MusicRecognitionService
                         .recognize(context)
                 }
             }
@@ -148,7 +148,7 @@ fun RecognitionScreen(
     fun startRecognition() {
         if (hasPermission) {
             coroutineScope.launch {
-                com.metrolist.music.recognition.MusicRecognitionService
+                com.nestmusic.music.recognition.MusicRecognitionService
                     .recognize(context)
             }
         } else {
@@ -158,7 +158,7 @@ fun RecognitionScreen(
 
     LaunchedEffect(Unit) {
         if (autoStart &&
-            com.metrolist.music.recognition.MusicRecognitionService.recognitionStatus.value
+            com.nestmusic.music.recognition.MusicRecognitionService.recognitionStatus.value
                 is RecognitionStatus.Ready
         ) {
             startRecognition()
@@ -166,13 +166,13 @@ fun RecognitionScreen(
     }
 
     fun resetToReady() {
-        com.metrolist.music.recognition.MusicRecognitionService
+        com.nestmusic.music.recognition.MusicRecognitionService
             .reset()
     }
 
     fun saveToHistory(result: RecognitionResult) {
         // Skip if the widget service already persisted this result to avoid a duplicate entry
-        if (com.metrolist.music.recognition.MusicRecognitionService.resultSavedExternally) return
+        if (com.nestmusic.music.recognition.MusicRecognitionService.resultSavedExternally) return
         coroutineScope.launch(Dispatchers.IO) {
             database.query {
                 insert(
@@ -248,7 +248,7 @@ fun RecognitionScreen(
                     is RecognitionStatus.Listening -> {
                         ListeningState(
                             onCancel = {
-                                com.metrolist.music.recognition.MusicRecognitionService
+                                com.nestmusic.music.recognition.MusicRecognitionService
                                     .reset()
                             },
                         )
@@ -502,7 +502,7 @@ private fun SuccessState(
                 Modifier
                     .size(180.dp)
                     .aspectRatio(1f),
-            shape = RoundedCornerShape(com.metrolist.music.constants.ThumbnailCornerRadius),
+            shape = RoundedCornerShape(com.nestmusic.music.constants.ThumbnailCornerRadius),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             AsyncImage(

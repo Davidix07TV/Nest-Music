@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.component
+package com.nestmusic.music.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.mediarouter.media.MediaRouter
-import com.metrolist.music.R
+import com.nestmusic.music.R
 
 @Composable
 fun CastPickerSheet(

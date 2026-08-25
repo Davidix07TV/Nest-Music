@@ -1,10 +1,10 @@
-﻿package com.nestmusic.music.playback.alarm
+package com.nestmusic.music.playback.alarm
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.metrolist.music.playback.MusicService
+import com.nestmusic.music.playback.MusicService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +32,6 @@ class MusicAlarmReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val ACTION_TRIGGER_ALARM = "com.metrolist.music.action.TRIGGER_ALARM"
+        const val ACTION_TRIGGER_ALARM = "com.nestmusic.music.action.TRIGGER_ALARM"
     }
 }

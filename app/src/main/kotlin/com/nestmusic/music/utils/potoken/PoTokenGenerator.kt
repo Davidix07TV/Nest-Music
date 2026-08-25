@@ -1,7 +1,7 @@
-ï»¿package com.nestmusic.music.utils.potoken
+package com.nestmusic.music.utils.potoken
 
 import android.webkit.CookieManager
-import com.metrolist.music.utils.cipher.CipherDeobfuscator
+import com.nestmusic.music.utils.cipher.CipherDeobfuscator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.runBlocking
@@ -72,7 +72,7 @@ class PoTokenGenerator {
     }
 
     private companion object {
-        // Healthy cold-start (WebView spin-up + botguard JS + token gen) is ~2â€“5s in practice;
+        // Healthy cold-start (WebView spin-up + botguard JS + token gen) is ~2–5s in practice;
         // 8s leaves slack for a slow device without making the user wait too long before the
         // fallback chain (ANDROID_VR, etc.) takes over when the WebView hangs.
         const val POTOKEN_TIMEOUT_MS = 8_000L
@@ -90,7 +90,7 @@ class PoTokenGenerator {
             webPoTokenGenLock.withLock {
                 val shouldRecreate =
                     forceRecreate || webPoTokenGenerator == null || webPoTokenGenerator!!.isExpired ||
-                        // Renderer died (OOM kill) â€” recreate proactively instead of letting the
+                        // Renderer died (OOM kill) — recreate proactively instead of letting the
                         // first post-crash generatePoToken() fail against the dead instance.
                         webPoTokenGenerator!!.isDead ||
                         webPoTokenSessionId != sessionId

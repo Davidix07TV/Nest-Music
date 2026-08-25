@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -7,7 +7,7 @@ package com.nestmusic.music.ui.screens.wrapped
 
 import android.content.Context
 import androidx.compose.runtime.compositionLocalOf
-import com.metrolist.music.db.DatabaseDao
+import com.nestmusic.music.db.DatabaseDao
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors

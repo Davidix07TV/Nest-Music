@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -18,17 +18,17 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.strategy.ContentHints
-import com.metrolist.music.constants.AudioQuality
-import com.metrolist.music.constants.AudioQualityKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.FormatEntity
-import com.metrolist.music.db.entities.SongEntity
-import com.metrolist.music.di.DownloadCache
-import com.metrolist.music.di.PlayerCache
-import com.metrolist.music.utils.YTPlayerUtils
-import com.metrolist.music.utils.enumPreference
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.strategy.ContentHints
+import com.nestmusic.music.constants.AudioQuality
+import com.nestmusic.music.constants.AudioQualityKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.FormatEntity
+import com.nestmusic.music.db.entities.SongEntity
+import com.nestmusic.music.di.DownloadCache
+import com.nestmusic.music.di.PlayerCache
+import com.nestmusic.music.utils.YTPlayerUtils
+import com.nestmusic.music.utils.enumPreference
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -159,7 +159,7 @@ constructor(
                     ),
                 )
 
-                // Metadata registration only — dateDownload is intentionally NOT set here.
+                // Metadata registration only � dateDownload is intentionally NOT set here.
                 // It belongs solely to onDownloadChanged()'s STATE_COMPLETED branch below,
                 // which only fires once the download has actually finished. Setting it here
                 // (at URL-resolve time, i.e. the moment the download merely *starts*) would

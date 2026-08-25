@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -10,7 +10,7 @@ import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.metrolist.music.constants.PlayerBackgroundStyle
+import com.nestmusic.music.constants.PlayerBackgroundStyle
 
 /**
  * Player slider color configuration for consistent styling across all slider types

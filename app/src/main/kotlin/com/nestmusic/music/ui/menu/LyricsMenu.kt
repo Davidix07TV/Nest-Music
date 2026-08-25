@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -61,34 +61,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.LyricsEntity
-import com.metrolist.music.db.entities.SongEntity
-import com.metrolist.music.lyrics.LyricsTranslationHelper
-import com.metrolist.music.lyrics.LyricsUtils
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.component.TextFieldDialog
-import com.metrolist.music.viewmodels.LyricsMenuViewModel
-import com.metrolist.music.constants.OpenRouterApiKey
-import com.metrolist.music.constants.DeeplApiKey
-import com.metrolist.music.constants.AiProviderKey
-import com.metrolist.music.constants.TranslateLanguageKey
-import com.metrolist.music.constants.TranslateModeKey
-import com.metrolist.music.constants.RespectAgentPositioningKey
-import com.metrolist.music.constants.ShowIntervalIndicatorKey
-import com.metrolist.music.constants.OpenRouterBaseUrlKey
-import com.metrolist.music.constants.OpenRouterDefaultBaseUrl
-import com.metrolist.music.constants.OpenRouterDefaultModel
-import com.metrolist.music.constants.OpenRouterModelKey
-import com.metrolist.music.constants.DeeplFormalityKey
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.LyricsEntity
+import com.nestmusic.music.db.entities.SongEntity
+import com.nestmusic.music.lyrics.LyricsTranslationHelper
+import com.nestmusic.music.lyrics.LyricsUtils
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.TextFieldDialog
+import com.nestmusic.music.viewmodels.LyricsMenuViewModel
+import com.nestmusic.music.constants.OpenRouterApiKey
+import com.nestmusic.music.constants.DeeplApiKey
+import com.nestmusic.music.constants.AiProviderKey
+import com.nestmusic.music.constants.TranslateLanguageKey
+import com.nestmusic.music.constants.TranslateModeKey
+import com.nestmusic.music.constants.RespectAgentPositioningKey
+import com.nestmusic.music.constants.ShowIntervalIndicatorKey
+import com.nestmusic.music.constants.OpenRouterBaseUrlKey
+import com.nestmusic.music.constants.OpenRouterDefaultBaseUrl
+import com.nestmusic.music.constants.OpenRouterDefaultModel
+import com.nestmusic.music.constants.OpenRouterModelKey
+import com.nestmusic.music.constants.DeeplFormalityKey
+import com.nestmusic.music.utils.rememberPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -506,10 +506,10 @@ fun LyricsMenu(
                                         checked = hasTranslations,
                                         onCheckedChange = { newCheckedState ->
                                             if (newCheckedState) {
-                                                // Enable translations â€“ hasActiveTranslations updates when done
+                                                // Enable translations – hasActiveTranslations updates when done
                                                 LyricsTranslationHelper.triggerManualTranslation()
                                             } else {
-                                                // Disable translations â€“ triggerClearTranslations resets hasActiveTranslations
+                                                // Disable translations – triggerClearTranslations resets hasActiveTranslations
                                                 lyricsProvider()?.let { lyrics ->
                                                     val clearedLyrics = LyricsTranslationHelper.clearTranslations(lyrics)
                                                     database.query {

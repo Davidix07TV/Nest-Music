@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.component
+package com.nestmusic.music.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -23,12 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.music.R
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.ui.utils.resize
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.ui.utils.resize
 
 @Composable
 fun SpeedDialGridItem(

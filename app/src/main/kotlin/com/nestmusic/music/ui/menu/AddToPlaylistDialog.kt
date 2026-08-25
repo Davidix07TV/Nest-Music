@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -30,24 +30,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.R
-import com.metrolist.music.constants.AddToPlaylistSortDescendingKey
-import com.metrolist.music.constants.AddToPlaylistSortTypeKey
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.constants.PlaylistSortType
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.ui.component.CreatePlaylistDialog
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.ListItem
-import com.metrolist.music.ui.component.PlaylistListItem
-import com.metrolist.music.ui.component.SortHeader
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.PlaylistsViewModel
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AddToPlaylistSortDescendingKey
+import com.nestmusic.music.constants.AddToPlaylistSortTypeKey
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.constants.PlaylistSortType
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.ui.component.CreatePlaylistDialog
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.ListItem
+import com.nestmusic.music.ui.component.PlaylistListItem
+import com.nestmusic.music.ui.component.SortHeader
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.PlaylistsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
@@ -73,7 +73,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.FilterChip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.material3.FilterChipDefaults
-import com.metrolist.music.LocalSyncUtils
+import com.nestmusic.music.LocalSyncUtils
 
 @Composable
 fun AddToPlaylistDialog(

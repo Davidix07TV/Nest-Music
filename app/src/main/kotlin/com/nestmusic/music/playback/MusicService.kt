@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -24,8 +24,8 @@ import android.media.AudioDeviceInfo
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
-import com.metrolist.music.playback.audio.VolumeNormalizationAudioProcessor
-import com.metrolist.music.utils.safeDataStoreEdit
+import com.nestmusic.music.playback.audio.VolumeNormalizationAudioProcessor
+import com.nestmusic.music.utils.safeDataStoreEdit
 import android.net.ConnectivityManager
 import android.os.Binder
 import android.os.Build
@@ -92,136 +92,136 @@ import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionToken
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.MoreExecutors
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.strategy.ContentHints
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.lastfm.LastFM
-import com.metrolist.music.MainActivity
-import com.metrolist.music.R
-import com.metrolist.music.constants.AndroidAutoTargetPlaylistKey
-import com.metrolist.music.constants.AudioNormalizationKey
-import com.metrolist.music.constants.AudioOffload
-import com.metrolist.music.constants.AudioQualityKey
-import com.metrolist.music.constants.AudioTrackPlaybackParamsKey
-import com.metrolist.music.constants.AutoDownloadOnLikeKey
-import com.metrolist.music.constants.AutoLoadMoreKey
-import com.metrolist.music.constants.AutoSkipNextOnErrorKey
-import com.metrolist.music.constants.StreamSourceAndroidVRKey
-import com.metrolist.music.constants.StreamSourceTVHTML5Key
-import com.metrolist.music.constants.StreamSourceVisionOSKey
-import com.metrolist.music.constants.StreamSourceWebCreatorKey
-import com.metrolist.music.constants.StreamSourceWebRemixKey
-import com.metrolist.music.constants.AutoplayKey
-import com.metrolist.music.constants.CrossfadeDurationKey
-import com.metrolist.music.constants.CrossfadeEnabledKey
-import com.metrolist.music.constants.CrossfadeGaplessKey
-import com.metrolist.music.constants.DisableLoadMoreWhenRepeatAllKey
-import com.metrolist.music.constants.DiscordActivityNameKey
-import com.metrolist.music.constants.DiscordActivityTypeKey
-import com.metrolist.music.constants.DiscordAdvancedModeKey
-import com.metrolist.music.constants.DiscordButton1EnabledKey
-import com.metrolist.music.constants.DiscordButton1LabelKey
-import com.metrolist.music.constants.DiscordButton1UrlKey
-import com.metrolist.music.constants.DiscordButton2EnabledKey
-import com.metrolist.music.constants.DiscordButton2LabelKey
-import com.metrolist.music.constants.DiscordButton2UrlKey
-import com.metrolist.music.constants.DiscordDetailsTemplateKey
-import com.metrolist.music.constants.DiscordStateTemplateKey
-import com.metrolist.music.constants.DiscordUserStatusKey
-import com.metrolist.music.constants.EnableDiscordRPCKey
-import com.metrolist.music.discord.DiscordActivity
-import com.metrolist.music.discord.DiscordDefaults
-import com.metrolist.music.discord.DiscordRpcManager
-import com.metrolist.music.discord.DiscordActivityBuilder
-import com.metrolist.music.discord.DiscordTemplateRenderer
-import com.metrolist.music.discord.PresenceStatus
-import com.metrolist.music.constants.EnableLastFMScrobblingKey
-import com.metrolist.music.constants.EnableSongCacheKey
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.HistoryDuration
-import com.metrolist.music.constants.LastFMUseNowPlaying
-import com.metrolist.music.constants.MediaSessionConstants
-import com.metrolist.music.constants.MediaSessionConstants.CommandAddToTargetPlaylist
-import com.metrolist.music.constants.MediaSessionConstants.CommandToggleLike
-import com.metrolist.music.constants.MediaSessionConstants.CommandToggleRepeatMode
-import com.metrolist.music.constants.MediaSessionConstants.CommandToggleShuffle
-import com.metrolist.music.constants.MediaSessionConstants.CommandToggleStartRadio
-import com.metrolist.music.constants.PauseListenHistoryKey
-import com.metrolist.music.constants.PauseOnMute
-import com.metrolist.music.constants.PersistentQueueKey
-import com.metrolist.music.constants.PersistentShuffleAcrossQueuesKey
-import com.metrolist.music.constants.PlayerVolumeKey
-import com.metrolist.music.constants.PreventDuplicateTracksInQueueKey
-import com.metrolist.music.constants.RememberShuffleAndRepeatKey
-import com.metrolist.music.constants.RepeatModeKey
-import com.metrolist.music.constants.ResumeOnBluetoothConnectKey
-import com.metrolist.music.constants.ScrobbleDelayPercentKey
-import com.metrolist.music.constants.ScrobbleDelaySecondsKey
-import com.metrolist.music.constants.ScrobbleMinSongDurationKey
-import com.metrolist.music.constants.ShowLyricsKey
-import com.metrolist.music.constants.ShuffleModeKey
-import com.metrolist.music.constants.ShufflePlaylistFirstKey
-import com.metrolist.music.constants.SimilarContent
-import com.metrolist.music.constants.SkipSilenceInstantKey
-import com.metrolist.music.constants.SkipSilenceKey
-import com.metrolist.music.constants.StopMusicOnTaskClearKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.Event
-import com.metrolist.music.db.entities.FormatEntity
-import com.metrolist.music.db.entities.LyricsEntity
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.db.entities.RelatedSongMap
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.di.DownloadCache
-import com.metrolist.music.di.PlayerCache
-import com.metrolist.music.eq.EqualizerService
-import com.metrolist.music.eq.audio.CustomEqualizerAudioProcessor
-import com.metrolist.music.eq.data.EQProfileRepository
-import com.metrolist.music.extensions.SilentHandler
-import com.metrolist.music.extensions.collect
-import com.metrolist.music.extensions.collectLatest
-import com.metrolist.music.extensions.currentMetadata
-import com.metrolist.music.extensions.findNextMediaItemById
-import com.metrolist.music.extensions.mediaItems
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.extensions.setOffloadEnabled
-import com.metrolist.music.extensions.toEnum
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.extensions.toPersistQueue
-import com.metrolist.music.extensions.toQueue
-import com.metrolist.music.lyrics.LyricsHelper
-import com.metrolist.music.models.PersistPlayerState
-import com.metrolist.music.models.PersistQueue
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.alarm.MusicAlarmScheduler
-import com.metrolist.music.playback.alarm.MusicAlarmStore
-import com.metrolist.music.playback.audio.SilenceDetectorAudioProcessor
-import com.metrolist.music.playback.queues.EmptyQueue
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.Queue
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.playback.queues.YouTubePlaylistQueue
-import com.metrolist.music.playback.queues.filterExplicit
-import com.metrolist.music.playback.queues.filterVideoSongs
-import com.metrolist.music.constants.LoudnessLevel
-import com.metrolist.music.constants.LoudnessLevelKey
-import com.metrolist.music.utils.CoilBitmapLoader
-import com.metrolist.music.utils.NetworkConnectivityObserver
-import com.metrolist.music.utils.ScrobbleManager
-import com.metrolist.music.utils.SyncUtils
-import com.metrolist.music.utils.getArtistSeparator
-import com.metrolist.music.utils.joinToArtistString
-import com.metrolist.music.utils.YTPlayerUtils
-import com.metrolist.music.utils.cipher.CipherDeobfuscator
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
-import com.metrolist.music.widget.MetrolistWidgetManager
-import com.metrolist.music.widget.MusicWidgetReceiver
-import com.metrolist.music.widget.PlaylistWidgetReceiver
-import com.metrolist.music.ui.utils.resize
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.strategy.ContentHints
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.lastfm.LastFM
+import com.nestmusic.music.MainActivity
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AndroidAutoTargetPlaylistKey
+import com.nestmusic.music.constants.AudioNormalizationKey
+import com.nestmusic.music.constants.AudioOffload
+import com.nestmusic.music.constants.AudioQualityKey
+import com.nestmusic.music.constants.AudioTrackPlaybackParamsKey
+import com.nestmusic.music.constants.AutoDownloadOnLikeKey
+import com.nestmusic.music.constants.AutoLoadMoreKey
+import com.nestmusic.music.constants.AutoSkipNextOnErrorKey
+import com.nestmusic.music.constants.StreamSourceAndroidVRKey
+import com.nestmusic.music.constants.StreamSourceTVHTML5Key
+import com.nestmusic.music.constants.StreamSourceVisionOSKey
+import com.nestmusic.music.constants.StreamSourceWebCreatorKey
+import com.nestmusic.music.constants.StreamSourceWebRemixKey
+import com.nestmusic.music.constants.AutoplayKey
+import com.nestmusic.music.constants.CrossfadeDurationKey
+import com.nestmusic.music.constants.CrossfadeEnabledKey
+import com.nestmusic.music.constants.CrossfadeGaplessKey
+import com.nestmusic.music.constants.DisableLoadMoreWhenRepeatAllKey
+import com.nestmusic.music.constants.DiscordActivityNameKey
+import com.nestmusic.music.constants.DiscordActivityTypeKey
+import com.nestmusic.music.constants.DiscordAdvancedModeKey
+import com.nestmusic.music.constants.DiscordButton1EnabledKey
+import com.nestmusic.music.constants.DiscordButton1LabelKey
+import com.nestmusic.music.constants.DiscordButton1UrlKey
+import com.nestmusic.music.constants.DiscordButton2EnabledKey
+import com.nestmusic.music.constants.DiscordButton2LabelKey
+import com.nestmusic.music.constants.DiscordButton2UrlKey
+import com.nestmusic.music.constants.DiscordDetailsTemplateKey
+import com.nestmusic.music.constants.DiscordStateTemplateKey
+import com.nestmusic.music.constants.DiscordUserStatusKey
+import com.nestmusic.music.constants.EnableDiscordRPCKey
+import com.nestmusic.music.discord.DiscordActivity
+import com.nestmusic.music.discord.DiscordDefaults
+import com.nestmusic.music.discord.DiscordRpcManager
+import com.nestmusic.music.discord.DiscordActivityBuilder
+import com.nestmusic.music.discord.DiscordTemplateRenderer
+import com.nestmusic.music.discord.PresenceStatus
+import com.nestmusic.music.constants.EnableLastFMScrobblingKey
+import com.nestmusic.music.constants.EnableSongCacheKey
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.HistoryDuration
+import com.nestmusic.music.constants.LastFMUseNowPlaying
+import com.nestmusic.music.constants.MediaSessionConstants
+import com.nestmusic.music.constants.MediaSessionConstants.CommandAddToTargetPlaylist
+import com.nestmusic.music.constants.MediaSessionConstants.CommandToggleLike
+import com.nestmusic.music.constants.MediaSessionConstants.CommandToggleRepeatMode
+import com.nestmusic.music.constants.MediaSessionConstants.CommandToggleShuffle
+import com.nestmusic.music.constants.MediaSessionConstants.CommandToggleStartRadio
+import com.nestmusic.music.constants.PauseListenHistoryKey
+import com.nestmusic.music.constants.PauseOnMute
+import com.nestmusic.music.constants.PersistentQueueKey
+import com.nestmusic.music.constants.PersistentShuffleAcrossQueuesKey
+import com.nestmusic.music.constants.PlayerVolumeKey
+import com.nestmusic.music.constants.PreventDuplicateTracksInQueueKey
+import com.nestmusic.music.constants.RememberShuffleAndRepeatKey
+import com.nestmusic.music.constants.RepeatModeKey
+import com.nestmusic.music.constants.ResumeOnBluetoothConnectKey
+import com.nestmusic.music.constants.ScrobbleDelayPercentKey
+import com.nestmusic.music.constants.ScrobbleDelaySecondsKey
+import com.nestmusic.music.constants.ScrobbleMinSongDurationKey
+import com.nestmusic.music.constants.ShowLyricsKey
+import com.nestmusic.music.constants.ShuffleModeKey
+import com.nestmusic.music.constants.ShufflePlaylistFirstKey
+import com.nestmusic.music.constants.SimilarContent
+import com.nestmusic.music.constants.SkipSilenceInstantKey
+import com.nestmusic.music.constants.SkipSilenceKey
+import com.nestmusic.music.constants.StopMusicOnTaskClearKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.Event
+import com.nestmusic.music.db.entities.FormatEntity
+import com.nestmusic.music.db.entities.LyricsEntity
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.db.entities.RelatedSongMap
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.di.DownloadCache
+import com.nestmusic.music.di.PlayerCache
+import com.nestmusic.music.eq.EqualizerService
+import com.nestmusic.music.eq.audio.CustomEqualizerAudioProcessor
+import com.nestmusic.music.eq.data.EQProfileRepository
+import com.nestmusic.music.extensions.SilentHandler
+import com.nestmusic.music.extensions.collect
+import com.nestmusic.music.extensions.collectLatest
+import com.nestmusic.music.extensions.currentMetadata
+import com.nestmusic.music.extensions.findNextMediaItemById
+import com.nestmusic.music.extensions.mediaItems
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.extensions.setOffloadEnabled
+import com.nestmusic.music.extensions.toEnum
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.extensions.toPersistQueue
+import com.nestmusic.music.extensions.toQueue
+import com.nestmusic.music.lyrics.LyricsHelper
+import com.nestmusic.music.models.PersistPlayerState
+import com.nestmusic.music.models.PersistQueue
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.alarm.MusicAlarmScheduler
+import com.nestmusic.music.playback.alarm.MusicAlarmStore
+import com.nestmusic.music.playback.audio.SilenceDetectorAudioProcessor
+import com.nestmusic.music.playback.queues.EmptyQueue
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.Queue
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.playback.queues.YouTubePlaylistQueue
+import com.nestmusic.music.playback.queues.filterExplicit
+import com.nestmusic.music.playback.queues.filterVideoSongs
+import com.nestmusic.music.constants.LoudnessLevel
+import com.nestmusic.music.constants.LoudnessLevelKey
+import com.nestmusic.music.utils.CoilBitmapLoader
+import com.nestmusic.music.utils.NetworkConnectivityObserver
+import com.nestmusic.music.utils.ScrobbleManager
+import com.nestmusic.music.utils.SyncUtils
+import com.nestmusic.music.utils.getArtistSeparator
+import com.nestmusic.music.utils.joinToArtistString
+import com.nestmusic.music.utils.YTPlayerUtils
+import com.nestmusic.music.utils.cipher.CipherDeobfuscator
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
+import com.nestmusic.music.widget.MetrolistWidgetManager
+import com.nestmusic.music.widget.MusicWidgetReceiver
+import com.nestmusic.music.widget.PlaylistWidgetReceiver
+import com.nestmusic.music.ui.utils.resize
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlin.coroutines.coroutineContext
@@ -291,7 +291,7 @@ class MusicService :
     lateinit var widgetManager: MetrolistWidgetManager
 
     @Inject
-    lateinit var listenTogetherManager: com.metrolist.music.listentogether.ListenTogetherManager
+    lateinit var listenTogetherManager: com.nestmusic.music.listentogether.ListenTogetherManager
 
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: AudioFocusRequest? = null
@@ -332,12 +332,12 @@ class MusicService :
     private val isNetworkConnected = MutableStateFlow(false)
     val currentStreamClient = MutableStateFlow<String?>(null)
 
-    private lateinit var audioQuality: com.metrolist.music.constants.AudioQuality
+    private lateinit var audioQuality: com.nestmusic.music.constants.AudioQuality
 
     private var currentQueue: Queue = EmptyQueue
     var queueTitle: String? = null
 
-    val currentMediaMetadata = MutableStateFlow<com.metrolist.music.models.MediaMetadata?>(null)
+    val currentMediaMetadata = MutableStateFlow<com.nestmusic.music.models.MediaMetadata?>(null)
     private val currentSong =
         currentMediaMetadata
             .flatMapLatest { mediaMetadata ->
@@ -472,8 +472,8 @@ class MusicService :
     private var initialBufferRecoveryJob: Job? = null
     private var initialBufferRecoveryAttemptedMediaId: String? = null
     // True only when stopOnError() paused playback purely because of a network outage
-    // (waitOnNetworkError exhausting its attempts). Lets triggerRetry() know it's safe â€”
-    // and necessary â€” to explicitly resume playback once connectivity returns, rather than
+    // (waitOnNetworkError exhausting its attempts). Lets triggerRetry() know it's safe —
+    // and necessary — to explicitly resume playback once connectivity returns, rather than
     // leaving the player "prepared but paused" forever.
     private var pausedDueToNetworkError = false
     private var silenceSkipJob: Job? = null
@@ -506,7 +506,7 @@ class MusicService :
     // spans), so a single playback can re-resolve dozens or hundreds of times in a
     // very short window. Without this guard, every single resolve would launch its
     // own coroutine doing a Room read + a hop to Dispatchers.Main + a Room
-    // transaction â€” all redundant, since they all converge on the same mediaId and
+    // transaction — all redundant, since they all converge on the same mediaId and
     // mostly no-op. If those launches outpace how fast they can drain (e.g. the
     // Main thread is busy with playback/UI work), dozens of them pile up in memory
     // at once, which is enough to blow past this app's heap limit on low-RAM
@@ -735,9 +735,9 @@ class MusicService :
         audioManager.registerAudioDeviceCallback(audioDeviceCallback, null)
 
         audioQuality = startupPrefs!![AudioQualityKey]?.let { value ->
-            if (value == "VERY_HIGH") com.metrolist.music.constants.AudioQuality.HIGH
-            else com.metrolist.music.constants.AudioQuality.entries.find { it.name == value }
-        } ?: com.metrolist.music.constants.AudioQuality.AUTO
+            if (value == "VERY_HIGH") com.nestmusic.music.constants.AudioQuality.HIGH
+            else com.nestmusic.music.constants.AudioQuality.entries.find { it.name == value }
+        } ?: com.nestmusic.music.constants.AudioQuality.AUTO
         playerVolume = MutableStateFlow((startupPrefs!![PlayerVolumeKey] ?: 1f).coerceIn(0f, 1f))
 
         initializeCast()
@@ -782,9 +782,9 @@ class MusicService :
             dataStore.data
                 .map {
                     it[AudioQualityKey]?.let { value ->
-                        if (value == "VERY_HIGH") com.metrolist.music.constants.AudioQuality.HIGH
-                        else com.metrolist.music.constants.AudioQuality.entries.find { it.name == value }
-                    } ?: com.metrolist.music.constants.AudioQuality.AUTO
+                        if (value == "VERY_HIGH") com.nestmusic.music.constants.AudioQuality.HIGH
+                        else com.nestmusic.music.constants.AudioQuality.entries.find { it.name == value }
+                    } ?: com.nestmusic.music.constants.AudioQuality.AUTO
                 }.distinctUntilChanged()
                 .collect { newQuality ->
                     val oldQuality = audioQuality
@@ -1167,7 +1167,7 @@ class MusicService :
         scope.launch {
             dataStore.data.map { it[AutoLoadMoreKey] ?: true }.distinctUntilChanged().collect { cachedAutoLoadMore = it }
         }
-        // Keep YTPlayerUtils in sync with the stream source toggles (Settings â†’ Stream sources).
+        // Keep YTPlayerUtils in sync with the stream source toggles (Settings ? Stream sources).
         // Map to the derived set + distinctUntilChanged so an unrelated preference write doesn't
         // rebuild the set and rewrite the @Volatile field on every DataStore emission.
         scope.launch {
@@ -1300,7 +1300,7 @@ class MusicService :
 
         val silenceProcessor = SilenceDetectorAudioProcessor { handleLongSilenceDetected() }
 
-        // Set initial state â€” use pre-read prefs when available, otherwise fall back to DataStore
+        // Set initial state — use pre-read prefs when available, otherwise fall back to DataStore
         val useAudioTrackPlaybackParams = if (prefs != null) {
             val skipSilence = prefs[SkipSilenceKey] ?: false
             val instantSkip = prefs[SkipSilenceInstantKey] ?: false
@@ -1485,7 +1485,7 @@ class MusicService :
         // before anything else can return early. Previously, hitting MAX_RETRY_COUNT while
         // still offline called stopOnError() and returned WITHOUT setting
         // waitingForNetworkConnection = true. That meant the "isConnected && waitingFor...
-        // -> triggerRetry()" listener never fired once the network actually came back â€”
+        // -> triggerRetry()" listener never fired once the network actually came back —
         // the player was left paused in a post-error state, and since ExoPlayer requires an
         // explicit prepare() after a fatal error before play() does anything, no song would
         // play again until the app was killed and relaunched (which recreates the player).
@@ -1497,7 +1497,7 @@ class MusicService :
             pausedDueToNetworkError = true
             stopOnError()
             retryCount = 0
-            // Don't schedule another backoff job â€” we're out of attempts for now â€” but stay
+            // Don't schedule another backoff job — we're out of attempts for now — but stay
             // "waiting" so the connectivity listener can still auto-resume on reconnect.
             retryJob?.cancel()
             return
@@ -1515,7 +1515,7 @@ class MusicService :
                     retryCount++
                     triggerRetry()
                 }
-                // If still offline when the timer fires, just let the job end â€” we stay
+                // If still offline when the timer fires, just let the job end — we stay
                 // "waiting" and the connectivityObserver listener (not this job) is what
                 // will catch the eventual reconnection and call triggerRetry().
             }
@@ -1538,13 +1538,13 @@ class MusicService :
             player.prepare()
             if (shouldResumePlayback) {
                 // We explicitly paused this ourselves (stopOnError) purely because of the
-                // network outage â€” playWhenReady is now false, so prepare() alone would just
+                // network outage — playWhenReady is now false, so prepare() alone would just
                 // sit there "ready but paused" until the user manually pressed play again on
                 // this exact item. Resume explicitly so reconnecting actually resumes audio.
                 player.playWhenReady = true
             }
             // Otherwise (we never force-paused), leave playWhenReady as-is and let the
-            // player auto-resume on its own â€” this avoids stealing audio focus on ordinary
+            // player auto-resume on its own — this avoids stealing audio focus on ordinary
             // mid-stream retries where the user never lost the "should be playing" intent.
         }
     }
@@ -1639,7 +1639,7 @@ class MusicService :
 
     /**
      * Registers / refreshes song metadata (title, duration, isVideo, related songs)
-     * for [mediaId]. Pure metadata bookkeeping only â€” does NOT touch [dateDownload].
+     * for [mediaId]. Pure metadata bookkeeping only — does NOT touch [dateDownload].
      *
      * Looks across player, secondaryPlayer and fadingPlayer so metadata is still
      * found correctly while a crossfade swap is in progress.
@@ -1715,8 +1715,8 @@ class MusicService :
      * recoverSong() is called from resolveDataSpec() on every dataSpec/chunk
      * resolution rather than once per song, so without this guard a heavily
      * fragmented (e.g. long-cached) file can fan out dozens of redundant,
-     * concurrent recoverSong() coroutines â€” each doing a Room read, a hop to
-     * Dispatchers.Main, and a Room transaction â€” for work that's already done
+     * concurrent recoverSong() coroutines — each doing a Room read, a hop to
+     * Dispatchers.Main, and a Room transaction — for work that's already done
      * after the first one completes. Always call this instead of launching
      * recoverSong() directly.
      */
@@ -1738,7 +1738,7 @@ class MusicService :
      * Marks [mediaId] as belonging to the Cache Playlist by setting [dateDownload],
      * but ONLY if the full file (byte 0 through contentLength) is actually present
      * in playerCache. This must only be called from a genuine "track finished
-     * naturally" signal (see onMediaItemTransition's AUTO-reason handling) â€”
+     * naturally" signal (see onMediaItemTransition's AUTO-reason handling) —
      * never from raw dataSpec/chunk resolution, since the player's background
      * prefetch can finish downloading a short file in seconds, long before the
      * user has actually listened to it (or even if they skipped away early).
@@ -2237,7 +2237,7 @@ class MusicService :
         }
     }
 
-    private suspend fun toggleEpisodeSaveForLater(songEntity: com.metrolist.music.db.entities.SongEntity) {
+    private suspend fun toggleEpisodeSaveForLater(songEntity: com.nestmusic.music.db.entities.SongEntity) {
         val isCurrentlySaved = songEntity.inLibrary != null
         val shouldBeSaved = !isCurrentlySaved
 
@@ -3294,7 +3294,7 @@ class MusicService :
             // rate-limited refresh corrects the table, allow WEB_REMIX again on the next resolution.
             scope.launch {
                 if (CipherDeobfuscator.onStreamRejected()) {
-                    Timber.tag(TAG).d("Player config changed after stream rejection â€” restoring WEB_REMIX")
+                    Timber.tag(TAG).d("Player config changed after stream rejection — restoring WEB_REMIX")
                     YTPlayerUtils.clearWebRemixFailures()
                 }
             }
@@ -3548,11 +3548,11 @@ class MusicService :
 
     private suspend fun updateDiscordRPC(song: Song, isPlaying: Boolean) {
         if (!DiscordRpcManager.isReady()) {
-            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping â€” not ready")
+            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping — not ready")
             return
         }
         if (!discordRpcEnabled) {
-            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping â€” RPC disabled")
+            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping — RPC disabled")
             return
         }
 
@@ -3592,7 +3592,7 @@ class MusicService :
         val btn2Url = dataStore.get(DiscordButton2UrlKey, DiscordDefaults.BUTTON2_URL)
 
         Timber.tag("DiscordSvc").d(
-            "updateDiscordRPC: prefs â€” advancedMode=%s, activityType=%d, activityName=%s, stateTemplate=%s, detailsTemplate=%s",
+            "updateDiscordRPC: prefs — advancedMode=%s, activityType=%d, activityName=%s, stateTemplate=%s, detailsTemplate=%s",
             advancedMode, activityType, activityName, stateTemplate, detailsTemplate,
         )
 
@@ -3750,7 +3750,7 @@ class MusicService :
                     when {
                         dataSpec.length >= 0 -> dataSpec.length
                         contentLength != null -> (contentLength - dataSpec.position).coerceAtLeast(1)
-                        else -> CHUNK_LENGTH // contentLength unknown yet â€” fall back to old probe size
+                        else -> CHUNK_LENGTH // contentLength unknown yet — fall back to old probe size
                     }
 
                 if (downloadCache.isCached(mediaId, dataSpec.position, requiredLength)) {
@@ -4669,7 +4669,7 @@ class MusicService :
      * Initialize Google Cast support
      */
     private fun initializeCast() {
-        if (dataStore.get(com.metrolist.music.constants.EnableGoogleCastKey, true)) {
+        if (dataStore.get(com.nestmusic.music.constants.EnableGoogleCastKey, true)) {
             try {
                 castConnectionHandler = CastConnectionHandler(this, scope, this)
                 castConnectionHandler?.initialize()
@@ -4904,7 +4904,7 @@ class MusicService :
     }
 
     companion object {
-        const val ACTION_ALARM_TRIGGER = "com.metrolist.music.action.ALARM_TRIGGER"
+        const val ACTION_ALARM_TRIGGER = "com.nestmusic.music.action.ALARM_TRIGGER"
         const val EXTRA_ALARM_ID = "extra_alarm_id"
         const val EXTRA_ALARM_PLAYLIST_ID = "extra_alarm_playlist_id"
         const val EXTRA_ALARM_RANDOM_SONG = "extra_alarm_random_song"

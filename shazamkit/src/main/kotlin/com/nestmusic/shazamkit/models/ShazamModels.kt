@@ -1,4 +1,4 @@
-﻿package com.nestmusic.shazamkit.models
+package com.nestmusic.shazamkit.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

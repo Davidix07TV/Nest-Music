@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * OuterTune Project Copyright (C) 2025
  * Licensed under GPL-3.0 | See git history for contributors
@@ -7,30 +7,30 @@
 package com.nestmusic.music.utils
 
 import android.content.Context
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.utils.completed
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.lastfm.LastFM
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.LastFMUseSendLikes
-import com.metrolist.music.constants.LastFullSyncKey
-import com.metrolist.music.constants.SYNC_COOLDOWN
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.db.entities.PlaylistEntity
-import com.metrolist.music.db.entities.PlaylistSongMap
-import com.metrolist.music.db.entities.PodcastEntity
-import com.metrolist.music.db.entities.SetVideoIdEntity
-import com.metrolist.music.db.entities.SongEntity
-import com.metrolist.music.extensions.collectLatest
-import com.metrolist.music.extensions.isInternetConnected
-import com.metrolist.music.extensions.isSyncEnabled
-import com.metrolist.music.models.toMediaMetadata
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.utils.completed
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.lastfm.LastFM
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.LastFMUseSendLikes
+import com.nestmusic.music.constants.LastFullSyncKey
+import com.nestmusic.music.constants.SYNC_COOLDOWN
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.db.entities.PlaylistEntity
+import com.nestmusic.music.db.entities.PlaylistSongMap
+import com.nestmusic.music.db.entities.PodcastEntity
+import com.nestmusic.music.db.entities.SetVideoIdEntity
+import com.nestmusic.music.db.entities.SongEntity
+import com.nestmusic.music.extensions.collectLatest
+import com.nestmusic.music.extensions.isInternetConnected
+import com.nestmusic.music.extensions.isSyncEnabled
+import com.nestmusic.music.models.toMediaMetadata
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -1459,7 +1459,7 @@ class SyncUtils @Inject constructor(
                                 executeSyncPlaylist(playlist.id, playlistEntity.id)
                                 delay(DB_OPERATION_DELAY_MS)
                             } else {
-                                Timber.d("Skipping playlist ${playlist.title} â€” remove in progress")
+                                Timber.d("Skipping playlist ${playlist.title} — remove in progress")
                             }
                             delay(DB_OPERATION_DELAY_MS)
                         } catch (e: Exception) {
@@ -1498,7 +1498,7 @@ class SyncUtils @Inject constructor(
             autoSyncPlaylists.forEach { playlist ->
                 // Skip playlists with a pending remove operation
                 if (isPlaylistBeingModified(playlist.id)) {
-                    Timber.d("Skipping playlist ${playlist.name} â€” remove in progress")
+                    Timber.d("Skipping playlist ${playlist.name} — remove in progress")
                     return@forEach
                 }
                 try {

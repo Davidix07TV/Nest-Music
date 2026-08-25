@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -50,22 +50,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.menu.AddToPlaylistDialogOnline
-import com.metrolist.music.ui.menu.CsvColumnMappingDialog
-import com.metrolist.music.ui.menu.CsvImportProgressDialog
-import com.metrolist.music.ui.menu.LoadingScreen
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.viewmodels.BackupPreviewInfo
-import com.metrolist.music.viewmodels.BackupRestoreViewModel
-import com.metrolist.music.viewmodels.ConvertedSongLog
-import com.metrolist.music.viewmodels.CsvImportState
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.menu.AddToPlaylistDialogOnline
+import com.nestmusic.music.ui.menu.CsvColumnMappingDialog
+import com.nestmusic.music.ui.menu.CsvImportProgressDialog
+import com.nestmusic.music.ui.menu.LoadingScreen
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.viewmodels.BackupPreviewInfo
+import com.nestmusic.music.viewmodels.BackupRestoreViewModel
+import com.nestmusic.music.viewmodels.ConvertedSongLog
+import com.nestmusic.music.viewmodels.CsvImportState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

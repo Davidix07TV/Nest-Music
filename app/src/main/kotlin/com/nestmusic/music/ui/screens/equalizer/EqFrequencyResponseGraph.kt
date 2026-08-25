@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.screens.equalizer
+package com.nestmusic.music.ui.screens.equalizer
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,8 +21,8 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.metrolist.music.eq.data.FilterType
-import com.metrolist.music.eq.data.ParametricEQBand
+import com.nestmusic.music.eq.data.FilterType
+import com.nestmusic.music.eq.data.ParametricEQBand
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -239,7 +239,7 @@ private fun computeGraphData(bands: List<ParametricEQBand>, preamp: Double): Gra
         if (totalDb > maxDb) maxDb = totalDb
     }
 
-    // Always center on 0 dB — symmetric range based on whichever extreme is larger
+    // Always center on 0 dB � symmetric range based on whichever extreme is larger
     val dbStep = 2.5
     val peakAbs = max(abs(minDb), abs(maxDb))
     val halfRange = max(ceil((peakAbs + 1.0) / dbStep) * dbStep, dbStep)

@@ -1,7 +1,7 @@
-ï»¿package com.nestmusic.music.utils.cipher
+package com.nestmusic.music.utils.cipher
 
 import android.content.Context
-import com.metrolist.innertube.YouTube
+import com.nestmusic.innertube.YouTube
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -74,8 +74,8 @@ object PlayerConfigStore {
 
     // Advanced every time a remote refresh actually changes the table. The cipher records the epoch
     // its WebView was built under and rebuilds when this advances, so a corrected config for the
-    // current player â€” arriving by any refresh path AFTER the WebView was built from a missing or
-    // wrong entry â€” takes effect on the next decipher instead of being ignored until the process is
+    // current player — arriving by any refresh path AFTER the WebView was built from a missing or
+    // wrong entry — takes effect on the next decipher instead of being ignored until the process is
     // restarted. See CipherDeobfuscator.getOrCreateWebView().
     @Volatile
     var configEpoch: Int = 0
@@ -91,12 +91,12 @@ object PlayerConfigStore {
     private var lastRejectionAttemptMs = 0L
 
     // The two cooldown gates read DIFFERENT stamps on purpose (see above). Routed through these
-    // functions â€” which forceRefresh / refreshAfterStreamRejection actually call â€” so a unit test
+    // functions — which forceRefresh / refreshAfterStreamRejection actually call — so a unit test
     // can prove neither path is gated by the other's cooldown without touching the network.
     /**
      * True iff [stampMs] lies within [windowMs] of [now]. The in-range check (not a plain
      * `now - stamp < window`) matters: these are wall-clock stamps, and a backward clock
-     * adjustment (NTP correction, manual change) makes the delta negative â€” a plain
+     * adjustment (NTP correction, manual change) makes the delta negative — a plain
      * less-than would then hold the window for the entire skew duration, wedging
      * cooldowns/TTLs exactly while playback is broken. Every wall-clock window check in
      * this module MUST go through this helper.
@@ -137,7 +137,7 @@ object PlayerConfigStore {
             else -> result
         }
         if (bundledConfigs.isEmpty()) {
-            Timber.tag(TAG).e("Bundled $ASSET_NAME missing or invalid â€” config table starts empty")
+            Timber.tag(TAG).e("Bundled $ASSET_NAME missing or invalid — config table starts empty")
         } else {
             Timber.tag(TAG).d("Loaded bundled configs (${bundledConfigs.size} hashes)")
         }
@@ -204,14 +204,14 @@ object PlayerConfigStore {
     /**
      * Failure-triggered refresh: called when a player-hash lookup misses. Single-flight, with
      * the cooldown decided under the lock (a check-then-set outside it would let concurrent
-     * misses race). Returns true iff [missingHash] is now in the table â€” whether THIS call's
-     * fetch did the work or a concurrent/just-finished refresh already brought it in â€” so
+     * misses race). Returns true iff [missingHash] is now in the table — whether THIS call's
+     * fetch did the work or a concurrent/just-finished refresh already brought it in — so
      * callers retry extraction exactly when it can succeed.
      */
     suspend fun forceRefresh(missingHash: String): Boolean = withContext(Dispatchers.IO) {
         refreshMutex.withLock {
             // A refresh that held the lock while we waited (startup TTL, another miss) may
-            // have just landed this config â€” don't burn a fetch or arm the cooldown.
+            // have just landed this config — don't burn a fetch or arm the cooldown.
             if (mergedConfigs.containsKey(missingHash)) {
                 Timber.tag(TAG).d("forceRefresh: $missingHash arrived via concurrent refresh")
                 return@withLock true
@@ -231,11 +231,11 @@ object PlayerConfigStore {
     /**
      * Stream-rejection refresh: a deciphered URL was rejected by the CDN (e.g. a WEB_REMIX 403),
      * which can mean the cipher produced a wrong-but-non-throwing signature from a stale/wrong
-     * player config â€” a failure the [CipherDeobfuscator] exception-retry never sees. Unlike
+     * player config — a failure the [CipherDeobfuscator] exception-retry never sees. Unlike
      * [forceRefresh], this does NOT short-circuit when the current hash is already present (the
      * entry may be present but WRONG), so it always re-fetches; it has its OWN cooldown (so it can't
      * starve the unknown-hash [forceRefresh] path) but shares the single-flight lock. Returns
-     * whether the table changed â€” when true, [configEpoch] has advanced and the cipher rebuilds.
+     * whether the table changed — when true, [configEpoch] has advanced and the cipher rebuilds.
      */
     suspend fun refreshAfterStreamRejection(playerHash: String?): Boolean = withContext(Dispatchers.IO) {
         refreshMutex.withLock {
@@ -269,7 +269,7 @@ object PlayerConfigStore {
     private suspend fun refreshIfStale() {
         val lastFetchMs = readMeta(FARADAY_SOURCE)?.second ?: 0L
         // lastFetchMs is persisted, so a future stamp (wall clock stepped back after the
-        // write) must count as stale, not fresh â€” withinWindow handles that.
+        // write) must count as stale, not fresh — withinWindow handles that.
         if (withinWindow(System.currentTimeMillis(), lastFetchMs, REFRESH_TTL_MS)) {
             Timber.tag(TAG).d("Faraday configs fresh (fetched ${System.currentTimeMillis() - lastFetchMs} ms ago)")
             return
@@ -280,9 +280,9 @@ object PlayerConfigStore {
     }
 
     /**
-     * Fetches the remote JSON (with If-None-Match) and applies it when valid. Any failure â€”
+     * Fetches the remote JSON (with If-None-Match) and applies it when valid. Any failure —
      * HTTP error (including the 404 served until the file lands on the repo's default
-     * branch), network exception, or validation failure â€” keeps the previous map and cache.
+     * branch), network exception, or validation failure — keeps the previous map and cache.
      * lastFetchMs is only advanced on 200/304 so transient failures retry on the next trigger.
      */
     private fun fetchAndApply(source: RemoteSource): FetchResult {
@@ -301,19 +301,19 @@ object PlayerConfigStore {
                     return FetchResult(changed = false, reachedServer = true)
                 }
                 if (!response.isSuccessful) {
-                    Timber.tag(TAG).w("${source.name} config fetch HTTP ${response.code} â€” keeping previous configs")
+                    Timber.tag(TAG).w("${source.name} config fetch HTTP ${response.code} — keeping previous configs")
                     return FetchResult(changed = false, reachedServer = true)
                 }
 
                 val body = response.body?.string()
                 if (body.isNullOrEmpty()) {
-                    Timber.tag(TAG).w("${source.name} config fetch returned empty body â€” keeping previous configs")
+                    Timber.tag(TAG).w("${source.name} config fetch returned empty body — keeping previous configs")
                     return FetchResult(changed = false, reachedServer = true)
                 }
 
                 val remote = when (val result = PlayerConfigParser.parse(body)) {
                     is PlayerConfigParser.ParseResult.Failure -> {
-                        Timber.tag(TAG).w("${source.name} configs rejected: ${result.reason} â€” keeping previous configs")
+                        Timber.tag(TAG).w("${source.name} configs rejected: ${result.reason} — keeping previous configs")
                         return FetchResult(changed = false, reachedServer = true)
                     }
                     is PlayerConfigParser.ParseResult.Success -> {
@@ -330,7 +330,7 @@ object PlayerConfigStore {
                 )
             }
         } catch (e: Exception) {
-            Timber.tag(TAG).w(e, "${source.name} config fetch failed: ${e.message} â€” keeping previous configs")
+            Timber.tag(TAG).w(e, "${source.name} config fetch failed: ${e.message} — keeping previous configs")
             return FetchResult(changed = false, reachedServer = false)
         }
     }
@@ -338,7 +338,7 @@ object PlayerConfigStore {
     /**
      * Applies a validated remote table to memory FIRST, then best-effort persists the raw
      * body + meta. A disk failure (full disk, IO error) must never discard an in-hand
-     * validated fix â€” losing the cache only costs a refetch on the next start, while losing
+     * validated fix — losing the cache only costs a refetch on the next start, while losing
      * the memory update costs working playback now. Returns whether the table changed.
      */
     internal fun applyRemote(
@@ -449,7 +449,7 @@ object PlayerConfigStore {
         val tmp = File(file.parentFile, "${file.name}.tmp")
         tmp.writeText(content)
         if (!tmp.renameTo(file)) {
-            // renameTo won't overwrite an existing target on some filesystems â€” retry after
+            // renameTo won't overwrite an existing target on some filesystems — retry after
             // deleting it (two cheap metadata ops, still atomic) before the last-resort direct
             // write, which is both non-atomic and a second full write of the content.
             file.delete()

@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.utils
+package com.nestmusic.music.utils
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

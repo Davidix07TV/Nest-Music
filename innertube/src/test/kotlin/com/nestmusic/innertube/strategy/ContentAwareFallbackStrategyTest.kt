@@ -1,6 +1,6 @@
-﻿package com.nestmusic.innertube.strategy
+package com.nestmusic.innertube.strategy
 
-import com.metrolist.innertube.models.YouTubeClient
+import com.nestmusic.innertube.models.YouTubeClient
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

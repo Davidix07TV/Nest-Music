@@ -1,4 +1,4 @@
-ï»¿package com.nestmusic.music.utils.cipher
+package com.nestmusic.music.utils.cipher
 
 /**
  * Pure (no Android deps) policy for recovering from WebView renderer deaths.
@@ -9,7 +9,7 @@
  * doomed multi-second rebuild for that song.
  *
  * The window is deliberately SHORT and half-open: the non-WebView paths (NewPipe extractor,
- * fallback clients) are unreliable â€” the cipher WebView is the primary path â€” so we must get
+ * fallback clients) are unreliable — the cipher WebView is the primary path — so we must get
  * back to retrying it quickly once memory pressure may have eased. Once the window expires, one
  * attempt is allowed. Success fully resets the policy; another failure re-arms the window
  * immediately.
@@ -38,7 +38,7 @@ class RendererRecoveryPolicy(
         }
     }
 
-    /** Record a successful WebView operation â€” fully resets the policy. */
+    /** Record a successful WebView operation — fully resets the policy. */
     fun onSuccess() {
         consecutiveFailures = 0
         backoffUntilMs = 0L

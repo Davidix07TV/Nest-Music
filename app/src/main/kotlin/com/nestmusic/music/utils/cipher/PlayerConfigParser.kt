@@ -1,4 +1,4 @@
-ï»¿package com.nestmusic.music.utils.cipher
+package com.nestmusic.music.utils.cipher
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -14,7 +14,7 @@ import kotlinx.serialization.json.jsonObject
  * [PlayerConfigStore].
  *
  * Security boundary: every value in this file ends up evaluated as JavaScript inside the
- * cipher WebView, so entries are regex-locked to shapes that cannot carry arbitrary JS â€”
+ * cipher WebView, so entries are regex-locked to shapes that cannot carry arbitrary JS —
  * `sig` must be a single `name(int,int,INPUT)` call and `nClass` a bare identifier; the
  * n-transform IIFE is built locally from [buildNJsExpression], never taken from the file.
  */
@@ -40,7 +40,7 @@ object PlayerConfigParser {
 
     /**
      * Parses [jsonText]. File-level problems (malformed JSON, missing/unsupported
-     * schemaVersion, missing `players`) return [ParseResult.Failure] â€” callers keep their
+     * schemaVersion, missing `players`) return [ParseResult.Failure] — callers keep their
      * previous map. Invalid individual entries are skipped and reported in
      * [ParseResult.Success.skippedEntries] so one bad entry can't poison the rest.
      */
@@ -76,7 +76,7 @@ object PlayerConfigParser {
             }
             val (config, aliases) = entry
             // A key collision (an alias duplicating another entry's hash or alias, or its
-            // own primary) makes the table ambiguous â€” which entry wins would depend on
+            // own primary) makes the table ambiguous — which entry wins would depend on
             // iteration order. That is a file-level defect, not a bad entry: reject the
             // whole file so callers keep their previous table.
             val keys = listOf(hash) + aliases

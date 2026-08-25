@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.recognition
+package com.nestmusic.music.recognition
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
@@ -52,7 +52,7 @@ object AudioResampler {
         }
 
         try {
-            Timber.tag(TAG).d("Resampling: %dHz → %dHz, %d bytes input", decodedAudio.sampleRate, outputSampleRate, decodedAudio.data.size)
+            Timber.tag(TAG).d("Resampling: %dHz ? %dHz, %d bytes input", decodedAudio.sampleRate, outputSampleRate, decodedAudio.data.size)
 
             val inputSamples = shortArrayFromByteArray(decodedAudio.data)
             val ratio = outputSampleRate.toDouble() / decodedAudio.sampleRate

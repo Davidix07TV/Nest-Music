@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -56,29 +56,29 @@ import androidx.core.net.toUri
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalNavController
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.YouTubeAlbumRadio
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.YouTubeListItem
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.YouTubeAlbumRadio
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.utils.reportException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -9,16 +9,16 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.music.App
-import com.metrolist.music.constants.AccountChannelHandleKey
-import com.metrolist.music.constants.AccountEmailKey
-import com.metrolist.music.constants.AccountNameKey
-import com.metrolist.music.constants.DataSyncIdKey
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.VisitorDataKey
-import com.metrolist.music.utils.SyncUtils
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.safeDataStoreEdit
+import com.nestmusic.music.App
+import com.nestmusic.music.constants.AccountChannelHandleKey
+import com.nestmusic.music.constants.AccountEmailKey
+import com.nestmusic.music.constants.AccountNameKey
+import com.nestmusic.music.constants.DataSyncIdKey
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.VisitorDataKey
+import com.nestmusic.music.utils.SyncUtils
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.safeDataStoreEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,7 +64,7 @@ class AccountSettingsViewModel @Inject constructor(
     suspend fun logoutAndClearLibraryData(context: Context) {
         Timber.d("[LOGOUT_CLEAR] ViewModel: logoutAndClearLibraryData called")
         withContext(Dispatchers.IO) {
-            // Forget account first â€” clears cookie/auth from DataStore.
+            // Forget account first — clears cookie/auth from DataStore.
             // Once isLoggedIn() returns false, ALL sync operations will skip.
             App.forgetAccount(context)
 
@@ -112,7 +112,7 @@ class AccountSettingsViewModel @Inject constructor(
                 settings[AccountChannelHandleKey] = accountChannelHandle
             }
             if (!saved) {
-                Timber.e("saveTokenAndRestart: DataStore write failed â€” skipping restart to avoid losing credentials")
+                Timber.e("saveTokenAndRestart: DataStore write failed — skipping restart to avoid losing credentials")
                 return@launch
             }
             withContext(Dispatchers.Main) {

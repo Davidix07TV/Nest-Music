@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -114,65 +114,65 @@ import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.AiProviderKey
-import com.metrolist.music.constants.AiSystemPromptKey
-import com.metrolist.music.constants.DarkModeKey
-import com.metrolist.music.constants.DeeplApiKey
-import com.metrolist.music.constants.DeeplFormalityKey
-import com.metrolist.music.constants.LyricsAnimationStyle
-import com.metrolist.music.constants.LyricsAnimationStyleKey
-import com.metrolist.music.constants.LyricsClickKey
-import com.metrolist.music.constants.LyricsGlowEffectKey
-import com.metrolist.music.constants.LyricsLineSpacingKey
-import com.metrolist.music.constants.LyricsRomanizeAsMainKey
-import com.metrolist.music.constants.LyricsRomanizeCyrillicByLineKey
-import com.metrolist.music.constants.LyricsRomanizeList
-import com.metrolist.music.constants.LyricsScrollKey
-import com.metrolist.music.constants.LyricsTextPositionKey
-import com.metrolist.music.constants.LyricsTextSizeKey
-import com.metrolist.music.constants.OpenRouterApiKey
-import com.metrolist.music.constants.OpenRouterBaseUrlKey
-import com.metrolist.music.constants.OpenRouterModelKey
-import com.metrolist.music.constants.PlayerBackgroundStyle
-import com.metrolist.music.constants.PlayerBackgroundStyleKey
-import com.metrolist.music.constants.TranslateLanguageKey
-import com.metrolist.music.constants.TranslateModeKey
-import com.metrolist.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
-import com.metrolist.music.lyrics.LyricsEntry
-import com.metrolist.music.lyrics.LyricsResyncHelper
-import com.metrolist.music.lyrics.LyricsTranslationHelper
-import com.metrolist.music.lyrics.LyricsUtils.findCurrentLineIndex
-import com.metrolist.music.lyrics.LyricsUtils.isBelarusian
-import com.metrolist.music.lyrics.LyricsUtils.isBulgarian
-import com.metrolist.music.lyrics.LyricsUtils.isChinese
-import com.metrolist.music.lyrics.LyricsUtils.isHindi
-import com.metrolist.music.lyrics.LyricsUtils.isJapanese
-import com.metrolist.music.lyrics.LyricsUtils.isKorean
-import com.metrolist.music.lyrics.LyricsUtils.isKyrgyz
-import com.metrolist.music.lyrics.LyricsUtils.isMacedonian
-import com.metrolist.music.lyrics.LyricsUtils.isRussian
-import com.metrolist.music.lyrics.LyricsUtils.isSerbian
-import com.metrolist.music.lyrics.LyricsUtils.isUkrainian
-import com.metrolist.music.lyrics.LyricsUtils.parseLyrics
-import com.metrolist.music.lyrics.LyricsUtils.romanizeChinese
-import com.metrolist.music.lyrics.LyricsUtils.romanizeCyrillic
-import com.metrolist.music.lyrics.LyricsUtils.romanizeHindi
-import com.metrolist.music.lyrics.LyricsUtils.romanizeJapanese
-import com.metrolist.music.lyrics.LyricsUtils.romanizeKorean
-import com.metrolist.music.lyrics.lyricsTextLooksSynced
-import com.metrolist.music.ui.component.shimmer.ShimmerHost
-import com.metrolist.music.ui.component.shimmer.TextPlaceholder
-import com.metrolist.music.ui.screens.settings.DarkMode
-import com.metrolist.music.ui.screens.settings.LyricsPosition
-import com.metrolist.music.ui.screens.settings.defaultList
-import com.metrolist.music.ui.utils.fadingEdge
-import com.metrolist.music.utils.ComposeToImage
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AiProviderKey
+import com.nestmusic.music.constants.AiSystemPromptKey
+import com.nestmusic.music.constants.DarkModeKey
+import com.nestmusic.music.constants.DeeplApiKey
+import com.nestmusic.music.constants.DeeplFormalityKey
+import com.nestmusic.music.constants.LyricsAnimationStyle
+import com.nestmusic.music.constants.LyricsAnimationStyleKey
+import com.nestmusic.music.constants.LyricsClickKey
+import com.nestmusic.music.constants.LyricsGlowEffectKey
+import com.nestmusic.music.constants.LyricsLineSpacingKey
+import com.nestmusic.music.constants.LyricsRomanizeAsMainKey
+import com.nestmusic.music.constants.LyricsRomanizeCyrillicByLineKey
+import com.nestmusic.music.constants.LyricsRomanizeList
+import com.nestmusic.music.constants.LyricsScrollKey
+import com.nestmusic.music.constants.LyricsTextPositionKey
+import com.nestmusic.music.constants.LyricsTextSizeKey
+import com.nestmusic.music.constants.OpenRouterApiKey
+import com.nestmusic.music.constants.OpenRouterBaseUrlKey
+import com.nestmusic.music.constants.OpenRouterModelKey
+import com.nestmusic.music.constants.PlayerBackgroundStyle
+import com.nestmusic.music.constants.PlayerBackgroundStyleKey
+import com.nestmusic.music.constants.TranslateLanguageKey
+import com.nestmusic.music.constants.TranslateModeKey
+import com.nestmusic.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
+import com.nestmusic.music.lyrics.LyricsEntry
+import com.nestmusic.music.lyrics.LyricsResyncHelper
+import com.nestmusic.music.lyrics.LyricsTranslationHelper
+import com.nestmusic.music.lyrics.LyricsUtils.findCurrentLineIndex
+import com.nestmusic.music.lyrics.LyricsUtils.isBelarusian
+import com.nestmusic.music.lyrics.LyricsUtils.isBulgarian
+import com.nestmusic.music.lyrics.LyricsUtils.isChinese
+import com.nestmusic.music.lyrics.LyricsUtils.isHindi
+import com.nestmusic.music.lyrics.LyricsUtils.isJapanese
+import com.nestmusic.music.lyrics.LyricsUtils.isKorean
+import com.nestmusic.music.lyrics.LyricsUtils.isKyrgyz
+import com.nestmusic.music.lyrics.LyricsUtils.isMacedonian
+import com.nestmusic.music.lyrics.LyricsUtils.isRussian
+import com.nestmusic.music.lyrics.LyricsUtils.isSerbian
+import com.nestmusic.music.lyrics.LyricsUtils.isUkrainian
+import com.nestmusic.music.lyrics.LyricsUtils.parseLyrics
+import com.nestmusic.music.lyrics.LyricsUtils.romanizeChinese
+import com.nestmusic.music.lyrics.LyricsUtils.romanizeCyrillic
+import com.nestmusic.music.lyrics.LyricsUtils.romanizeHindi
+import com.nestmusic.music.lyrics.LyricsUtils.romanizeJapanese
+import com.nestmusic.music.lyrics.LyricsUtils.romanizeKorean
+import com.nestmusic.music.lyrics.lyricsTextLooksSynced
+import com.nestmusic.music.ui.component.shimmer.ShimmerHost
+import com.nestmusic.music.ui.component.shimmer.TextPlaceholder
+import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.screens.settings.LyricsPosition
+import com.nestmusic.music.ui.screens.settings.defaultList
+import com.nestmusic.music.ui.utils.fadingEdge
+import com.nestmusic.music.utils.ComposeToImage
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -2211,7 +2211,7 @@ fun OriginalLyrics(
                     }
                 }
             }
-        } // إغلاق else block
+        } // ????? else block
     }
 }
 

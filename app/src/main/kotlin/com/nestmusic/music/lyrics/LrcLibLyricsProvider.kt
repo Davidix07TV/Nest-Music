@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,10 +6,10 @@
 package com.nestmusic.music.lyrics
 
 import android.content.Context
-import com.metrolist.lrclib.LrcLib
-import com.metrolist.music.constants.EnableLrcLibKey
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
+import com.nestmusic.lrclib.LrcLib
+import com.nestmusic.music.constants.EnableLrcLibKey
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
 
 object LrcLibLyricsProvider : LyricsProvider {
     override val name = "LrcLib"

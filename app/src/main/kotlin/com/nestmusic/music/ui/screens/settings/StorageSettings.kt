@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -46,21 +46,21 @@ import coil3.SingletonImageLoader
 import coil3.annotation.DelicateCoilApi
 import coil3.annotation.ExperimentalCoilApi
 import coil3.imageLoader
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.EnableSongCacheKey
-import com.metrolist.music.constants.MaxImageCacheSizeKey
-import com.metrolist.music.constants.MaxSongCacheSizeKey
-import com.metrolist.music.extensions.tryOrNull
-import com.metrolist.music.ui.component.ActionPromptDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.EnableSongCacheKey
+import com.nestmusic.music.constants.MaxImageCacheSizeKey
+import com.nestmusic.music.constants.MaxSongCacheSizeKey
+import com.nestmusic.music.extensions.tryOrNull
+import com.nestmusic.music.ui.component.ActionPromptDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
 import android.text.format.Formatter
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first

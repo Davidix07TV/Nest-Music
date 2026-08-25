@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -23,48 +23,48 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
-import com.metrolist.music.constants.DarkModeKey
-import com.metrolist.music.constants.PureBlackKey
-import com.metrolist.music.ui.screens.artist.ArtistAlbumsScreen
-import com.metrolist.music.ui.screens.artist.ArtistItemsScreen
-import com.metrolist.music.ui.screens.artist.ArtistScreen
-import com.metrolist.music.ui.screens.artist.ArtistSongsScreen
-import com.metrolist.music.ui.screens.equalizer.EqScreen
-import com.metrolist.music.ui.screens.equalizer.wizard.WizardScreen
-import com.metrolist.music.ui.screens.library.LibraryScreen
-import com.metrolist.music.ui.screens.playlist.AutoPlaylistScreen
-import com.metrolist.music.ui.screens.playlist.CachePlaylistScreen
-import com.metrolist.music.ui.screens.playlist.LocalPlaylistScreen
-import com.metrolist.music.ui.screens.playlist.OnlinePlaylistScreen
-import com.metrolist.music.ui.screens.playlist.TopPlaylistScreen
-import com.metrolist.music.ui.screens.podcast.OnlinePodcastScreen
-import com.metrolist.music.ui.screens.recognition.RecognitionHistoryScreen
-import com.metrolist.music.ui.screens.recognition.RecognitionScreen
-import com.metrolist.music.ui.screens.search.OnlineSearchResult
-import com.metrolist.music.ui.screens.search.SearchScreen
-import com.metrolist.music.ui.screens.settings.AboutScreen
-import com.metrolist.music.ui.screens.settings.AiSettings
-import com.metrolist.music.ui.screens.settings.AndroidAutoSettings
-import com.metrolist.music.ui.screens.settings.AppearanceSettings
-import com.metrolist.music.ui.screens.settings.BackupAndRestore
-import com.metrolist.music.ui.screens.settings.ContentSettings
-import com.metrolist.music.ui.screens.settings.DarkMode
-import com.metrolist.music.ui.screens.settings.PlayerSettings
-import com.metrolist.music.ui.screens.settings.PrivacySettings
-import com.metrolist.music.ui.screens.settings.RomanizationSettings
-import com.metrolist.music.ui.screens.settings.SettingsScreen
-import com.metrolist.music.ui.screens.settings.StorageSettings
-import com.metrolist.music.ui.screens.settings.StreamSourcesSettings
-import com.metrolist.music.ui.screens.settings.ThemeScreen
-import com.metrolist.music.ui.screens.settings.UpdaterScreen
-import com.metrolist.music.ui.screens.settings.integrations.DiscordSettings
-import com.metrolist.music.ui.screens.settings.integrations.IntegrationScreen
-import com.metrolist.music.ui.screens.settings.integrations.LastFMSettings
-import com.metrolist.music.ui.screens.settings.integrations.ListenTogetherSettings
+import com.nestmusic.music.constants.DarkModeKey
+import com.nestmusic.music.constants.PureBlackKey
+import com.nestmusic.music.ui.screens.artist.ArtistAlbumsScreen
+import com.nestmusic.music.ui.screens.artist.ArtistItemsScreen
+import com.nestmusic.music.ui.screens.artist.ArtistScreen
+import com.nestmusic.music.ui.screens.artist.ArtistSongsScreen
+import com.nestmusic.music.ui.screens.equalizer.EqScreen
+import com.nestmusic.music.ui.screens.equalizer.wizard.WizardScreen
+import com.nestmusic.music.ui.screens.library.LibraryScreen
+import com.nestmusic.music.ui.screens.playlist.AutoPlaylistScreen
+import com.nestmusic.music.ui.screens.playlist.CachePlaylistScreen
+import com.nestmusic.music.ui.screens.playlist.LocalPlaylistScreen
+import com.nestmusic.music.ui.screens.playlist.OnlinePlaylistScreen
+import com.nestmusic.music.ui.screens.playlist.TopPlaylistScreen
+import com.nestmusic.music.ui.screens.podcast.OnlinePodcastScreen
+import com.nestmusic.music.ui.screens.recognition.RecognitionHistoryScreen
+import com.nestmusic.music.ui.screens.recognition.RecognitionScreen
+import com.nestmusic.music.ui.screens.search.OnlineSearchResult
+import com.nestmusic.music.ui.screens.search.SearchScreen
+import com.nestmusic.music.ui.screens.settings.AboutScreen
+import com.nestmusic.music.ui.screens.settings.AiSettings
+import com.nestmusic.music.ui.screens.settings.AndroidAutoSettings
+import com.nestmusic.music.ui.screens.settings.AppearanceSettings
+import com.nestmusic.music.ui.screens.settings.BackupAndRestore
+import com.nestmusic.music.ui.screens.settings.ContentSettings
+import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.screens.settings.PlayerSettings
+import com.nestmusic.music.ui.screens.settings.PrivacySettings
+import com.nestmusic.music.ui.screens.settings.RomanizationSettings
+import com.nestmusic.music.ui.screens.settings.SettingsScreen
+import com.nestmusic.music.ui.screens.settings.StorageSettings
+import com.nestmusic.music.ui.screens.settings.StreamSourcesSettings
+import com.nestmusic.music.ui.screens.settings.ThemeScreen
+import com.nestmusic.music.ui.screens.settings.UpdaterScreen
+import com.nestmusic.music.ui.screens.settings.integrations.DiscordSettings
+import com.nestmusic.music.ui.screens.settings.integrations.IntegrationScreen
+import com.nestmusic.music.ui.screens.settings.integrations.LastFMSettings
+import com.nestmusic.music.ui.screens.settings.integrations.ListenTogetherSettings
 
-import com.metrolist.music.ui.screens.wrapped.WrappedScreen
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.ui.screens.wrapped.WrappedScreen
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.navigationBuilder(

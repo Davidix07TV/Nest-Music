@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -61,37 +61,37 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.LocalSyncUtils
-import com.metrolist.music.R
-import com.metrolist.music.constants.CONTENT_TYPE_HEADER
-import com.metrolist.music.constants.CONTENT_TYPE_SONG
-import com.metrolist.music.constants.PodcastFilter
-import com.metrolist.music.constants.PodcastFilterKey
-import com.metrolist.music.constants.SongSortDescendingKey
-import com.metrolist.music.constants.SongSortType
-import com.metrolist.music.constants.SongSortTypeKey
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.PodcastEntity
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.ui.component.ChipsRow
-import com.metrolist.music.ui.component.HideOnScrollFAB
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.SortHeader
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.utils.joinByBullet
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.LibraryPodcastsViewModel
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.LocalSyncUtils
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CONTENT_TYPE_HEADER
+import com.nestmusic.music.constants.CONTENT_TYPE_SONG
+import com.nestmusic.music.constants.PodcastFilter
+import com.nestmusic.music.constants.PodcastFilterKey
+import com.nestmusic.music.constants.SongSortDescendingKey
+import com.nestmusic.music.constants.SongSortType
+import com.nestmusic.music.constants.SongSortTypeKey
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.PodcastEntity
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.ui.component.ChipsRow
+import com.nestmusic.music.ui.component.HideOnScrollFAB
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.SortHeader
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.utils.joinByBullet
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.LibraryPodcastsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -175,7 +175,7 @@ fun LibraryPodcastsScreen(
                     },
                 ),
     ) {
-        // Chip row header — same pattern as LibrarySongsScreen
+        // Chip row header � same pattern as LibrarySongsScreen
         val chipsHeader = @Composable {
             Row {
                 Spacer(Modifier.width(12.dp))
@@ -211,7 +211,7 @@ fun LibraryPodcastsScreen(
         }
 
         when (podcastFilter) {
-            // ── EPISODES FOR LATER tab ────────────────────────────────────
+            // -- EPISODES FOR LATER tab ------------------------------------
             PodcastFilter.EPISODES -> {
                 LazyColumn(
                     state = lazyListState,
@@ -273,7 +273,7 @@ fun LibraryPodcastsScreen(
                 }
             }
 
-            // ── CHANNELS tab — podcast host artist pages from YT Music ───
+            // -- CHANNELS tab � podcast host artist pages from YT Music ---
             PodcastFilter.CHANNELS -> {
                 LazyColumn(
                     state = lazyListState,
@@ -341,7 +341,7 @@ fun LibraryPodcastsScreen(
                 }
             }
 
-            // ── DOWNLOADED tab ────────────────────────────────────────────
+            // -- DOWNLOADED tab --------------------------------------------
             PodcastFilter.DOWNLOADED -> {
                 LazyColumn(
                     state = lazyListState,
@@ -490,7 +490,7 @@ fun LibraryPodcastsScreen(
     }
 }
 
-/** Auto-playlist card — mirrors YT Music design. Used for both SE and RDPN playlists. */
+/** Auto-playlist card � mirrors YT Music design. Used for both SE and RDPN playlists. */
 @Composable
 private fun AutoPlaylistCard(
     title: String,
@@ -549,7 +549,7 @@ private fun AutoPlaylistCard(
                     buildString {
                         append(stringResource(R.string.auto_playlist))
                         if (!episodeCount.isNullOrBlank()) {
-                            append(" • ")
+                            append(" � ")
                             append(episodeCount)
                         }
                     },
@@ -562,7 +562,7 @@ private fun AutoPlaylistCard(
     }
 }
 
-/** Episode playlist row shown in the Episodes tab — represents a saved podcast show */
+/** Episode playlist row shown in the Episodes tab � represents a saved podcast show */
 @Composable
 private fun PodcastEpisodePlaylistItem(
     podcast: PodcastEntity,

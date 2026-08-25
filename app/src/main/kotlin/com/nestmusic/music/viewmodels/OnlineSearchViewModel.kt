@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -13,19 +13,19 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.filterExplicit
-import com.metrolist.innertube.models.filterVideoSongs
-import com.metrolist.innertube.models.filterYoutubeShorts
-import com.metrolist.innertube.pages.SearchSummaryPage
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.HideYoutubeShortsKey
-import com.metrolist.music.models.ItemsPage
-import com.metrolist.music.utils.SearchRoutes
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.filterExplicit
+import com.nestmusic.innertube.models.filterVideoSongs
+import com.nestmusic.innertube.models.filterYoutubeShorts
+import com.nestmusic.innertube.pages.SearchSummaryPage
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.HideYoutubeShortsKey
+import com.nestmusic.music.models.ItemsPage
+import com.nestmusic.music.utils.SearchRoutes
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +75,7 @@ constructor(
                     // The FILTER_EPISODE API returns episodes in a format that differs from the
                     // summary search: playlistItemData is absent and the subtitle structure is
                     // different, making reliable isEpisode detection fail for many items.
-                    // Reuse the "Episodes" section from the summary page instead — it is already
+                    // Reuse the "Episodes" section from the summary page instead � it is already
                     // parsed correctly by fromMusicResponsiveListItemRenderer and guaranteed to
                     // show the same results as the episodes section in the "All" filter.
                     if (viewStateMap[filter.value] == null) {

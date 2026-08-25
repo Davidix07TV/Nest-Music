@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.cast
+package com.nestmusic.music.cast
 
 import android.content.Context
 import androidx.media3.cast.CastPlayer

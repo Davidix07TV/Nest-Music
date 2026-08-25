@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,8 +6,8 @@
 package com.nestmusic.music.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.metrolist.music.ui.screens.settings.DarkMode
-import com.metrolist.music.ui.theme.DefaultThemeColor
+import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.theme.DefaultThemeColor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

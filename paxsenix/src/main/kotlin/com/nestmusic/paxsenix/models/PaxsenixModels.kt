@@ -1,4 +1,4 @@
-﻿package com.nestmusic.paxsenix.models
+package com.nestmusic.paxsenix.models
 
 import kotlinx.serialization.Serializable
 

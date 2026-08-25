@@ -1,14 +1,14 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.Album
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.BrowseEndpoint
-import com.metrolist.innertube.models.PlaylistPanelVideoRenderer
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.innertube.models.oddElements
-import com.metrolist.innertube.models.splitBySeparator
-import com.metrolist.innertube.utils.parseTime
+import com.nestmusic.innertube.models.Album
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.BrowseEndpoint
+import com.nestmusic.innertube.models.PlaylistPanelVideoRenderer
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.innertube.models.oddElements
+import com.nestmusic.innertube.models.splitBySeparator
+import com.nestmusic.innertube.utils.parseTime
 
 data class NextResult(
     val title: String? = null,

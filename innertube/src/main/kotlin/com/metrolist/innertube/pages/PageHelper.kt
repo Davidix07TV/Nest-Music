@@ -1,12 +1,12 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.Menu
-import com.metrolist.innertube.models.MusicResponsiveListItemRenderer.FlexColumn
-import com.metrolist.innertube.models.Run
-import com.metrolist.innertube.models.splitArtistsByConjunction
-import com.metrolist.innertube.models.splitBySeparator
-import com.metrolist.innertube.utils.parseTime
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.Menu
+import com.nestmusic.innertube.models.MusicResponsiveListItemRenderer.FlexColumn
+import com.nestmusic.innertube.models.Run
+import com.nestmusic.innertube.models.splitArtistsByConjunction
+import com.nestmusic.innertube.models.splitBySeparator
+import com.nestmusic.innertube.utils.parseTime
 import timber.log.Timber
 
 object PageHelper {

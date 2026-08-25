@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -22,9 +22,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.metrolist.music.ui.screens.wrapped.LocalWrappedManager
-import com.metrolist.music.ui.screens.wrapped.MessagePair
-import com.metrolist.music.ui.theme.bbh_bartle
+import com.nestmusic.music.ui.screens.wrapped.LocalWrappedManager
+import com.nestmusic.music.ui.screens.wrapped.MessagePair
+import com.nestmusic.music.ui.theme.bbh_bartle
 import kotlinx.coroutines.delay
 
 @Composable

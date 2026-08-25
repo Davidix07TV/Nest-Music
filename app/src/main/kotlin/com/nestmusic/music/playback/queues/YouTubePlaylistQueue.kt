@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,10 +6,10 @@
 package com.nestmusic.music.playback.queues
 
 import androidx.media3.common.MediaItem
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.MediaMetadata
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.MediaMetadata
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 

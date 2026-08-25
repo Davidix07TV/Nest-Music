@@ -1,10 +1,10 @@
-﻿package com.nestmusic.music.ui.screens.equalizer
+package com.nestmusic.music.ui.screens.equalizer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.music.eq.EqualizerService
-import com.metrolist.music.eq.data.EQProfileRepository
-import com.metrolist.music.eq.data.ParametricEQParser
+import com.nestmusic.music.eq.EqualizerService
+import com.nestmusic.music.eq.data.EQProfileRepository
+import com.nestmusic.music.eq.data.ParametricEQParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

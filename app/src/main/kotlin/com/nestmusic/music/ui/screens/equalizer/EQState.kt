@@ -1,6 +1,6 @@
-﻿package com.nestmusic.music.ui.screens.equalizer
+package com.nestmusic.music.ui.screens.equalizer
 
-import com.metrolist.music.eq.data.SavedEQProfile
+import com.nestmusic.music.eq.data.SavedEQProfile
 
 /**
  * UI State for EQ Screen

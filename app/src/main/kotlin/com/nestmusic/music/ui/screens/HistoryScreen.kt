@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -56,32 +56,32 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.metrolist.innertube.utils.parseCookieString
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.HistorySource
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.ChipsRow
-import com.metrolist.music.ui.component.HideOnScrollFAB
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.NavigationTitle
-import com.metrolist.music.ui.component.SongListItem
-import com.metrolist.music.ui.component.YouTubeListItem
-import com.metrolist.music.ui.menu.SelectionMediaMetadataMenu
-import com.metrolist.music.ui.menu.SongMenu
-import com.metrolist.music.ui.menu.YouTubeSongMenu
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.DateAgo
-import com.metrolist.music.viewmodels.HistoryViewModel
+import com.nestmusic.innertube.utils.parseCookieString
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.HistorySource
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.ChipsRow
+import com.nestmusic.music.ui.component.HideOnScrollFAB
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.NavigationTitle
+import com.nestmusic.music.ui.component.SongListItem
+import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.ui.menu.SelectionMediaMetadataMenu
+import com.nestmusic.music.ui.menu.SongMenu
+import com.nestmusic.music.ui.menu.YouTubeSongMenu
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.DateAgo
+import com.nestmusic.music.viewmodels.HistoryViewModel
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

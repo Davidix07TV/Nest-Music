@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -99,33 +99,33 @@ import androidx.datastore.preferences.core.edit
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.PlayerBackgroundStyle
-import com.metrolist.music.constants.QueueEditLockKey
-import com.metrolist.music.constants.UseNewPlayerDesignKey
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.extensions.move
-import com.metrolist.music.extensions.toggleRepeatMode
-import com.metrolist.music.listentogether.RoomRole
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.ui.component.ActionPromptDialog
-import com.metrolist.music.ui.component.BottomSheet
-import com.metrolist.music.ui.component.BottomSheetState
-import com.metrolist.music.ui.component.LocalBottomSheetPageState
-import com.metrolist.music.ui.component.LocalMenuState
-import com.metrolist.music.ui.component.MediaMetadataListItem
-import com.metrolist.music.ui.menu.PlayerMenu
-import com.metrolist.music.ui.menu.QueueMenu
-import com.metrolist.music.ui.menu.SelectionMediaMetadataMenu
-import com.metrolist.music.ui.utils.ShowMediaInfo
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.utils.safeDataStoreEdit
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.PlayerBackgroundStyle
+import com.nestmusic.music.constants.QueueEditLockKey
+import com.nestmusic.music.constants.UseNewPlayerDesignKey
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.extensions.move
+import com.nestmusic.music.extensions.toggleRepeatMode
+import com.nestmusic.music.listentogether.RoomRole
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.ui.component.ActionPromptDialog
+import com.nestmusic.music.ui.component.BottomSheet
+import com.nestmusic.music.ui.component.BottomSheetState
+import com.nestmusic.music.ui.component.LocalBottomSheetPageState
+import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.MediaMetadataListItem
+import com.nestmusic.music.ui.menu.PlayerMenu
+import com.nestmusic.music.ui.menu.QueueMenu
+import com.nestmusic.music.ui.menu.SelectionMediaMetadataMenu
+import com.nestmusic.music.ui.utils.ShowMediaInfo
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.utils.safeDataStoreEdit
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -133,11 +133,11 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.roundToInt
-import com.metrolist.music.constants.SleepTimerDefaultKey
+import com.nestmusic.music.constants.SleepTimerDefaultKey
 import android.widget.Toast
 import androidx.compose.runtime.derivedStateOf
-import com.metrolist.music.constants.SleepTimerFadeOutKey
-import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
+import com.nestmusic.music.constants.SleepTimerFadeOutKey
+import com.nestmusic.music.constants.SleepTimerStopAfterCurrentSongKey
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.material3.Button
 
@@ -169,7 +169,7 @@ fun Queue(
 
     // Listen Together state (reactive)
     val listenTogetherManager = LocalListenTogetherManager.current
-    val listenTogetherRoleState = listenTogetherManager?.role?.collectAsStateWithLifecycle(initialValue = com.metrolist.music.listentogether.RoomRole.NONE)
+    val listenTogetherRoleState = listenTogetherManager?.role?.collectAsStateWithLifecycle(initialValue = com.nestmusic.music.listentogether.RoomRole.NONE)
     val isListenTogetherGuest = listenTogetherRoleState?.value == RoomRole.GUEST
 
     val playerConnection = LocalPlayerConnection.current ?: return

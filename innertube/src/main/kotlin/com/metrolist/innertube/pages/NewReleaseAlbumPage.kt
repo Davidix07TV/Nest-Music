@@ -1,10 +1,10 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.MusicTwoRowItemRenderer
-import com.metrolist.innertube.models.oddElements
-import com.metrolist.innertube.models.splitBySeparator
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.MusicTwoRowItemRenderer
+import com.nestmusic.innertube.models.oddElements
+import com.nestmusic.innertube.models.splitBySeparator
 
 object NewReleaseAlbumPage {
     fun fromMusicTwoRowItemRenderer(renderer: MusicTwoRowItemRenderer): AlbumItem? {

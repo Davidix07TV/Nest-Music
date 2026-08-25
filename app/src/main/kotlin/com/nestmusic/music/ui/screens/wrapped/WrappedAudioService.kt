@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -12,11 +12,11 @@ import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.metrolist.music.R
-import com.metrolist.music.constants.AudioQuality
-import com.metrolist.music.utils.YTPlayerUtils
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AudioQuality
+import com.nestmusic.music.utils.YTPlayerUtils
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -103,7 +103,7 @@ class WrappedAudioService(
         }
 
         return try {
-            val audioQuality = context.dataStore.get(com.metrolist.music.constants.AudioQualityKey).let { value ->
+            val audioQuality = context.dataStore.get(com.nestmusic.music.constants.AudioQualityKey).let { value ->
                 if (value == "VERY_HIGH") AudioQuality.HIGH
                 else AudioQuality.entries.find { it.name == value } ?: AudioQuality.AUTO
             }

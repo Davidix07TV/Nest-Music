@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -42,24 +42,24 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.AiProviderKey
-import com.metrolist.music.constants.AiSystemPromptKey
-import com.metrolist.music.constants.DEFAULT_AI_SYSTEM_PROMPT
-import com.metrolist.music.constants.DeeplApiKey
-import com.metrolist.music.constants.DeeplFormalityKey
-import com.metrolist.music.constants.LanguageCodeToName
-import com.metrolist.music.constants.OpenRouterApiKey
-import com.metrolist.music.constants.OpenRouterBaseUrlKey
-import com.metrolist.music.constants.OpenRouterModelKey
-import com.metrolist.music.constants.TranslateLanguageKey
-import com.metrolist.music.constants.TranslateModeKey
-import com.metrolist.music.ui.component.EnumDialog
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.component.TextFieldDialog
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AiProviderKey
+import com.nestmusic.music.constants.AiSystemPromptKey
+import com.nestmusic.music.constants.DEFAULT_AI_SYSTEM_PROMPT
+import com.nestmusic.music.constants.DeeplApiKey
+import com.nestmusic.music.constants.DeeplFormalityKey
+import com.nestmusic.music.constants.LanguageCodeToName
+import com.nestmusic.music.constants.OpenRouterApiKey
+import com.nestmusic.music.constants.OpenRouterBaseUrlKey
+import com.nestmusic.music.constants.OpenRouterModelKey
+import com.nestmusic.music.constants.TranslateLanguageKey
+import com.nestmusic.music.constants.TranslateModeKey
+import com.nestmusic.music.ui.component.EnumDialog
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.component.TextFieldDialog
+import com.nestmusic.music.utils.rememberPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -529,7 +529,7 @@ fun AiSettings(navController: NavController) {
                                 description = {
                                     Text(
                                         if (deeplApiKey.isNotEmpty()) {
-                                            "â€¢".repeat(minOf(deeplApiKey.length, 8))
+                                            "•".repeat(minOf(deeplApiKey.length, 8))
                                         } else {
                                             stringResource(R.string.not_set)
                                         },
@@ -563,7 +563,7 @@ fun AiSettings(navController: NavController) {
                                 description = {
                                     Text(
                                         if (openRouterApiKey.isNotEmpty()) {
-                                            "â€¢".repeat(minOf(openRouterApiKey.length, 8))
+                                            "•".repeat(minOf(openRouterApiKey.length, 8))
                                         } else {
                                             stringResource(R.string.not_set)
                                         },
@@ -624,7 +624,7 @@ fun AiSettings(navController: NavController) {
                                     Text(
                                         if (aiSystemPrompt.isNotBlank()) {
                                             aiSystemPrompt.take(60).let {
-                                                if (aiSystemPrompt.length > 60) "$itâ€¦" else it
+                                                if (aiSystemPrompt.length > 60) "$it…" else it
                                             }
                                         } else {
                                             stringResource(R.string.ai_system_prompt_default)

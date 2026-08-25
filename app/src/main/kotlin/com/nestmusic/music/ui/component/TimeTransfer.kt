@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.component
+package com.nestmusic.music.ui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,9 +18,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.SongWithStats
-import com.metrolist.music.viewmodels.StatsViewModel
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.SongWithStats
+import com.nestmusic.music.viewmodels.StatsViewModel
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 

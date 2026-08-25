@@ -1,6 +1,6 @@
-package com.metrolist.innertube.utils
+package com.nestmusic.innertube.utils
 
-import com.metrolist.innertube.models.WatchEndpoint
+import com.nestmusic.innertube.models.WatchEndpoint
 
 /**
  * Utility class for parsing YouTube and YouTube Music URLs.

@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.cast
+package com.nestmusic.music.cast
 
 /**
  * Stub CastOptionsProvider for Izzy builds.

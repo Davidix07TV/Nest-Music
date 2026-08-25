@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  * 
@@ -89,43 +89,43 @@ import androidx.media3.exoplayer.offline.Download.STATE_DOWNLOADING
 import androidx.media3.exoplayer.offline.Download.STATE_QUEUED
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.EpisodeItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.PodcastItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.CropAlbumArtKey
-import com.metrolist.music.constants.GridItemSize
-import com.metrolist.music.constants.GridItemsSizeKey
-import com.metrolist.music.constants.GridThumbnailHeight
-import com.metrolist.music.constants.ListItemHeight
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.constants.SmallGridThumbnailHeight
-import com.metrolist.music.constants.SwipeToSongKey
-import com.metrolist.music.constants.ThumbnailCornerRadius
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.Artist
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.playback.queues.LocalAlbumRadio
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.joinByBullet
-import com.metrolist.music.utils.joinToArtistString
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.EpisodeItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.PodcastItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.CropAlbumArtKey
+import com.nestmusic.music.constants.GridItemSize
+import com.nestmusic.music.constants.GridItemsSizeKey
+import com.nestmusic.music.constants.GridThumbnailHeight
+import com.nestmusic.music.constants.ListItemHeight
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.constants.SmallGridThumbnailHeight
+import com.nestmusic.music.constants.SwipeToSongKey
+import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.Artist
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.playback.queues.LocalAlbumRadio
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.music.utils.joinByBullet
+import com.nestmusic.music.utils.joinToArtistString
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.utils.reportException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -190,7 +190,7 @@ fun ClickableArtistText(
 @JvmName("ClickableArtistTextInnerTube")
 @Composable
 fun ClickableArtistText(
-    artists: List<com.metrolist.innertube.models.Artist>,
+    artists: List<com.nestmusic.innertube.models.Artist>,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.bodySmall,
     maxLines: Int = 1,
@@ -1113,7 +1113,7 @@ fun MediaMetadataListItem(
                     )
                     append(base)
                     if (mediaMetadata.suggestedBy != null && base.isNotEmpty()) {
-                        append(" • ")
+                        append(" � ")
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(mediaMetadata.suggestedBy)
                         }

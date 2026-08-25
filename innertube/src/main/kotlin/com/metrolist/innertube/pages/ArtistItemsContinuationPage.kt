@@ -1,6 +1,6 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.YTItem
+import com.nestmusic.innertube.models.YTItem
 
 data class ArtistItemsContinuationPage(
     val items: List<YTItem>,

@@ -1,9 +1,9 @@
-package com.metrolist.innertube.models.response
+package com.nestmusic.innertube.models.response
 
-import com.metrolist.innertube.models.AccountInfo
-import com.metrolist.innertube.models.Runs
-import com.metrolist.innertube.models.Thumbnails
-import com.metrolist.innertube.models.Thumbnail
+import com.nestmusic.innertube.models.AccountInfo
+import com.nestmusic.innertube.models.Runs
+import com.nestmusic.innertube.models.Thumbnails
+import com.nestmusic.innertube.models.Thumbnail
 import kotlinx.serialization.Serializable
 
 @Serializable

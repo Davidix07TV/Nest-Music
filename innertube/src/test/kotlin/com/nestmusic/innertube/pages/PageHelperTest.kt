@@ -1,12 +1,12 @@
-ï»¿package com.nestmusic.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.BrowseEndpoint
-import com.metrolist.innertube.models.BrowseEndpoint.BrowseEndpointContextSupportedConfigs
-import com.metrolist.innertube.models.BrowseEndpoint.BrowseEndpointContextSupportedConfigs.BrowseEndpointContextMusicConfig
-import com.metrolist.innertube.models.BrowseEndpoint.BrowseEndpointContextSupportedConfigs.BrowseEndpointContextMusicConfig.Companion.MUSIC_PAGE_TYPE_ARTIST
-import com.metrolist.innertube.models.NavigationEndpoint
-import com.metrolist.innertube.models.Run
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.BrowseEndpoint
+import com.nestmusic.innertube.models.BrowseEndpoint.BrowseEndpointContextSupportedConfigs
+import com.nestmusic.innertube.models.BrowseEndpoint.BrowseEndpointContextSupportedConfigs.BrowseEndpointContextMusicConfig
+import com.nestmusic.innertube.models.BrowseEndpoint.BrowseEndpointContextSupportedConfigs.BrowseEndpointContextMusicConfig.Companion.MUSIC_PAGE_TYPE_ARTIST
+import com.nestmusic.innertube.models.NavigationEndpoint
+import com.nestmusic.innertube.models.Run
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -23,7 +23,7 @@ class PageHelperTest {
     fun `search metadata is not parsed as an artist`() {
         val runs = listOf(
             Run("Song", null),
-            Run(" â€¢ ", null),
+            Run(" • ", null),
             Run("3:04", null),
             Run("6m\u00a0plays", null),
         )
@@ -36,7 +36,7 @@ class PageHelperTest {
     fun `linked artist is found after search type label`() {
         val runs = listOf(
             Run("Song", null),
-            Run(" â€¢ ", null),
+            Run(" • ", null),
             Run(
                 "Lupus Nocte",
                 NavigationEndpoint(browseEndpoint = BrowseEndpoint(browseId = "UC123")),
@@ -51,9 +51,9 @@ class PageHelperTest {
         val artists = PageHelper.extractArtists(
             listOf(
                 Run("Artist", null),
-                Run(" â€¢ ", null),
+                Run(" • ", null),
                 Run("Album", null),
-                Run(" â€¢ ", null),
+                Run(" • ", null),
                 Run("3:42", null),
             ),
         )

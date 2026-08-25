@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.discord
+package com.nestmusic.music.discord
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

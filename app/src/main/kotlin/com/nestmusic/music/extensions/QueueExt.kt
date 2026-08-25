@@ -1,19 +1,19 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
 package com.nestmusic.music.extensions
 
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.models.PersistQueue
-import com.metrolist.music.models.QueueData
-import com.metrolist.music.models.QueueType
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.LocalAlbumRadio
-import com.metrolist.music.playback.queues.Queue
-import com.metrolist.music.playback.queues.YouTubeAlbumRadio
-import com.metrolist.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.models.PersistQueue
+import com.nestmusic.music.models.QueueData
+import com.nestmusic.music.models.QueueType
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.LocalAlbumRadio
+import com.nestmusic.music.playback.queues.Queue
+import com.nestmusic.music.playback.queues.YouTubeAlbumRadio
+import com.nestmusic.music.playback.queues.YouTubeQueue
 
 fun Queue.toPersistQueue(
     title: String?,

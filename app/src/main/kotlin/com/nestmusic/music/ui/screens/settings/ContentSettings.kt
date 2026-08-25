@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -52,48 +52,48 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.AppLanguageKey
-import com.metrolist.music.constants.ContentCountryKey
-import com.metrolist.music.constants.ContentLanguageKey
-import com.metrolist.music.constants.CountryCodeToName
-import com.metrolist.music.constants.EnableBetterLyricsKey
-import com.metrolist.music.constants.EnableKugouKey
-import com.metrolist.music.constants.EnableLrcLibKey
-import com.metrolist.music.constants.EnablePaxsenixKey
-import com.metrolist.music.constants.EnableLyricsPlus
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.HideYoutubeShortsKey
-import com.metrolist.music.constants.LanguageCodeToName
-import com.metrolist.music.constants.LyricsProviderOrderKey
-import com.metrolist.music.constants.ProxyEnabledKey
-import com.metrolist.music.constants.ProxyPasswordKey
-import com.metrolist.music.constants.ProxyTypeKey
-import com.metrolist.music.constants.ProxyUrlKey
-import com.metrolist.music.constants.ProxyUsernameKey
-import com.metrolist.music.constants.QuickPicks
-import com.metrolist.music.constants.QuickPicksKey
-import com.metrolist.music.constants.RandomizeHomeOrderKey
-import com.metrolist.music.constants.SYSTEM_DEFAULT
-import com.metrolist.music.constants.ShowArtistDescriptionKey
-import com.metrolist.music.constants.ShowMostStatsPlaylistsKey
-import com.metrolist.music.constants.ShowArtistSubscriberCountKey
-import com.metrolist.music.constants.ShowMonthlyListenersKey
-import com.metrolist.music.constants.ShowWrappedCardKey
-import com.metrolist.music.constants.TopSize
-import com.metrolist.music.ui.component.EnumDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.component.DraggableLyricsProviderItem
-import com.metrolist.music.ui.component.DraggableLyricsProviderList
-import com.metrolist.music.lyrics.LyricsProviderRegistry
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AppLanguageKey
+import com.nestmusic.music.constants.ContentCountryKey
+import com.nestmusic.music.constants.ContentLanguageKey
+import com.nestmusic.music.constants.CountryCodeToName
+import com.nestmusic.music.constants.EnableBetterLyricsKey
+import com.nestmusic.music.constants.EnableKugouKey
+import com.nestmusic.music.constants.EnableLrcLibKey
+import com.nestmusic.music.constants.EnablePaxsenixKey
+import com.nestmusic.music.constants.EnableLyricsPlus
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.HideYoutubeShortsKey
+import com.nestmusic.music.constants.LanguageCodeToName
+import com.nestmusic.music.constants.LyricsProviderOrderKey
+import com.nestmusic.music.constants.ProxyEnabledKey
+import com.nestmusic.music.constants.ProxyPasswordKey
+import com.nestmusic.music.constants.ProxyTypeKey
+import com.nestmusic.music.constants.ProxyUrlKey
+import com.nestmusic.music.constants.ProxyUsernameKey
+import com.nestmusic.music.constants.QuickPicks
+import com.nestmusic.music.constants.QuickPicksKey
+import com.nestmusic.music.constants.RandomizeHomeOrderKey
+import com.nestmusic.music.constants.SYSTEM_DEFAULT
+import com.nestmusic.music.constants.ShowArtistDescriptionKey
+import com.nestmusic.music.constants.ShowMostStatsPlaylistsKey
+import com.nestmusic.music.constants.ShowArtistSubscriberCountKey
+import com.nestmusic.music.constants.ShowMonthlyListenersKey
+import com.nestmusic.music.constants.ShowWrappedCardKey
+import com.nestmusic.music.constants.TopSize
+import com.nestmusic.music.ui.component.EnumDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.component.DraggableLyricsProviderItem
+import com.nestmusic.music.ui.component.DraggableLyricsProviderList
+import com.nestmusic.music.lyrics.LyricsProviderRegistry
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
 import java.net.Proxy
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,17 +141,17 @@ fun ContentSettings(
     LaunchedEffect(showMostStatsPlaylists) {
         if (!showMostStatsPlaylists) {
             database.withTransaction {
-                clearPlaylist(com.metrolist.music.db.entities.PlaylistEntity.WEEKLY_MOST_PLAYLIST_ID)
-                clearPlaylist(com.metrolist.music.db.entities.PlaylistEntity.MONTHLY_MOST_PLAYLIST_ID)
+                clearPlaylist(com.nestmusic.music.db.entities.PlaylistEntity.WEEKLY_MOST_PLAYLIST_ID)
+                clearPlaylist(com.nestmusic.music.db.entities.PlaylistEntity.MONTHLY_MOST_PLAYLIST_ID)
                 delete(
-                    com.metrolist.music.db.entities.PlaylistEntity(
-                        id = com.metrolist.music.db.entities.PlaylistEntity.WEEKLY_MOST_PLAYLIST_ID,
+                    com.nestmusic.music.db.entities.PlaylistEntity(
+                        id = com.nestmusic.music.db.entities.PlaylistEntity.WEEKLY_MOST_PLAYLIST_ID,
                         name = "",
                     ),
                 )
                 delete(
-                    com.metrolist.music.db.entities.PlaylistEntity(
-                        id = com.metrolist.music.db.entities.PlaylistEntity.MONTHLY_MOST_PLAYLIST_ID,
+                    com.nestmusic.music.db.entities.PlaylistEntity(
+                        id = com.nestmusic.music.db.entities.PlaylistEntity.MONTHLY_MOST_PLAYLIST_ID,
                         name = "",
                     ),
                 )

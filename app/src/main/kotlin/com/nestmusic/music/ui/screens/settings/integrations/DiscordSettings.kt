@@ -1,4 +1,4 @@
-ï»¿package com.nestmusic.music.ui.screens.settings.integrations
+package com.nestmusic.music.ui.screens.settings.integrations
 
 import android.app.Activity
 import android.content.Intent
@@ -74,40 +74,40 @@ import androidx.core.net.toUri
 import androidx.media3.common.Player.STATE_READY
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.constants.DiscordActivityNameKey
-import com.metrolist.music.constants.DiscordActivityTypeKey
-import com.metrolist.music.constants.DiscordAdvancedModeKey
-import com.metrolist.music.constants.DiscordAvatarKey
-import com.metrolist.music.constants.DiscordButton1EnabledKey
-import com.metrolist.music.constants.DiscordButton1LabelKey
-import com.metrolist.music.constants.DiscordButton1UrlKey
-import com.metrolist.music.constants.DiscordButton2EnabledKey
-import com.metrolist.music.constants.DiscordButton2LabelKey
-import com.metrolist.music.constants.DiscordButton2UrlKey
-import com.metrolist.music.constants.DiscordDetailsTemplateKey
-import com.metrolist.music.constants.DiscordInfoDismissedKey
-import com.metrolist.music.constants.DiscordNameKey
-import com.metrolist.music.constants.DiscordStateTemplateKey
-import com.metrolist.music.constants.DiscordUserStatusKey
-import com.metrolist.music.constants.DiscordUsernameKey
-import com.metrolist.music.constants.EnableDiscordRPCKey
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.discord.DiscordDefaults
-import com.metrolist.music.discord.DiscordRpcManager
-import com.metrolist.music.discord.DiscordTemplateRenderer
-import com.metrolist.music.ui.component.EnumDialog
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.makeTimeString
-import com.metrolist.music.utils.safeDataStoreEdit
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.DiscordActivityNameKey
+import com.nestmusic.music.constants.DiscordActivityTypeKey
+import com.nestmusic.music.constants.DiscordAdvancedModeKey
+import com.nestmusic.music.constants.DiscordAvatarKey
+import com.nestmusic.music.constants.DiscordButton1EnabledKey
+import com.nestmusic.music.constants.DiscordButton1LabelKey
+import com.nestmusic.music.constants.DiscordButton1UrlKey
+import com.nestmusic.music.constants.DiscordButton2EnabledKey
+import com.nestmusic.music.constants.DiscordButton2LabelKey
+import com.nestmusic.music.constants.DiscordButton2UrlKey
+import com.nestmusic.music.constants.DiscordDetailsTemplateKey
+import com.nestmusic.music.constants.DiscordInfoDismissedKey
+import com.nestmusic.music.constants.DiscordNameKey
+import com.nestmusic.music.constants.DiscordStateTemplateKey
+import com.nestmusic.music.constants.DiscordUserStatusKey
+import com.nestmusic.music.constants.DiscordUsernameKey
+import com.nestmusic.music.constants.EnableDiscordRPCKey
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.discord.DiscordDefaults
+import com.nestmusic.music.discord.DiscordRpcManager
+import com.nestmusic.music.discord.DiscordTemplateRenderer
+import com.nestmusic.music.ui.component.EnumDialog
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.makeTimeString
+import com.nestmusic.music.utils.safeDataStoreEdit
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -619,14 +619,14 @@ fun DiscordSettings(
                             if (btn1Enabled) {
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_label)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_label)}") },
                                         description = { Text(btn1Label) },
                                         onClick = { showBtn1LabelDialog = true },
                                     ),
                                 )
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_url)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_url)}") },
                                         description = { Text(btn1Url) },
                                         onClick = { showBtn1UrlDialog = true },
                                     ),
@@ -662,14 +662,14 @@ fun DiscordSettings(
                             if (btn2Enabled) {
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_label)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_label)}") },
                                         description = { Text(btn2Label) },
                                         onClick = { showBtn2LabelDialog = true },
                                     ),
                                 )
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_url)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_url)}") },
                                         description = { Text(btn2Url) },
                                         onClick = { showBtn2UrlDialog = true },
                                     ),
@@ -795,7 +795,7 @@ fun DiscordSettings(
 
     if (showBtn1LabelDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_label)}",
+            title = "${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_label)}",
             value = btn1Label,
             onDone = {
                 onBtn1LabelChange(it)
@@ -810,7 +810,7 @@ fun DiscordSettings(
 
     if (showBtn1UrlDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_url)}",
+            title = "${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_url)}",
             value = btn1Url,
             onDone = {
                 onBtn1UrlChange(it)
@@ -825,7 +825,7 @@ fun DiscordSettings(
 
     if (showBtn2LabelDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_label)}",
+            title = "${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_label)}",
             value = btn2Label,
             onDone = {
                 onBtn2LabelChange(it)
@@ -840,7 +840,7 @@ fun DiscordSettings(
 
     if (showBtn2UrlDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_url)}",
+            title = "${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_url)}",
             value = btn2Url,
             onDone = {
                 onBtn2UrlChange(it)

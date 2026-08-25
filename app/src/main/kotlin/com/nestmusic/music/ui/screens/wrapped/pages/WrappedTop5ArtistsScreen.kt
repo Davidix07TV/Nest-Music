@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -38,11 +38,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.Artist
-import com.metrolist.music.ui.screens.wrapped.components.AnimatedBackground
-import com.metrolist.music.ui.screens.wrapped.components.ShapeType
-import com.metrolist.music.ui.theme.bbh_bartle
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.Artist
+import com.nestmusic.music.ui.screens.wrapped.components.AnimatedBackground
+import com.nestmusic.music.ui.screens.wrapped.components.ShapeType
+import com.nestmusic.music.ui.theme.bbh_bartle
 import kotlinx.coroutines.delay
 
 @Composable

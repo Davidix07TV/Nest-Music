@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,10 +6,10 @@
 package com.nestmusic.music.lyrics
 
 import android.content.Context
-import com.metrolist.music.betterlyrics.TTMLParser
-import com.metrolist.music.constants.EnableLyricsPlus
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
+import com.nestmusic.music.betterlyrics.TTMLParser
+import com.nestmusic.music.constants.EnableLyricsPlus
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -289,9 +289,9 @@ object LyricsPlusProvider : LyricsProvider {
      * Converts a LyricsPlus JSON response to
      * Metrolist's extended LRC:
      *
-     *   [mm:ss.cc]{agent:v1}line text     ← multi-voice agent tag
-     *   <word:startSec:endSec|word:...>   ← word-sync block (Word mode only)
-     *   [mm:ss.cc]{bg}bg vocal text       ← first in a consecutive bg run
+     *   [mm:ss.cc]{agent:v1}line text     ? multi-voice agent tag
+     *   <word:startSec:endSec|word:...>   ? word-sync block (Word mode only)
+     *   [mm:ss.cc]{bg}bg vocal text       ? first in a consecutive bg run
      *   <word:startSec:endSec|...>
      */
     private fun convertToLrc(response: LyricsPlusResponse?): String? {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -69,17 +69,17 @@ import androidx.compose.ui.unit.sp
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.music.BuildConfig
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.playback.PlayerConnection
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.Material3SettingsGroup
-import com.metrolist.music.ui.component.Material3SettingsItem
-import com.metrolist.music.ui.utils.backToMain
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.music.BuildConfig
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.playback.PlayerConnection
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.Material3SettingsGroup
+import com.nestmusic.music.ui.component.Material3SettingsItem
+import com.nestmusic.music.ui.utils.backToMain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -252,28 +252,19 @@ fun AboutScreen(
                     .fillMaxWidth()
                     .padding(24.dp)
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_logo_oval),
-                        contentDescription = null,
-                        modifier = Modifier.size(84.dp)
-                    )
-                    Image(
-                        painter = painterResource(R.drawable.about_icon),
-                        contentDescription = stringResource(R.string.metrolist),
-                        modifier = Modifier.size(64.dp)
-                    )
-                }
+                Image(
+                    painter = painterResource(R.mipmap.ic_launcher),
+                    contentDescription = stringResource(R.string.app_name),
+                    modifier = Modifier.size(84.dp)
+                )
         
                 Spacer(Modifier.width(20.dp))
         
                 Column {
-                    val metrolistName = stringResource(R.string.metrolist)
-                        .lowercase(Locale.getDefault())
-                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                    val appName = stringResource(R.string.app_name)
 
                     Text(
-                        text = metrolistName,
+                        text = appName,
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Black,
                         color = MaterialTheme.colorScheme.onSurface,

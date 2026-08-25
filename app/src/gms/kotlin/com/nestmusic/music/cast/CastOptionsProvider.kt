@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.cast
+package com.nestmusic.music.cast
 
 import android.content.Context
 import com.google.android.gms.cast.CastMediaControlIntent

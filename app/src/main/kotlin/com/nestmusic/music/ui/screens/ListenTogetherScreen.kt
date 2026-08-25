@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -85,22 +85,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.constants.AppBarHeight
-import com.metrolist.music.constants.ListenTogetherInTopBarKey
-import com.metrolist.music.constants.ListenTogetherUsernameKey
-import com.metrolist.music.listentogether.ConnectionState
-import com.metrolist.music.listentogether.JoinRequestPayload
-import com.metrolist.music.listentogether.ListenTogetherEvent
-import com.metrolist.music.listentogether.RoomRole
-import com.metrolist.music.listentogether.SuggestionReceivedPayload
-import com.metrolist.music.listentogether.UserInfo
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.utils.backToMain
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AppBarHeight
+import com.nestmusic.music.constants.ListenTogetherInTopBarKey
+import com.nestmusic.music.constants.ListenTogetherUsernameKey
+import com.nestmusic.music.listentogether.ConnectionState
+import com.nestmusic.music.listentogether.JoinRequestPayload
+import com.nestmusic.music.listentogether.ListenTogetherEvent
+import com.nestmusic.music.listentogether.RoomRole
+import com.nestmusic.music.listentogether.SuggestionReceivedPayload
+import com.nestmusic.music.listentogether.UserInfo
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.launch
 import androidx.compose.material3.IconButton as MaterialIconButton
 

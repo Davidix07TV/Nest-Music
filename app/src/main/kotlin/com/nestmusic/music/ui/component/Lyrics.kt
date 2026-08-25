@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.music.constants.ExperimentalLyricsKey
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.viewmodels.LyricsViewModel
+import com.nestmusic.music.constants.ExperimentalLyricsKey
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.viewmodels.LyricsViewModel
 
 @Composable
 fun Lyrics(

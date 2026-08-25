@@ -250,12 +250,12 @@
     <string name="wrapped_intro_title">METROLIST</string>
     <string name="wrapped_intro_subtitle">è ora di vedere cosa hai ascoltato per quest\'anno…</string>
     <string name="wrapped_intro_button">cominciamo!</string>
-    <string name="wrapped_logo_content_description">Logo di Metrolist</string>
+    <string name="wrapped_logo_content_description">Logo di Nest Music</string>
     <string name="wrapped_year">2025</string>
     <string name="wrapped_ready_title">IL TUO WRAPPED È PRONTO!</string>
     <string name="wrapped_ready_subtitle">È ora di vedere cosa hai amato quest\'anno…</string>
     <string name="wrapped_thank_you">Grazie per l\'ascolto!</string>
-    <string name="wrapped_special_thanks">Un ringraziamento speciale a MO Agami per aver creato Metrolist</string>
+    <string name="wrapped_special_thanks">Un ringraziamento speciale a Davidix per aver creato Nest Music</string>
     <string name="wrapped_close">Chiudi Wrapped</string>
     <string name="wrapped_playlist_title">Il tuo Wrapped %s</string>
     <string name="wrapped_create_playlist">Crea playlist</string>

@@ -1,6 +1,6 @@
-﻿package com.nestmusic.music.discord
+package com.nestmusic.music.discord
 
-import com.metrolist.music.db.entities.Song
+import com.nestmusic.music.db.entities.Song
 import timber.log.Timber
 
 object DiscordActivityBuilder {
@@ -102,7 +102,7 @@ object DiscordActivityBuilder {
         )
 
         Timber.tag(TAG).d(
-            "build: result — name=%s, type=%d, state=%s, details=%s, btn1=%s, btn2=%s",
+            "build: result � name=%s, type=%d, state=%s, details=%s, btn1=%s, btn2=%s",
             result.name, result.activityType, result.state, result.details,
             result.button1Label?.take(30), result.button2Label?.take(30),
         )

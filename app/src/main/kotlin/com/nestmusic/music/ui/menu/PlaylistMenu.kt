@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -45,31 +45,31 @@ import androidx.core.net.toUri
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import com.metrolist.innertube.YouTube
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.LocalDownloadUtil
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.LocalPlayerConnection
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.PlaylistSong
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.extensions.toMediaItem
-import com.metrolist.music.playback.ExoDownloadService
-import com.metrolist.music.playback.queues.ListQueue
-import com.metrolist.music.playback.queues.YouTubeQueue
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.ui.component.NewAction
-import com.metrolist.music.ui.component.NewActionGrid
-import com.metrolist.music.ui.component.PlaylistListItem
-import com.metrolist.music.ui.component.TextFieldDialog
-import com.metrolist.music.ui.menu.ExportDialog
-import com.metrolist.music.utils.PlaylistExporter
-import com.metrolist.music.utils.getExportFileUri
-import com.metrolist.music.utils.saveToPublicDocuments
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.LocalDownloadUtil
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.LocalPlayerConnection
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.PlaylistSong
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.extensions.toMediaItem
+import com.nestmusic.music.playback.ExoDownloadService
+import com.nestmusic.music.playback.queues.ListQueue
+import com.nestmusic.music.playback.queues.YouTubeQueue
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.ui.component.NewAction
+import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.PlaylistListItem
+import com.nestmusic.music.ui.component.TextFieldDialog
+import com.nestmusic.music.ui.menu.ExportDialog
+import com.nestmusic.music.utils.PlaylistExporter
+import com.nestmusic.music.utils.getExportFileUri
+import com.nestmusic.music.utils.saveToPublicDocuments
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -663,9 +663,9 @@ fun PlaylistMenu(
             onShare = { format ->
                 val playlistSongs =
                     songs.map { s ->
-                        com.metrolist.music.db.entities.PlaylistSong(
+                        com.nestmusic.music.db.entities.PlaylistSong(
                             map =
-                                com.metrolist.music.db.entities.PlaylistSongMap(
+                                com.nestmusic.music.db.entities.PlaylistSongMap(
                                     songId = s.id,
                                     playlistId = playlist.id,
                                     position = 0,
@@ -698,9 +698,9 @@ fun PlaylistMenu(
             onSave = { format ->
                 val playlistSongs =
                     songs.map { s ->
-                        com.metrolist.music.db.entities.PlaylistSong(
+                        com.nestmusic.music.db.entities.PlaylistSong(
                             map =
-                                com.metrolist.music.db.entities.PlaylistSongMap(
+                                com.nestmusic.music.db.entities.PlaylistSongMap(
                                     songId = s.id,
                                     playlistId = playlist.id,
                                     position = 0,

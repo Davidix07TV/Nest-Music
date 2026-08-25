@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.discord
+package com.nestmusic.music.discord
 
 data class DiscordActivity(
     val activityType: Int = 2,

@@ -1,4 +1,4 @@
-package com.metrolist.innertube
+package com.nestmusic.innertube
 
 object YouTubeConstants {
     const val DEFAULT_TOP_RESULT = "Top result"

@@ -1,4 +1,4 @@
-﻿package com.nestmusic.lrclib.models
+package com.nestmusic.lrclib.models
 
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
@@ -24,7 +24,7 @@ internal fun List<Track>.bestMatchingFor(duration: Int): Track? {
         ?.takeIf { abs(it.duration.toInt() - duration) <= 2 }
 }
 
-// Relaxed matching with ±5 seconds tolerance
+// Relaxed matching with �5 seconds tolerance
 internal fun List<Track>.bestMatchingForRelaxed(duration: Int): Track? {
     if (isEmpty()) return null
 

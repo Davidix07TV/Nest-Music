@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,8 +6,8 @@
 package com.nestmusic.music.playback.queues
 
 import androidx.media3.common.MediaItem
-import com.metrolist.music.extensions.metadata
-import com.metrolist.music.models.MediaMetadata
+import com.nestmusic.music.extensions.metadata
+import com.nestmusic.music.models.MediaMetadata
 
 interface Queue {
     val preloadItem: MediaMetadata?

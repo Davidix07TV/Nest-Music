@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -29,8 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.metrolist.music.R
-import com.metrolist.music.constants.PlaylistSongSortType
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.PlaylistSongSortType
 
 @Composable
 inline fun <reified T : Enum<T>> SortHeader(

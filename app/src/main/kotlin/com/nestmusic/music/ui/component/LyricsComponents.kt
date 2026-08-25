@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -75,11 +75,11 @@ import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
-import com.metrolist.music.R
-import com.metrolist.music.lyrics.LyricsTranslationHelper
-import com.metrolist.music.models.MediaMetadata
-import com.metrolist.music.ui.screens.settings.LyricsPosition
-import com.metrolist.music.utils.ComposeToImage
+import com.nestmusic.music.R
+import com.nestmusic.music.lyrics.LyricsTranslationHelper
+import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.ui.screens.settings.LyricsPosition
+import com.nestmusic.music.utils.ComposeToImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

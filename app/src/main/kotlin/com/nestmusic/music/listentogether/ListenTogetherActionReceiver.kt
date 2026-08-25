@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.listentogether
+package com.nestmusic.music.listentogether
 
 import android.content.BroadcastReceiver
 import android.content.Context

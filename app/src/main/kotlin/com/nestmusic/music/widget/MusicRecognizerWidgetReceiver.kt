@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -16,37 +16,37 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
-import com.metrolist.music.MainActivity
-import com.metrolist.music.R
-import com.metrolist.music.recognition.MusicRecognitionService
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.ALBUM_ART_CACHE_FILE
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.PREF_ARTIST_NAME
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.PREF_COVER_ART_PATH
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.PREF_ERROR_MESSAGE
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.PREF_PULSE_FRAME
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.PREF_SONG_TITLE
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.PREF_STATE
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.PREFS_NAME
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.STATE_ERROR
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.STATE_IDLE
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.STATE_LISTENING
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.STATE_NO_MATCH
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.STATE_PROCESSING
-import com.metrolist.music.widget.MusicRecognizerWidgetService.Companion.STATE_SUCCESS
+import com.nestmusic.music.MainActivity
+import com.nestmusic.music.R
+import com.nestmusic.music.recognition.MusicRecognitionService
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.ALBUM_ART_CACHE_FILE
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.PREF_ARTIST_NAME
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.PREF_COVER_ART_PATH
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.PREF_ERROR_MESSAGE
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.PREF_PULSE_FRAME
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.PREF_SONG_TITLE
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.PREF_STATE
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.PREFS_NAME
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.STATE_ERROR
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.STATE_IDLE
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.STATE_LISTENING
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.STATE_NO_MATCH
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.STATE_PROCESSING
+import com.nestmusic.music.widget.MusicRecognizerWidgetService.Companion.STATE_SUCCESS
 import java.io.File
 
 /**
  * AppWidgetProvider for the Music Recognizer Widget.
  *
  * Sizes:
- *  - 1×1 (minWidth < 110dp): Only the animated mic circle
- *  - 1×3 (minWidth 110–229dp): Album art + song info + mic button (compact)
- *  - 1×4 (minWidth ≥ 230dp): Album art + song info + mic button (wide, default)
+ *  - 1�1 (minWidth < 110dp): Only the animated mic circle
+ *  - 1�3 (minWidth 110�229dp): Album art + song info + mic button (compact)
+ *  - 1�4 (minWidth = 230dp): Album art + song info + mic button (wide, default)
  *
  * Click behaviour:
- *  - Mic button  → start / stop recognition
- *  - Album art / text area (SUCCESS) → open app on recognition history screen
- *  - Album art / text area (other)   → open app on recognition screen
+ *  - Mic button  ? start / stop recognition
+ *  - Album art / text area (SUCCESS) ? open app on recognition history screen
+ *  - Album art / text area (other)   ? open app on recognition screen
  */
 class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
 
@@ -89,13 +89,13 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
         }
     }
 
-    // ─── Recognition start / stop ─────────────────────────────────────────────
+    // --- Recognition start / stop ---------------------------------------------
 
     private fun handleStartRecognition(context: Context) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val currentState = prefs.getInt(PREF_STATE, STATE_IDLE)
 
-        // If active → stop
+        // If active ? stop
         if (currentState == STATE_LISTENING || currentState == STATE_PROCESSING) {
             context.startService(
                 Intent(context, MusicRecognizerWidgetService::class.java).apply {
@@ -105,12 +105,12 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
             return
         }
 
-        // Showing a result/error → clear it before starting a new search
+        // Showing a result/error ? clear it before starting a new search
         if (currentState == STATE_SUCCESS || currentState == STATE_NO_MATCH || currentState == STATE_ERROR) {
             prefs.edit().putInt(PREF_STATE, STATE_IDLE).apply()
         }
 
-        // No mic permission → open the app so the user can grant it
+        // No mic permission ? open the app so the user can grant it
         if (!MusicRecognitionService.hasRecordPermission(context)) {
             context.startActivity(
                 Intent(context, MainActivity::class.java).apply {
@@ -132,7 +132,7 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
         }
     }
 
-    // ─── Widget update ────────────────────────────────────────────────────────
+    // --- Widget update --------------------------------------------------------
 
     private fun updateAllWidgets(context: Context, appWidgetManager: AppWidgetManager) {
         val componentName = ComponentName(context, MusicRecognizerWidgetReceiver::class.java)
@@ -165,7 +165,7 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
         }
     }
 
-    // ─── Layout builders ──────────────────────────────────────────────────────
+    // --- Layout builders ------------------------------------------------------
 
     private fun createWideViews(
         context: Context,
@@ -218,7 +218,7 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
         return views
     }
 
-    // ─── State helpers ────────────────────────────────────────────────────────
+    // --- State helpers --------------------------------------------------------
 
     private fun applyAlbumArt(
         views: RemoteViews,
@@ -305,9 +305,9 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
         views.setImageViewResource(pulseViewId, pulseDrawable)
     }
 
-    // ─── PendingIntents ───────────────────────────────────────────────────────
+    // --- PendingIntents -------------------------------------------------------
 
-    /** Tap on mic button → start or stop recognition */
+    /** Tap on mic button ? start or stop recognition */
     private fun getMicIntent(context: Context): PendingIntent =
         PendingIntent.getBroadcast(
             context, 20,
@@ -318,7 +318,7 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
         )
 
     /**
-     * Tap on song info area / album art → always open the recognition screen.
+     * Tap on song info area / album art ? always open the recognition screen.
      * On SUCCESS the screen will show the result that the widget service already
      * set on [MusicRecognitionService.recognitionStatus].
      */
@@ -333,8 +333,8 @@ class MusicRecognizerWidgetReceiver : AppWidgetProvider() {
         )
 
     companion object {
-        const val ACTION_START_RECOGNITION = "com.metrolist.music.widget.recognizer.TAP_MIC"
-        const val ACTION_UPDATE_WIDGET = "com.metrolist.music.widget.recognizer.UPDATE"
-        const val ACTION_RESET_STATE = "com.metrolist.music.widget.recognizer.RESET"
+        const val ACTION_START_RECOGNITION = "com.nestmusic.music.widget.recognizer.TAP_MIC"
+        const val ACTION_UPDATE_WIDGET = "com.nestmusic.music.widget.recognizer.UPDATE"
+        const val ACTION_RESET_STATE = "com.nestmusic.music.widget.recognizer.RESET"
     }
 }

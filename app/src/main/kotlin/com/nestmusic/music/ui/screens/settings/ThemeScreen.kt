@@ -1,4 +1,4 @@
-﻿package com.nestmusic.music.ui.screens.settings
+package com.nestmusic.music.ui.screens.settings
 
 import android.content.res.Configuration
 import android.os.Build
@@ -72,16 +72,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
-import com.metrolist.music.R
-import com.metrolist.music.constants.DarkModeKey
-import com.metrolist.music.constants.DynamicThemeKey
-import com.metrolist.music.constants.PureBlackKey
-import com.metrolist.music.constants.PureBlackMiniPlayerKey
-import com.metrolist.music.constants.SelectedThemeColorKey
-import com.metrolist.music.ui.theme.DefaultThemeColor
-import com.metrolist.music.ui.theme.MetrolistTheme
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.DarkModeKey
+import com.nestmusic.music.constants.DynamicThemeKey
+import com.nestmusic.music.constants.PureBlackKey
+import com.nestmusic.music.constants.PureBlackMiniPlayerKey
+import com.nestmusic.music.constants.SelectedThemeColorKey
+import com.nestmusic.music.ui.theme.DefaultThemeColor
+import com.nestmusic.music.ui.theme.MetrolistTheme
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
 
 data class ThemePalette(
     val nameRes: Int,

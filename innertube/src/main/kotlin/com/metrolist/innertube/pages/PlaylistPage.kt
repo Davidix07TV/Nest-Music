@@ -1,10 +1,10 @@
-package com.metrolist.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.Album
-import com.metrolist.innertube.models.MusicResponsiveListItemRenderer
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.utils.parseTime
+import com.nestmusic.innertube.models.Album
+import com.nestmusic.innertube.models.MusicResponsiveListItemRenderer
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.utils.parseTime
 import timber.log.Timber
 
 data class PlaylistPage(

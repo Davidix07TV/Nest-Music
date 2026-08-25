@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -34,28 +34,28 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.music.LocalDatabase
-import com.metrolist.music.R
-import com.metrolist.music.constants.AddToPlaylistSortDescendingKey
-import com.metrolist.music.constants.AddToPlaylistSortTypeKey
-import com.metrolist.music.constants.ListThumbnailSize
-import com.metrolist.music.constants.PlaylistSortType
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.models.ItemsPage
-import com.metrolist.music.models.toMediaMetadata
-import com.metrolist.music.ui.component.CreatePlaylistDialog
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.ListDialog
-import com.metrolist.music.ui.component.ListItem
-import com.metrolist.music.ui.component.PlaylistListItem
-import com.metrolist.music.ui.component.SortHeader
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import com.metrolist.music.utils.reportException
-import com.metrolist.music.viewmodels.PlaylistsViewModel
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.music.LocalDatabase
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.AddToPlaylistSortDescendingKey
+import com.nestmusic.music.constants.AddToPlaylistSortTypeKey
+import com.nestmusic.music.constants.ListThumbnailSize
+import com.nestmusic.music.constants.PlaylistSortType
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.models.ItemsPage
+import com.nestmusic.music.models.toMediaMetadata
+import com.nestmusic.music.ui.component.CreatePlaylistDialog
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.ListItem
+import com.nestmusic.music.ui.component.PlaylistListItem
+import com.nestmusic.music.ui.component.SortHeader
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.utils.reportException
+import com.nestmusic.music.viewmodels.PlaylistsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

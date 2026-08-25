@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -32,17 +32,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.offline.Download
-import com.metrolist.music.LocalListenTogetherManager
-import com.metrolist.music.R
-import com.metrolist.music.db.entities.Playlist
-import com.metrolist.music.db.entities.PlaylistSong
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.ui.component.DefaultDialog
-import com.metrolist.music.ui.component.Material3MenuGroup
-import com.metrolist.music.ui.component.Material3MenuItemData
-import com.metrolist.music.utils.PlaylistExporter
-import com.metrolist.music.utils.getExportFileUri
-import com.metrolist.music.utils.saveToPublicDocuments
+import com.nestmusic.music.LocalListenTogetherManager
+import com.nestmusic.music.R
+import com.nestmusic.music.db.entities.Playlist
+import com.nestmusic.music.db.entities.PlaylistSong
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.ui.component.DefaultDialog
+import com.nestmusic.music.ui.component.Material3MenuGroup
+import com.nestmusic.music.ui.component.Material3MenuItemData
+import com.nestmusic.music.utils.PlaylistExporter
+import com.nestmusic.music.utils.getExportFileUri
+import com.nestmusic.music.utils.saveToPublicDocuments
 import kotlinx.coroutines.launch
 
 /**
@@ -426,7 +426,7 @@ fun AutoPlaylistMenu(
             songs.map { song ->
                 PlaylistSong(
                     map =
-                        com.metrolist.music.db.entities.PlaylistSongMap(
+                        com.nestmusic.music.db.entities.PlaylistSongMap(
                             songId = song.id,
                             playlistId = "auto_playlist",
                             position = 0,

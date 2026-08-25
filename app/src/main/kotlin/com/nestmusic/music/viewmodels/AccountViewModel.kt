@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -8,19 +8,19 @@ package com.nestmusic.music.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.filterYoutubeShorts
-import com.metrolist.innertube.utils.completed
-import com.metrolist.music.constants.HideYoutubeShortsKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.PodcastEntity
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.filterYoutubeShorts
+import com.nestmusic.innertube.utils.completed
+import com.nestmusic.music.constants.HideYoutubeShortsKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.PodcastEntity
+import com.nestmusic.music.ui.utils.resize
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

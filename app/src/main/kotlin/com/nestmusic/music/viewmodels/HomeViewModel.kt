@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -8,45 +8,45 @@ package com.nestmusic.music.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.metrolist.innertube.YouTube
-import com.metrolist.innertube.models.AlbumItem
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.ArtistItem
-import com.metrolist.innertube.models.PlaylistItem
-import com.metrolist.innertube.models.SongItem
+import com.nestmusic.innertube.YouTube
+import com.nestmusic.innertube.models.AlbumItem
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.ArtistItem
+import com.nestmusic.innertube.models.PlaylistItem
+import com.nestmusic.innertube.models.SongItem
 import kotlinx.coroutines.flow.combine
-import com.metrolist.innertube.models.WatchEndpoint
-import com.metrolist.innertube.models.BrowseEndpoint
-import com.metrolist.innertube.models.YTItem
-import com.metrolist.innertube.models.filterExplicit
-import com.metrolist.innertube.models.filterVideoSongs
-import com.metrolist.innertube.models.filterYoutubeShorts
-import com.metrolist.innertube.pages.ExplorePage
-import com.metrolist.innertube.pages.HomePage
-import com.metrolist.innertube.utils.completed
-import com.metrolist.music.constants.HideExplicitKey
-import com.metrolist.music.constants.HideVideoSongsKey
-import com.metrolist.music.constants.HideYoutubeShortsKey
-import com.metrolist.music.constants.InnerTubeCookieKey
-import com.metrolist.music.constants.QuickPicks
-import com.metrolist.music.constants.QuickPicksKey
-import com.metrolist.music.constants.ShowWrappedCardKey
-import com.metrolist.music.constants.WrappedSeenKey
-import com.metrolist.music.db.MusicDatabase
-import com.metrolist.music.db.entities.Album
-import com.metrolist.music.db.entities.LocalItem
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SpeedDialItem
-import com.metrolist.music.extensions.filterVideoSongs
-import com.metrolist.music.extensions.toEnum
-import com.metrolist.music.models.SimilarRecommendation
-import com.metrolist.music.ui.screens.wrapped.WrappedAudioService
-import com.metrolist.music.ui.screens.wrapped.WrappedManager
-import com.metrolist.music.utils.SyncUtils
-import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.safeDataStoreEdit
-import com.metrolist.music.utils.get
-import com.metrolist.music.utils.reportException
+import com.nestmusic.innertube.models.WatchEndpoint
+import com.nestmusic.innertube.models.BrowseEndpoint
+import com.nestmusic.innertube.models.YTItem
+import com.nestmusic.innertube.models.filterExplicit
+import com.nestmusic.innertube.models.filterVideoSongs
+import com.nestmusic.innertube.models.filterYoutubeShorts
+import com.nestmusic.innertube.pages.ExplorePage
+import com.nestmusic.innertube.pages.HomePage
+import com.nestmusic.innertube.utils.completed
+import com.nestmusic.music.constants.HideExplicitKey
+import com.nestmusic.music.constants.HideVideoSongsKey
+import com.nestmusic.music.constants.HideYoutubeShortsKey
+import com.nestmusic.music.constants.InnerTubeCookieKey
+import com.nestmusic.music.constants.QuickPicks
+import com.nestmusic.music.constants.QuickPicksKey
+import com.nestmusic.music.constants.ShowWrappedCardKey
+import com.nestmusic.music.constants.WrappedSeenKey
+import com.nestmusic.music.db.MusicDatabase
+import com.nestmusic.music.db.entities.Album
+import com.nestmusic.music.db.entities.LocalItem
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SpeedDialItem
+import com.nestmusic.music.extensions.filterVideoSongs
+import com.nestmusic.music.extensions.toEnum
+import com.nestmusic.music.models.SimilarRecommendation
+import com.nestmusic.music.ui.screens.wrapped.WrappedAudioService
+import com.nestmusic.music.ui.screens.wrapped.WrappedManager
+import com.nestmusic.music.utils.SyncUtils
+import com.nestmusic.music.utils.dataStore
+import com.nestmusic.music.utils.safeDataStoreEdit
+import com.nestmusic.music.utils.get
+import com.nestmusic.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -105,7 +105,7 @@ class HomeViewModel @Inject constructor(
     private val previousHomePage = MutableStateFlow<HomePage?>(null)
 
     // Official API data for podcast sections
-    val savedPodcastShows = MutableStateFlow<List<com.metrolist.innertube.models.PodcastItem>>(emptyList())
+    val savedPodcastShows = MutableStateFlow<List<com.nestmusic.innertube.models.PodcastItem>>(emptyList())
     val episodesForLater = MutableStateFlow<List<SongItem>>(emptyList())
 
     val allLocalItems = MutableStateFlow<List<LocalItem>>(emptyList())
@@ -148,7 +148,7 @@ class HomeViewModel @Inject constructor(
                                 year = item.album.year,
                                 thumbnail = item.thumbnailUrl ?: ""
                             )
-                            is com.metrolist.music.db.entities.Artist -> ArtistItem(
+                            is com.nestmusic.music.db.entities.Artist -> ArtistItem(
                                 id = item.id,
                                 title = item.title,
                                 thumbnail = item.thumbnailUrl,
@@ -223,7 +223,7 @@ class HomeViewModel @Inject constructor(
                             year = item.album.year,
                             thumbnail = item.thumbnailUrl ?: ""
                         ))
-                        is com.metrolist.music.db.entities.Artist -> otherSources.add(ArtistItem(
+                        is com.nestmusic.music.db.entities.Artist -> otherSources.add(ArtistItem(
                             id = item.id,
                             title = item.title,
                             thumbnail = item.thumbnailUrl,
@@ -463,7 +463,7 @@ class HomeViewModel @Inject constructor(
         val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
         val fromTimeStamp = LocalDateTime.now().minusWeeks(2)
 
-        // Phase 1: Load essential sections in parallel â€” local DB (fast) + YouTube home page.
+        // Phase 1: Load essential sections in parallel — local DB (fast) + YouTube home page.
         // isLoading is set to false as soon as all Phase 1 tasks complete so the UI appears quickly.
         coroutineScope {
             launch(Dispatchers.IO) { getQuickPicks() }
@@ -507,7 +507,7 @@ class HomeViewModel @Inject constructor(
             .filter { it is Song || it is Album }
         isLoading.value = false
 
-        // Phase 2: Heavy multi-request operations â€” run in background without blocking the UI.
+        // Phase 2: Heavy multi-request operations — run in background without blocking the UI.
         viewModelScope.launch(Dispatchers.IO) { getDailyDiscover() }
 
         viewModelScope.launch(Dispatchers.IO) { getCommunityPlaylists() }

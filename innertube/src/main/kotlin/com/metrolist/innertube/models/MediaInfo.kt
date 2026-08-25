@@ -1,4 +1,4 @@
-package com.metrolist.innertube.models
+package com.nestmusic.innertube.models
 
 data class MediaInfo(
     val videoId: String,

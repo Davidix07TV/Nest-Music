@@ -1,8 +1,8 @@
-﻿package com.nestmusic.music.playback
+package com.nestmusic.music.playback
 
-import com.metrolist.music.db.entities.ArtistEntity
-import com.metrolist.music.db.entities.Song
-import com.metrolist.music.db.entities.SongEntity
+import com.nestmusic.music.db.entities.ArtistEntity
+import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SongEntity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue

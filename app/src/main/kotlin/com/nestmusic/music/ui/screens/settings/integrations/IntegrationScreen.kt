@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -20,12 +20,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.metrolist.music.LocalPlayerAwareWindowInsets
-import com.metrolist.music.R
-import com.metrolist.music.ui.component.IconButton
-import com.metrolist.music.ui.component.IntegrationCard
-import com.metrolist.music.ui.component.IntegrationCardItem
-import com.metrolist.music.ui.utils.backToMain
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.R
+import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.component.IntegrationCard
+import com.nestmusic.music.ui.component.IntegrationCardItem
+import com.nestmusic.music.ui.utils.backToMain
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

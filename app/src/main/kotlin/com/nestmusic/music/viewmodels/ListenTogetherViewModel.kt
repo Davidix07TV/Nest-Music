@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -6,7 +6,7 @@
 package com.nestmusic.music.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.metrolist.music.listentogether.ListenTogetherManager
+import com.nestmusic.music.listentogether.ListenTogetherManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

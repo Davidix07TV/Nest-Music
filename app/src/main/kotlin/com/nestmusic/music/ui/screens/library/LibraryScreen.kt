@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -13,12 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.metrolist.music.LocalNavController
-import com.metrolist.music.R
-import com.metrolist.music.constants.ChipSortTypeKey
-import com.metrolist.music.constants.LibraryFilter
-import com.metrolist.music.ui.component.ChipsRow
-import com.metrolist.music.utils.rememberEnumPreference
+import com.nestmusic.music.LocalNavController
+import com.nestmusic.music.R
+import com.nestmusic.music.constants.ChipSortTypeKey
+import com.nestmusic.music.constants.LibraryFilter
+import com.nestmusic.music.ui.component.ChipsRow
+import com.nestmusic.music.utils.rememberEnumPreference
 
 @Composable
 fun LibraryScreen() {

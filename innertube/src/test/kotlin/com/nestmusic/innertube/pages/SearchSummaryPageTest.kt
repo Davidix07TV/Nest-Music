@@ -1,13 +1,13 @@
-﻿package com.nestmusic.innertube.pages
+package com.nestmusic.innertube.pages
 
-import com.metrolist.innertube.models.Artist
-import com.metrolist.innertube.models.MusicResponsiveListItemRenderer
-import com.metrolist.innertube.models.Run
-import com.metrolist.innertube.models.Runs
-import com.metrolist.innertube.models.SongItem
-import com.metrolist.innertube.models.Thumbnail
-import com.metrolist.innertube.models.ThumbnailRenderer
-import com.metrolist.innertube.models.Thumbnails
+import com.nestmusic.innertube.models.Artist
+import com.nestmusic.innertube.models.MusicResponsiveListItemRenderer
+import com.nestmusic.innertube.models.Run
+import com.nestmusic.innertube.models.Runs
+import com.nestmusic.innertube.models.SongItem
+import com.nestmusic.innertube.models.Thumbnail
+import com.nestmusic.innertube.models.ThumbnailRenderer
+import com.nestmusic.innertube.models.Thumbnails
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -18,7 +18,7 @@ class SearchSummaryPageTest {
             title = "Howling",
             metadata = listOf(
                 Run("Song", null),
-                Run(" • ", null),
+                Run(" � ", null),
                 Run("3:04", null),
                 Run("6m\u00a0plays", null),
             ),

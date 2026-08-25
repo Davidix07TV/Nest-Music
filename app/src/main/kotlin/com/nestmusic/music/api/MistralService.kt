@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
@@ -71,7 +71,7 @@ CRITICAL RULES:
 
 CRITICAL REQUIREMENTS:
 - Use ONLY simple ASCII characters (a-z, A-Z, 0-9, basic punctuation)
-- NO special characters like ā, ī, ū, ñ, ç, etc.
+- NO special characters like a, i, u, �, �, etc.
 - NO diacritics or accent marks
 - If text is already in Latin script, return it UNCHANGED
 - For non-Latin scripts (Hindi, Chinese, Japanese, Korean, Cyrillic, etc.), provide simple romanization
@@ -80,9 +80,9 @@ CRITICAL REQUIREMENTS:
 - Preserve line-by-line structure exactly
 
 Examples of correct simple romanization:
-- Sanskrit/Hindi "आ" → "aa" (not "ā")
-- Japanese "東京" → "toukyou" or "tokyo" (not "tōkyō")
-- Korean "서울" → "seoul" (not "sŏul")
+- Sanskrit/Hindi "?" ? "aa" (not "a")
+- Japanese "??" ? "toukyou" or "tokyo" (not "tokyo")
+- Korean "??" ? "seoul" (not "soul")
 
 Input ($lineCount lines):
 $text
@@ -103,9 +103,9 @@ CRITICAL REQUIREMENTS:
 - If text is already in $targetLanguage script, return it UNCHANGED
 
 Examples:
-- Japanese "こんにちは" to Hindi → "कोन्निचिवा" (phonetic, not translation)
-- English "Hello" to Hindi → "हेलो" (phonetic)
-- Korean "안녕하세요" to Hindi → "अन्न्योंग हासेयो" (phonetic)
+- Japanese "?????" to Hindi ? "??????????" (phonetic, not translation)
+- English "Hello" to Hindi ? "????" (phonetic)
+- Korean "?????" to Hindi ? "????????? ??????" (phonetic)
 
 Input ($lineCount lines):
 $text
