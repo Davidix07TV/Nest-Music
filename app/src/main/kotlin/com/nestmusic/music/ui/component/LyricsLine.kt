@@ -275,6 +275,7 @@ internal fun LyricsLine(
                 horizontalAlignment = agentAlignment
             ) {
                 if (isActiveLine && isSynced && !item.isBackground) {
+                    val isPlaybackActive by playerConnection.isPlaying.collectAsState()
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -282,7 +283,7 @@ internal fun LyricsLine(
                     ) {
                         RealtimeLyricsVisualizer(
                             color = expressiveAccent,
-                            isPlaying = playerConnection.player.isPlaying
+                            isPlaying = isPlaybackActive
                         )
                     }
                 }
@@ -445,7 +446,7 @@ private fun WordLevelLyrics(
                         lastUpdateTime = now
                     }
                     val elapsed = now - lastUpdateTime
-                    smoothPosition = lastPlayerPos + lyricsOffset + (if (playerConnection.player.isPlaying) elapsed else 0)
+                    smoothPosition = lastPlayerPos + lyricsOffset + (if (playerConnection.isPlaying.value) elapsed else 0)
                 }
             }
         }

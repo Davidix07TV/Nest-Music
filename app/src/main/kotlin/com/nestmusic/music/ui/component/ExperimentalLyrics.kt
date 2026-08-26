@@ -359,7 +359,7 @@ fun ExperimentalLyrics(
                     lastUpdateTime = now
                 }
                 val elapsed = now - lastUpdateTime
-                lastPlayerPos + (if (playerConnection.player.isPlaying) elapsed else 0)
+                lastPlayerPos + (if (playerConnection.isPlaying.value) elapsed else 0)
             }
             
             currentPositionState = position
