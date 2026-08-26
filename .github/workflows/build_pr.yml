@@ -39,32 +39,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Restore PR debug keystore
-        id: pr_keystore
-        uses: actions/cache/restore@v5
-        with:
-          path: app/pr-debug.keystore
-          key: pr-debug-keystore-${{ github.event.number || github.ref }}
-
-      - name: Generate PR debug keystore if not cached
-        if: steps.pr_keystore.outputs.cache-hit != 'true'
+      - name: Generate Keystore
         run: |
+          mkdir -p ~/.android app
           keytool -genkeypair -v \
-            -keystore app/pr-debug.keystore \
+            -keystore ~/.android/debug.keystore \
             -storepass android \
             -alias androiddebugkey \
             -keypass android \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -dname "CN=Nest Music PR ${{ github.event.number || 'manual' }},O=NestMusic,C=US"
-
-      - name: Save PR debug keystore
-        if: steps.pr_keystore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v5
-        with:
-          path: app/pr-debug.keystore
-          key: ${{ steps.pr_keystore.outputs.cache-primary-key }}
+            -dname "CN=Nest Music,O=NestMusic,C=US"
+          cp ~/.android/debug.keystore app/persistent-debug.keystore
+          cp ~/.android/debug.keystore app/pr-debug.keystore
 
       - name: Build FOSS Release APK
         run: ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease
