@@ -1,0 +1,303 @@
+name: Release
+
+# Single public repo: releases, updater manifest (updates/latest.json), news and the
+# installer all live here. Windows and macOS (Apple Silicon) build on their own runners,
+# then one publish job writes the combined latest.json back to this repo.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  # Fallback for when GitHub's tag-push event doesn't fire the workflow (observed once on
+  # 2026-07-21: the tag existed on the remote, but no push event / workflow run was ever
+  # generated for it — deleting+recreating the tag didn't help either). Lets a release be
+  # kicked off manually for an already-pushed tag without needing a new tag name.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build & release (must already exist on the remote), e.g. v1.0.0-alpha.31'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build vendored Composer
+        working-directory: composer
+        run: |
+          npm install -g pnpm@9
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Create build directories
+        run: |
+          New-Item -ItemType Directory -Force src-tauri/binaries | Out-Null
+          New-Item -ItemType Directory -Force src-tauri/resources | Out-Null
+      - name: Install Python dependencies
+        working-directory: python-backend
+        run: pip install -r requirements.txt pyinstaller
+      - name: Configure feedback webhook
+        working-directory: python-backend
+        env:
+          WEBHOOK: ${{ secrets.KODAMA_FEEDBACK_WEBHOOK }}
+        run: |
+          $cfg = @{ webhook = "$env:WEBHOOK" } | ConvertTo-Json -Compress
+          Set-Content -Path feedback_config.json -Value $cfg -Encoding utf8
+      - name: Configure Last.fm
+        working-directory: python-backend
+        env:
+          LFM_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LFM_SECRET: ${{ secrets.LASTFM_API_SECRET }}
+        run: |
+          $cfg = @{ api_key = "$env:LFM_KEY"; api_secret = "$env:LFM_SECRET" } | ConvertTo-Json -Compress
+          Set-Content -Path lastfm_config.json -Value $cfg -Encoding utf8
+      - name: Build Python server (Windows)
+        working-directory: python-backend
+        run: |
+          pyinstaller kodama-server-x86_64-pc-windows-msvc.spec `
+            --distpath ../src-tauri/binaries `
+            --workpath build_tmp/kodama-server-x86_64-pc-windows-msvc
+      - name: Download node.exe
+        run: |
+          # v22+ required: yt-dlp EJS (signature/n-sig solving for the web_music PO-token path)
+          # needs Node >= 22. This is the runtime node the sidecar spawns.
+          Invoke-WebRequest -Uri "https://nodejs.org/dist/v22.18.0/win-x64/node.exe" -OutFile "src-tauri/resources/node.exe"
+      - name: Build PO-token generator (bgutil, Windows)
+        shell: bash
+        run: |
+          git clone --single-branch --branch 1.3.1 --depth 1 \
+            https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git potgen-src
+          cd potgen-src/server
+          npm ci
+          npx tsc
+          npm prune --omit=dev
+          DEST="$GITHUB_WORKSPACE/src-tauri/resources/potgen/server"
+          mkdir -p "$DEST"
+          cp -r build package.json node_modules "$DEST/"
+          echo "generator bundled -> $DEST"; ls "$DEST"
+          # Register the generator as a Tauri resource for THIS build only. Kept out of the
+          # committed config so local `tauri dev`/`build` never requires this CI artifact.
+          CFG="$GITHUB_WORKSPACE/src-tauri/tauri.windows.conf.json"
+          jq '.bundle.resources["resources/potgen/server"]="potgen/server"' "$CFG" > "$CFG.tmp" && mv "$CFG.tmp" "$CFG"
+          echo "merged potgen resource into windows conf"
+      - name: Install frontend dependencies
+        run: npm install
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: windows
+      - name: Build signed Tauri installer
+        uses: tauri-apps/tauri-action@v0
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          args: --target x86_64-pc-windows-msvc --bundles nsis
+      - name: Collect Windows artifacts
+        shell: bash
+        run: |
+          mkdir -p out
+          cp src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*_x64-setup.exe out/
+          cp src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*_x64-setup.exe.sig out/
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: out/*
+
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # audiopus_sys compiles libopus from source and drives it through autogen.sh, which the
+      # macOS runner has no autotools for ("Failed to autogen Opus"). Installing them is the
+      # whole fix: `brew install opus` would be wrong, because linking against a Homebrew dylib
+      # would break on machines without Homebrew. It has to stay a static build.
+      - name: Install autotools for the Opus decoder
+        run: brew install autoconf automake libtool
+      - name: Build vendored Composer
+        working-directory: composer
+        run: |
+          npm install -g pnpm@9
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Create build directories
+        run: mkdir -p src-tauri/binaries src-tauri/resources
+      - name: Install Python dependencies
+        working-directory: python-backend
+        run: pip install -r requirements.txt pyinstaller
+      - name: Configure feedback webhook
+        working-directory: python-backend
+        env:
+          WEBHOOK: ${{ secrets.KODAMA_FEEDBACK_WEBHOOK }}
+        run: |
+          printf '{"webhook":"%s"}' "$WEBHOOK" > feedback_config.json
+      - name: Configure Last.fm
+        working-directory: python-backend
+        env:
+          LFM_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LFM_SECRET: ${{ secrets.LASTFM_API_SECRET }}
+        run: |
+          printf '{"api_key":"%s","api_secret":"%s"}' "$LFM_KEY" "$LFM_SECRET" > lastfm_config.json
+      - name: Build Python server (macOS arm64)
+        working-directory: python-backend
+        run: |
+          pyinstaller kodama-server-aarch64-apple-darwin.spec \
+            --distpath ../src-tauri/binaries \
+            --workpath build_tmp/kodama-server-aarch64-apple-darwin
+          chmod +x ../src-tauri/binaries/kodama-server-aarch64-apple-darwin
+      - name: Download node (macOS arm64)
+        run: |
+          # v22+ runtime node for the yt-dlp EJS + bgutil PO-token path (macOS had none before).
+          curl -sL "https://nodejs.org/dist/v22.18.0/node-v22.18.0-darwin-arm64.tar.gz" -o node.tar.gz
+          tar -xzf node.tar.gz
+          cp node-v22.18.0-darwin-arm64/bin/node src-tauri/resources/node
+          chmod +x src-tauri/resources/node
+      - name: Build PO-token generator (bgutil, macOS)
+        run: |
+          git clone --single-branch --branch 1.3.1 --depth 1 \
+            https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git potgen-src
+          cd potgen-src/server
+          npm ci
+          npx tsc
+          npm prune --omit=dev
+          DEST="$GITHUB_WORKSPACE/src-tauri/resources/potgen/server"
+          mkdir -p "$DEST"
+          cp -r build package.json node_modules "$DEST/"
+          echo "generator bundled -> $DEST"; ls "$DEST"
+          # Register the generator as a Tauri resource for THIS build only. Kept out of the
+          # committed config so local `tauri dev`/`build` never requires this CI artifact.
+          CFG="$GITHUB_WORKSPACE/src-tauri/tauri.macos.conf.json"
+          jq '.bundle.resources["resources/potgen/server"]="potgen/server"' "$CFG" > "$CFG.tmp" && mv "$CFG.tmp" "$CFG"
+          echo "merged potgen resource into macos conf"
+      - name: Install frontend dependencies
+        run: npm install
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: macos
+      - name: Build signed Tauri app (.dmg + updater)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # NO macOS code signing: ad-hoc signing the app bundle enables library validation,
+          # which then rejects the PyInstaller-bundled Python.framework (different Team ID) and
+          # the sidecar server fails to load ("Failed to load Python shared library"). Leaving
+          # the app unsigned keeps the nested framework loadable; Gatekeeper is handled by the
+          # curl install.sh (curl-downloaded apps get no quarantine flag).
+        with:
+          args: --target aarch64-apple-darwin --bundles app,dmg
+      - name: Collect macOS artifacts
+        run: |
+          mkdir -p out
+          BASE=src-tauri/target/aarch64-apple-darwin/release/bundle
+          cp "$BASE"/dmg/*.dmg out/ || { echo "::error::dmg not found"; ls -R "$BASE" || true; exit 1; }
+          cp "$BASE"/macos/*.app.tar.gz out/ || { echo "::error::updater tar.gz not found"; ls -R "$BASE/macos" || true; exit 1; }
+          cp "$BASE"/macos/*.app.tar.gz.sig out/
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: out/*
+
+  publish:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/download-artifact@v4
+        with:
+          path: dl
+      - name: Publish release + updater manifest (this repo)
+        shell: bash
+        env:
+          DIST_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          TAG="${{ inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          DIST="${{ github.repository }}"
+          PRE=""
+          case "$TAG" in *alpha*|*beta*|*rc*) PRE="--prerelease";; esac
+          export GH_TOKEN="$DIST_TOKEN"
+
+          WIN_EXE=$(ls dl/windows/*_x64-setup.exe | head -1)
+          WIN_SIG="$WIN_EXE.sig"
+          DMG=$(ls dl/macos/*.dmg | head -1)
+          MAC_TGZ=$(ls dl/macos/*.app.tar.gz | head -1)
+          MAC_SIG="$MAC_TGZ.sig"
+          for f in "$WIN_EXE" "$WIN_SIG" "$DMG" "$MAC_TGZ" "$MAC_SIG"; do
+            [ -f "$f" ] || { echo "::error::missing artifact $f"; ls -R dl; exit 1; }
+          done
+
+          NOTES=""
+          if [ -f CHANGELOG.md ]; then
+            NOTES=$(awk "/^## \\[${VERSION}\\]/{f=1;next} f&&/^## \\[/{exit} f" CHANGELOG.md | sed '/^[[:space:]]*$/d' | head -80)
+          fi
+          [ -n "$NOTES" ] || NOTES="Kodama $TAG"
+
+          gh release view "$TAG" --repo "$DIST" >/dev/null 2>&1 || \
+            gh release create "$TAG" --repo "$DIST" --title "Kodama $TAG" --notes "$NOTES" $PRE
+          gh release upload "$TAG" "$WIN_EXE" "$WIN_SIG" "$DMG" "$MAC_TGZ" "$MAC_SIG" --repo "$DIST" --clobber
+
+          # Public dist repo: plain browser_download_url works (no token needed).
+          base_url="https://github.com/$DIST/releases/download/$TAG"
+          jq -n \
+            --arg version "v${VERSION}" \
+            --arg pub_date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg notes "$NOTES" \
+            --arg wurl "$base_url/$(basename "$WIN_EXE")" --arg wsig "$(cat "$WIN_SIG")" \
+            --arg murl "$base_url/$(basename "$MAC_TGZ")" --arg msig "$(cat "$MAC_SIG")" \
+            '{version:$version, pub_date:$pub_date, notes:$notes,
+              platforms:{
+                "windows-x86_64":{url:$wurl, signature:$wsig},
+                "darwin-aarch64":{url:$murl, signature:$msig}
+              }}' > latest.json
+          echo "latest.json:"; cat latest.json
+
+          # Commit the refreshed manifest back to master (branch push → no tag re-trigger).
+          git clone --depth 1 "https://x-access-token:${DIST_TOKEN}@github.com/${DIST}.git" dist_repo
+          mkdir -p dist_repo/updates
+          cp latest.json dist_repo/updates/latest.json
+          cd dist_repo
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add updates/latest.json
+          git diff --cached --quiet && echo "nothing to publish" || git commit -m "release: $TAG [skip ci]"
+          git push
+          echo "Published $TAG (windows-x86_64 + darwin-aarch64) to $DIST."
