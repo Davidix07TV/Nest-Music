@@ -297,23 +297,35 @@ This project is not affiliated with YouTube, YouTube Music, or Google. All trade
 
 </div>
 
-## Desktop preview
+## Desktop (Windows)
 
-Nest Music now includes a lightweight JVM desktop companion for Windows, macOS, and Linux. It keeps the Nest Music visual language on a large screen and provides quick picks, library navigation, a desktop player bar, and YouTube Music search. Search results currently open in the user's default browser while the native desktop playback layer is being built.
+Nest Music includes a full desktop app for Windows, built with **Tauri 2** (React + Vite frontend, Rust shell, Python sidecar). It supports synced lyrics, offline downloads, Discord Rich Presence, Last.fm scrobbling, an OBS overlay and more.
 
-Requires Java 21. To create the first Windows `.exe`, run this on a Windows machine with a full JDK 21+ installed:
+> The desktop app was formerly known as **Kodama** (by [KiyoshiTheDevil](https://github.com/KiyoshiTheDevil/Kodama)); Nest Music continues it as its own desktop client under the **AGPL-3.0** license, keeping the original attribution.
 
-```powershell
-# From the repository root
-.\gradlew.bat :desktop:packageWindows
+### Install
+
+Download the latest installer from GitHub Actions (workflow **Desktop Windows Installer** → artifact `nest-music-windows-installer`) or build it yourself:
+
+```bat
+cd desktop
+npm ci
+cd python-backend
+py -m pip install -r requirements.txt
+py -m pip install pyinstaller
+.\build_server.bat
+cd ..
+npm run tauri build
 ```
 
-The installer is generated in `desktop/build/windows-installer/`. It includes a Start Menu entry and an optional desktop shortcut. The native packaging step must run on Windows because `jpackage` creates platform-specific installers.
+The NSIS installer is written to `desktop/src-tauri/target/release/bundle/nsis/`.
 
-For local development or a portable JVM build:
+### Development
 
-```bash
-./gradlew :desktop:run
-./gradlew :desktop:jar
-java -jar desktop/build/libs/desktop-1.0.0.jar
+```bat
+cd desktop
+npm ci
+npm run tauri dev
 ```
+
+See `desktop/README.md` for the full desktop documentation.

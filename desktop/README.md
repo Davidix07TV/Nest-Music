@@ -1,22 +1,24 @@
 <div align="center">
-  <img width="210" height="48" alt="Nest Music Logo Full" src="https://github.com/user-attachments/assets/e003560b-1760-4657-a8fc-454195293937" />
+  <img width="128" height="128" alt="Nest Music" src="../assets/nest-music-logo.png" style="border-radius: 28px;" />
 </div>
 
 <div align="center">
+  <h1>Nest Music — Desktop</h1>
   <p>An unofficial desktop player for YouTube Music.</p>
 
-  [![Version](https://img.shields.io/github/v/release/KiyoshiTheDevil/Nest Music?include_prereleases&style=for-the-badge&color=a855f7&label=version)](https://github.com/KiyoshiTheDevil/Nest Music/releases/latest)
-  [![Downloads](https://img.shields.io/github/downloads/KiyoshiTheDevil/Nest Music/total?style=for-the-badge&color=a855f7&label=downloads)](https://github.com/KiyoshiTheDevil/Nest Music/releases)
-  [![Active users](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fnest-music-stats.kiyoshidesign.workers.dev%2Fbadge%3Fmetric%3Dmau)](https://github.com/KiyoshiTheDevil/Nest Music)
-  [![Platform](https://img.shields.io/badge/platform-Windows_%7C_macOS-0078d4?style=for-the-badge)](https://github.com/KiyoshiTheDevil/Nest Music/releases/latest)
+  [![Platform](https://img.shields.io/badge/platform-Windows_%7C_macOS-0078d4?style=for-the-badge)](https://github.com/Davidix07TV/Nest-Music/releases/latest)
   [![Tauri](https://img.shields.io/badge/Tauri-2.x-24c8db?style=for-the-badge&logo=tauri&logoColor=white)](https://tauri.app)
-  [![Crowdin](https://img.shields.io/badge/translate-Crowdin-2e3340?style=for-the-badge&logo=crowdin&logoColor=white)](https://crowdin.com/project/kiyoshi-music)
   [![License](https://img.shields.io/badge/license-AGPL_v3-3da639?style=for-the-badge)](LICENSE)
 </div>
 
 ---
 
-> AI notice: This app has been created with an LLM called **Claude Code**. If you're against the usage of LLMs or AI in any capacity, this app won't be for you. I hope you understand.
+> **Attribution**: the Nest Music desktop app was formerly known as **Kodama**, by
+> [KiyoshiTheDevil](https://github.com/KiyoshiTheDevil/Kodama). Nest Music continues that work as its own
+> desktop client and keeps the original **AGPL-3.0** attribution. Kodama was created with help from LLMs
+> (see the AI notice below, kept from the original project).
+
+> AI notice (from the original Kodama project): This app has been created with an LLM called **Claude Code**. If you're against the usage of LLMs or AI in any capacity, this app won't be for you. I hope you understand.
 
 ## Features
 

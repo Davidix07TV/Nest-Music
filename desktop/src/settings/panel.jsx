@@ -4,7 +4,7 @@ import { cn, Button, CardRoot, InputRoot, TextFieldRoot, Spinner, toast, ToggleB
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { API, thumb, useLang, useAnimations } from "../context.jsx";
 import { LANGUAGES, translate, translationProgress } from "../i18n.js";
-import { ArrowCircleUp, ArrowClockwise, ArrowSquareOut, ArrowsClockwise, ArrowsLeftRight, BrandBluesky, BrandDiscord, BrandGithub, BrandLastfm, BrandTiktok, BrandTwitch, BrandYoutube, Bug, CaretDown, CaretUp, ChatText, Check, CheckCircle, CircleHalf, ClapperboardPlay, ClockCounterClockwise, Columns, Copy, DeviceMobile, DownloadSimple, Eye, EyeSlash, Eyedropper, Flask, Gamepad, Globe, HardDrives, Info, Key, Keyboard, Link, Lock, LockOpen, MagnifyingGlass, MugHot, MusicNote, PaintBrushBroad, PencilSimple, PersonArmsSpread, Play, PlayCircle, ScreencastSimple, ShareNodes, Sliders, Sparkles, Tag, TextSize, Translate, Trash, UserCircle, Users, WaveformLines, X } from "../icons.jsx";
+import { ArrowCircleUp, ArrowClockwise, ArrowSquareOut, ArrowsClockwise, ArrowsLeftRight, BrandGithub, BrandLastfm, Bug, CaretDown, CaretUp, ChatText, Check, CheckCircle, CircleHalf, ClapperboardPlay, ClockCounterClockwise, Columns, Copy, DeviceMobile, DownloadSimple, Eye, EyeSlash, Eyedropper, Flask, Gamepad, Globe, HardDrives, Info, Key, Keyboard, Link, Lock, LockOpen, MagnifyingGlass, MusicNote, PaintBrushBroad, PencilSimple, PersonArmsSpread, Play, PlayCircle, ScreencastSimple, ShareNodes, Sliders, Sparkles, Tag, TextSize, Translate, Trash, UserCircle, Users, WaveformLines, X } from "../icons.jsx";
 import { DEFAULT_LYRICS_PROVIDERS } from "../lyrics/providers.js";
 import { renderNewsBody } from "../modals/news-modal.jsx";
 import { RemoteControlPanel } from "../ui/remote-control.jsx";
@@ -29,7 +29,7 @@ async function openOverlayEditor() {
   if (existing) { await existing.setFocus(); return; }
   new WebviewWindow("overlay-editor", {
     url: "/?overlayEditor=1",
-    title: "Overlay Editor — Kodama",
+    title: "Overlay Editor — Nest Music",
     width: 1440,
     height: 900,
     minWidth: 1000,
@@ -614,7 +614,7 @@ export function SettingsPanel({ onClose, onSectionChange, accent, onAccentChange
               >
                 <Lock size={36} style={{ color: "var(--accent)" }} />
               </div>
-              <div style={{ fontSize: "var(--t18)", fontWeight: 700, color: "var(--text-primary)" }}>Kodama</div>
+              <div style={{ fontSize: "var(--t18)", fontWeight: 700, color: "var(--text-primary)" }}>Nest Music</div>
               <div style={{ fontSize: "var(--t13)", color: "var(--text-muted)" }}>{t("pinEnterPrompt")}</div>
 
             </div>
@@ -1654,35 +1654,24 @@ export function SettingsPanel({ onClose, onSectionChange, accent, onAccentChange
               <>
                 {/* Logo + App Info */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "12px 0 28px" }}>
-                  <img src="/Kodama%20Logo%20Full.svg" alt="Kodama" style={{ width: 200, height: "auto", marginBottom: 12 }} />
+                  <img src="/Nest%20Music%20Logo.png" alt="Nest Music" style={{ width: 128, height: 128, borderRadius: 28, marginBottom: 12 }} />
                   <div style={{ fontSize: "var(--t13)", color: "var(--text-muted)", marginBottom: 12 }}>v{APP_VERSION}</div>
                   <div style={{ fontSize: "var(--t13)", color: "var(--text-secondary)", maxWidth: 420, lineHeight: 1.6, marginBottom: 20 }}>
                     {t("aboutDesc")}
                   </div>
                   <div className="flex gap-2.5 flex-wrap justify-center">
-                    <Button variant="secondary" size="sm" onPress={() => openUrl("https://kodama.kiyoshi.dev/")}>
-                      <Globe size={14} />
-                      Website
-                    </Button>
-                    <Button variant="secondary" size="sm" onPress={() => openUrl("https://github.com/KiyoshiTheDevil/Kodama")}>
+                    <Button variant="secondary" size="sm" onPress={() => openUrl("https://github.com/Davidix07TV/Nest-Music")}>
                       <BrandGithub size={14} />
                       GitHub
                     </Button>
-                    <Button size="sm" className="bg-[#5865F2]! text-white! font-semibold" onPress={() => openUrl("https://discord.gg/PzSsPF7KW")}>
-                      <BrandDiscord size={14} />
-                      Discord
-                    </Button>
-                    <Button size="sm" className="bg-[#FFDD00]! text-black! font-semibold" onPress={() => openUrl("https://buymeacoffee.com/kiyoshi_the_devil")}>
-                      ☕ Buy me a coffee
-                    </Button>
-                    <Button size="sm" className="bg-[#FF5E5B]! text-white! font-semibold" onPress={() => openUrl("https://ko-fi.com/kiyoshi_the_devil")}>
-                      <MugHot size={14} />
-                      Ko-fi
+                    <Button variant="secondary" size="sm" onPress={() => openUrl("https://github.com/KiyoshiTheDevil/Kodama")}>
+                      <Globe size={14} />
+                      Based on Kodama
                     </Button>
                   </div>
                 </div>
 
-                {/* Contributors */}
+                {/* Authors — Nest Music + attribution (the desktop app is built on Kodama, AGPL-3.0) */}
                 <div style={{ height: "0.5px", background: "var(--border)", marginBottom: 24 }} />
                 <div style={{ fontSize: "var(--t11)", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
                   {t("contributors")}
@@ -1690,34 +1679,19 @@ export function SettingsPanel({ onClose, onSectionChange, accent, onAccentChange
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
                   {[
                     {
+                      name: "Davidix07TV",
+                      role: "Nest Music \u2014 author & maintainer",
+                      avatar: null,
+                      links: [
+                        { icon: <BrandGithub size={13} />, url: "https://github.com/Davidix07TV" },
+                      ],
+                    },
+                    {
                       name: "Kiyoshi The Devil",
-                      role: t("contributorRoleDev"),
+                      role: "Kodama \u2014 original desktop app (AGPL-3.0)",
                       avatar: "KiyoshiTheDevil_ProfileImage.png",
                       links: [
-                        { icon: <BrandTwitch size={13} />, url: "https://twitch.tv/kiyoshi_the_devil" },
-                        { icon: <BrandYoutube size={13} />, url: "https://www.youtube.com/@kiyoshi_the_devil" },
-                        { icon: <BrandBluesky size={13} />, url: "https://bsky.app/profile/kiyoshi-the-devil.bsky.social" },
-                      ],
-                    },
-                    {
-                      name: "Grains Of Art",
-                      role: t("contributorRoleAlphaTesterArtist"),
-                      avatar: "GrainsOfArt_ProfileImage.png",
-                      links: [
-                        { icon: <BrandTwitch size={13} />, url: "https://www.twitch.tv/greekgeekgames" },
-                        { icon: <BrandYoutube size={13} />, url: "https://www.youtube.com/@GrainsOfArt" },
-                        { icon: <Link size={13} />, url: "https://linktr.ee/GrainsOfArt" },
-                      ],
-                    },
-                    {
-                      name: "LMary52",
-                      role: t("contributorRoleAlphaTester"),
-                      avatar: "LMary52_ProfileImage.png",
-                      links: [
-                        { icon: <BrandTwitch size={13} />, url: "https://www.twitch.tv/lmary52" },
-                        { icon: <BrandYoutube size={13} />, url: "https://www.youtube.com/@LMary52" },
-                        { icon: <BrandTiktok size={13} />, url: "https://www.tiktok.com/@lmary52" },
-                        { icon: <BrandBluesky size={13} />, url: "https://bsky.app/profile/lmary52.bsky.social" },
+                        { icon: <BrandGithub size={13} />, url: "https://github.com/KiyoshiTheDevil/Kodama" },
                       ],
                     },
                   ].map(c => (
@@ -1772,9 +1746,9 @@ export function SettingsPanel({ onClose, onSectionChange, accent, onAccentChange
                 {/* Legal */}
                 <div style={{ marginTop: 28, paddingTop: 20, borderTop: "0.5px solid var(--border)", display: "flex", justifyContent: "center", gap: 6, alignItems: "center" }}>
                   <span style={{ fontSize: "var(--t11)", color: "var(--text-muted)" }}>
-                    © {new Date().getFullYear()} KiyoshiTheDevil ·
+                    © {new Date().getFullYear()} Davidix07TV · Nest Music — based on Kodama by KiyoshiTheDevil ·
                   </span>
-                  <button onClick={() => openUrl("https://github.com/KiyoshiTheDevil/Kodama/blob/master/LICENSE")}
+                  <button onClick={() => openUrl("https://github.com/Davidix07TV/Nest-Music/blob/master/LICENSE")}
                     style={{
                       background: "none", border: "none", padding: 0, cursor: "default",
                       fontSize: "var(--t11)", color: "var(--text-muted)", fontFamily: "var(--font)",
@@ -1783,7 +1757,7 @@ export function SettingsPanel({ onClose, onSectionChange, accent, onAccentChange
                     onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
                     onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                   >
-                    GNU General Public License v3.0
+                    GNU Affero General Public License v3.0
                   </button>
                 </div>
               </>

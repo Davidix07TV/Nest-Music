@@ -92,7 +92,7 @@ export async function openMiniPlayer() {
 
   const win = new WebviewWindow(MINI_LABEL, {
     url: "/?miniPlayer=1",
-    title: "Kodama",
+    title: "Nest Music",
     width: size,
     height: size,
     minWidth: MINI_MIN,

@@ -1,25 +1,9 @@
 [
   {
-    "id": "2026-07-10-a-brief-welcome-to-all-new-users",
+    "id": "2026-08-26-welcome-to-nest-music",
     "type": "note",
-    "date": "2026-07-10",
-    "title": "A brief welcome to all new users!",
-    "body": "Uhm... hey!\n\nThank you for trying out my YouTube Music-Client!\nI'm still mesmerized of the amount of feedback I've received so far.\n# 🙃\n\nI'm already working on the next update, which hopefully should fix some of the bugs users experienced and adds a few new little features, like \"Direct Shuffle\", \"Start Radio from a Song\" or Plain-Lyrics not scrolling to the bottom immediatley.\n\nWith the upcoming update, the Report Tool also gets a little makeover with additional information that can be shared, if the user deems it useful.\n\nAgain, thank you so much and I hope you'll have a great experience as time goes on.\n\nSee ya in the next post!"
-  },
-  {
-    "id": "2026-07-06-this-is-another-notification-test",
-    "type": "note",
-    "date": "2026-07-06",
-    "title": "This is another notification test!",
-    "body": "Due to some issues in the Alpha 26, this hopefully works now in the newly released Alpha 27.\n\nmeow :3",
-    "image": "https://klipy.com/gifs/kasane-teto-birdbrain-1"
-  },
-  {
-    "id": "2026-06-28-hello",
-    "type": "note",
-    "date": "2026-06-28",
-    "title": "Hello!",
-    "body": "# Hi there!\n\nI hope you're having a fantastic day!\n\nFirst of all, thank you so much for testing the Alpha of Kodama. **I'm so excited!**\nThis heat over here is dreadful, but **thank GOD** it's getting more bearable soon.\n\nA few wonderful people on the [Better Lyrics Discord-Sever](https://discord.gg/UsHE3d5fWF) already gave some valuable feedback, as well as some close friends, so I hope everything is going to be fixed and get working.\n\nHere a little teaser of what to expect in the new update:\n- New Share option\n- Crossfade finally working\n- Custom Crossfade duration between specific songs\n- Custom App Icons\n- Improved Visualizer-Settings\n- Quicker song load times, especially with slower connections\n- Overall UI optimizations\n\nThis update should drop later today. So be prepared!\n\nIf you spot any issues, bugs or just have a suggestion in mind, don't hesitate to just the built in Report Tool.\n\nAgain, thank you so much! Without, this wouldn't be possible in the long run.\n\nLove y'all! 🩷",
-    "image": "https://media.tenor.com/AhtU402fQnsAAAAi/teto-teto-kasane.gif"
+    "date": "2026-08-26",
+    "title": "Welcome to Nest Music!",
+    "body": "# Hi there!\n\nWelcome to **Nest Music**, an open source YouTube Music client for Android and Windows.\n\nThe Windows desktop app is based on **Kodama** by [KiyoshiTheDevil](https://github.com/KiyoshiTheDevil/Kodama) (AGPL-3.0) \u2014 thank you for the amazing foundation.\n\nIf you spot any issues or have a suggestion, open an issue on [GitHub](https://github.com/Davidix07TV/Nest-Music/issues).\n\nEnjoy the music!"
   }
 ]
