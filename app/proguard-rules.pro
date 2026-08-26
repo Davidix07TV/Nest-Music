@@ -21,7 +21,7 @@
     @android.webkit.JavascriptInterface public *;
 }
 
-# Keep streaming utility classes
+-keep class com.nestmusic.music.** { *; }
 -keep class com.metrolist.music.utils.cipher.** { *; }
 -keep class com.metrolist.music.utils.potoken.** { *; }
 
