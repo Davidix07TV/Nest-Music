@@ -4,7 +4,7 @@
 
 # Nest Music
 
-### YouTube Music client for Android!
+### YouTube Music client for Android and Windows!
 
 [![Latest release](https://img.shields.io/github/v/release/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases)
 [![License](https://img.shields.io/github/license/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/blob/master/LICENSE)
@@ -237,9 +237,11 @@ Pull requests are welcome! Please ensure your changes align with the project goa
 
 <h1>Credits & Attribution</h1>
 
-<h3>Nest Music is built upon the excellent work of the Metrolist project.</h3>
+<h3>Nest Music is built upon the excellent work of the Metrolist and Kodama project.</h3>
 
-**Original Project**: [Metrolist](https://github.com/MetrolistGroup/Metrolist) by MetrolistGroup
+**Original Projects**:
+[Metrolist](https://github.com/MetrolistGroup/Metrolist) by MetrolistGroup
+[Kodama](https://github.com/KiyoshiTheDevil/Kodama) by KiyoshiTheDevil
 
 **This fork**: Rebranded as Nest Music with UI/UX improvements and ongoing maintenance.
 
