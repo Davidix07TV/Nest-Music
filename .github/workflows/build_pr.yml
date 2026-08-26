@@ -39,20 +39,29 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Generate Keystore
+      - name: Setup Official Keystore
         run: |
-          mkdir -p ~/.android app
-          keytool -genkeypair -v \
-            -keystore ~/.android/debug.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Nest Music,O=NestMusic,C=US"
-          cp ~/.android/debug.keystore app/persistent-debug.keystore
-          cp ~/.android/debug.keystore app/pr-debug.keystore
+          mkdir -p app/keystore ~/.android
+          if [ -n "${{ secrets.KEYSTORE }}" ]; then
+            echo "Using official repository secret keystore"
+            echo "${{ secrets.KEYSTORE }}" | base64 -d > app/keystore/release.keystore
+            cp app/keystore/release.keystore app/persistent-debug.keystore
+            cp app/keystore/release.keystore app/pr-debug.keystore
+            cp app/keystore/release.keystore ~/.android/debug.keystore
+          else
+            echo "Generating fallback keystore"
+            keytool -genkeypair -v \
+              -keystore ~/.android/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Nest Music,O=NestMusic,C=US"
+            cp ~/.android/debug.keystore app/persistent-debug.keystore
+            cp ~/.android/debug.keystore app/pr-debug.keystore
+          fi
 
       - name: Build FOSS Release APK
         run: ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease
@@ -61,6 +70,9 @@ jobs:
           NESTMUSIC_APPLICATION_ID: com.nestmusic.music
           NESTMUSIC_APP_NAME: Nest Music
           NESTMUSIC_DEBUG_KEYSTORE_PATH: pr-debug.keystore
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'android' }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'androiddebugkey' }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'android' }}
           PULL_REQUEST: "false"
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
