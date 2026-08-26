@@ -21,7 +21,7 @@ tasks.jar {
 }
 
 // Builds a native Windows installer when run on Windows with JDK 21+.
-// jpackage is included in every full JDK distribution.
+// The .exe installer needs WiX; packageWindowsPortable does not.
 tasks.register<Exec>("packageWindows") {
     group = "distribution"
     description = "Create a Nest Music .exe installer using jpackage (Windows only)"
@@ -47,5 +47,24 @@ tasks.register<Exec>("packageWindows") {
             "--win-shortcut",
             "--win-dir-chooser",
         )
+    }
+}
+
+// Portable Windows folder: produces Nest Music.exe without requiring WiX.
+tasks.register<Exec>("packageWindowsPortable") {
+    group = "distribution"
+    description = "Create a portable Windows app-image (no WiX required)"
+    dependsOn(tasks.jar)
+    notCompatibleWithConfigurationCache("jpackage uses Exec configuration at execution time")
+    onlyIf { System.getProperty("os.name").lowercase().contains("windows") }
+    val outputDir = layout.buildDirectory.dir("windows-portable").get().asFile
+    doFirst {
+        outputDir.deleteRecursively()
+        outputDir.mkdirs()
+        commandLine("jpackage", "--type", "app-image", "--name", "Nest Music",
+            "--app-version", project.version.toString(), "--description", "Nest Music desktop companion",
+            "--vendor", "Nest Music", "--input", tasks.jar.get().destinationDirectory.get().asFile.absolutePath,
+            "--main-jar", tasks.jar.get().archiveFileName.get(), "--main-class", application.mainClass.get(),
+            "--dest", outputDir.absolutePath)
     }
 }
