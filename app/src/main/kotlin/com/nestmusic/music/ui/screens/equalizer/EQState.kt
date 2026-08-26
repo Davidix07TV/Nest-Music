@@ -8,6 +8,7 @@ import com.nestmusic.music.eq.data.SavedEQProfile
  * UI State for EQ Screen and Player Equalizer
  */
 data class EQState(
+    val profiles: List<SavedEQProfile> = emptyList(),
     val isEnabled: Boolean = false,
     val activeProfileId: String? = null,
     val builtInPresets: List<SavedEQProfile> = BuiltInEQPresets.ALL_PRESETS,

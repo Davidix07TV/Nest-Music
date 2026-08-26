@@ -40,10 +40,13 @@ class EQViewModel @Inject constructor(
      */
     private fun loadProfiles() {
         viewModelScope.launch {
-            eqProfileRepository.profiles.collect { _ ->
+            eqProfileRepository.profiles.collect { allProfiles ->
                 val sortedProfiles = eqProfileRepository.getSortedProfiles()
                 _state.update {
-                    it.copy(customProfiles = sortedProfiles)
+                    it.copy(
+                        profiles = allProfiles,
+                        customProfiles = sortedProfiles
+                    )
                 }
             }
         }
