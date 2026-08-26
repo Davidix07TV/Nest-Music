@@ -187,6 +187,8 @@ android {
             signingConfig =
                 if (file("keystore/release.keystore").exists()) {
                     signingConfigs.getByName("release")
+                } else if (workflowDebugKeystoreFile != null && workflowDebugKeystoreFile.exists()) {
+                    signingConfigs.getByName("workflowDebug")
                 } else if (persistentDebugKeystoreFile.exists()) {
                     signingConfigs.getByName("persistentDebug")
                 } else {

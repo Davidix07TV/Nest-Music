@@ -253,7 +253,7 @@ fun AboutScreen(
                     .padding(24.dp)
             ) {
                 Image(
-                    painter = painterResource(R.mipmap.ic_launcher),
+                    painter = painterResource(R.drawable.app_logo),
                     contentDescription = stringResource(R.string.app_name),
                     modifier = Modifier.size(84.dp)
                 )
