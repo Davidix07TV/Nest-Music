@@ -8,7 +8,7 @@ import javax.swing.border.EmptyBorder
 private val bg = Color(0x0D0D12)
 private val panel = Color(0x17171F)
 private val panel2 = Color(0x22222D)
-private val text = Color(0xF4F1F8)
+private val uiText = Color(0xF4F1F8)
 private val muted = Color(0xAAA6B4)
 private val accent = Color(0xD7B5FF)
 
@@ -23,7 +23,7 @@ private class NestMusicWindow : JFrame("Nest Music") {
         defaultCloseOperation = EXIT_ON_CLOSE
         minimumSize = Dimension(980, 650)
         size = Dimension(1180, 760)
-        locationRelativeTo(null)
+        setLocationRelativeTo(null)
         content.background = bg
         content.border = EmptyBorder(22, 22, 18, 22)
         setContentPane(content)
@@ -45,9 +45,9 @@ private class NestMusicWindow : JFrame("Nest Music") {
     private fun home(): JPanel = JPanel(BorderLayout(0, 20)).apply {
         background = bg
         val top = JPanel(BorderLayout(18, 0)); top.background = bg
-        title.font = title.font.deriveFont(Font.BOLD, 30f); title.foreground = text
+        title.font = title.font.deriveFont(Font.BOLD, 30f); title.foreground = uiText
         top.add(title, BorderLayout.WEST)
-        search.preferredSize = Dimension(330, 40); search.background = panel2; search.foreground = text
+        search.preferredSize = Dimension(330, 40); search.background = panel2; search.foreground = uiText
         search.caretColor = accent; search.border = EmptyBorder(0, 14, 0, 14)
         search.toolTipText = "Search YouTube Music"
         search.addActionListener { openSearch() }
@@ -67,7 +67,7 @@ private class NestMusicWindow : JFrame("Nest Music") {
     }
 
     private fun card(name: String) = JButton("\n\n  $name\n").apply {
-        foreground = text; background = panel; isFocusPainted = false; border = EmptyBorder(14, 8, 14, 8)
+        foreground = uiText; background = panel; isFocusPainted = false; border = EmptyBorder(14, 8, 14, 8)
         font = font.deriveFont(Font.BOLD, 14f); toolTipText = "Open $name"
         addActionListener { openSearch(name) }
     }
@@ -76,13 +76,13 @@ private class NestMusicWindow : JFrame("Nest Music") {
         background = panel; border = EmptyBorder(12, 16, 12, 16); preferredSize = Dimension(0, 64)
         add(label("Nothing playing", 14, muted), BorderLayout.WEST)
         val controls = JPanel(FlowLayout(FlowLayout.CENTER, 12, 0)); controls.background = panel
-        listOf("⏮", "▶", "⏭").forEach { b -> controls.add(JButton(b).apply { foreground = text; background = panel2; isFocusPainted = false }) }
+        listOf("⏮", "▶", "⏭").forEach { b -> controls.add(JButton(b).apply { foreground = uiText; background = panel2; isFocusPainted = false }) }
         add(controls, BorderLayout.CENTER); add(label("Nest Music for desktop", 12, muted), BorderLayout.EAST)
     }
 
     private fun navButton(value: String, selected: Boolean) = JButton(value).apply {
         alignmentX = Component.LEFT_ALIGNMENT; maximumSize = Dimension(190, 42)
-        horizontalAlignment = SwingConstants.LEFT; foreground = if (selected) text else muted
+        horizontalAlignment = SwingConstants.LEFT; foreground = if (selected) uiText else muted
         background = if (selected) panel2 else bg; isFocusPainted = false; border = EmptyBorder(11, 14, 11, 8)
     }
 

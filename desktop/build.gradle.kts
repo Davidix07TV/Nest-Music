@@ -26,6 +26,7 @@ tasks.register<Exec>("packageWindows") {
     group = "distribution"
     description = "Create a Nest Music .exe installer using jpackage (Windows only)"
     dependsOn(tasks.jar)
+    notCompatibleWithConfigurationCache("jpackage uses Exec configuration at execution time")
     onlyIf { System.getProperty("os.name").lowercase().contains("windows") }
 
     val outputDir = layout.buildDirectory.dir("windows-installer").get().asFile
