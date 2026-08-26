@@ -1,0 +1,113 @@
+name: Desktop Windows Installer
+
+# Builds the real Windows desktop app (Tauri 2: React + Vite frontend, Rust shell,
+# Python sidecar) and uploads the NSIS installer as a downloadable artifact.
+#
+# Pipeline (all inside desktop/):
+#   1. npm ci                      — frontend deps (lockfile is committed)
+#   2. pip install + PyInstaller   — Python backend deps
+#   3. python-backend/build_server.bat
+#                                  — produces src-tauri/binaries/nest-music-server-x86_64-pc-windows-msvc.exe
+#                                    (the exact name Tauri's externalBin requires) and fetches the
+#                                    bundled node.exe resource into src-tauri/resources/
+#   4. npm run tauri build         — vite build + cargo build + NSIS installer
+#
+# Output artifact: desktop/src-tauri/target/release/bundle/nsis/*-setup.exe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    name: Build Windows NSIS installer
+    runs-on: windows-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: desktop
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Rust (stable, MSVC)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+          key: windows-x86_64
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Python dependencies and PyInstaller
+        working-directory: desktop/python-backend
+        run: |
+          py -m pip install --upgrade pip
+          py -m pip install -r requirements.txt
+          py -m pip install pyinstaller
+
+      - name: Build Python sidecar (PyInstaller)
+        working-directory: desktop/python-backend
+        env:
+          CI: 'true' # build_server.bat: skip the interactive pause
+        run: .\build_server.bat
+
+      - name: Verify sidecar binary exists
+        shell: bash
+        working-directory: desktop
+        run: |
+          if [ ! -f src-tauri/binaries/nest-music-server-x86_64-pc-windows-msvc.exe ]; then
+            echo "::error::sidecar missing: src-tauri/binaries/nest-music-server-x86_64-pc-windows-msvc.exe"
+            ls -la src-tauri/binaries || true
+            exit 1
+          fi
+          ls -la src-tauri/binaries
+
+      - name: Download bundled node.exe (Tauri resource)
+        run: |
+          New-Item -ItemType Directory -Force src-tauri/resources | Out-Null
+          if (-not (Test-Path src-tauri/resources/node.exe)) {
+            Invoke-WebRequest -Uri "https://nodejs.org/dist/v22.18.0/win-x64/node.exe" -OutFile "src-tauri/resources/node.exe"
+          }
+          Get-Item src-tauri/resources/node.exe | Select-Object FullName, Length
+
+      - name: Build Tauri app (NSIS installer)
+        run: npm run tauri build
+
+      - name: Collect installer
+        shell: bash
+        working-directory: desktop
+        run: |
+          ls -la src-tauri/target/release/bundle/nsis/
+          mkdir -p out
+          cp src-tauri/target/release/bundle/nsis/*-setup.exe out/
+          ls -la out
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nest-music-windows-installer
+          path: desktop/src-tauri/target/release/bundle/nsis/*setup.exe
+          if-no-files-found: error
