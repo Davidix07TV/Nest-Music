@@ -68,9 +68,9 @@ jobs:
       - name: Build Python server (Windows)
         working-directory: python-backend
         run: |
-          pyinstaller kodama-server-x86_64-pc-windows-msvc.spec `
+          pyinstaller nest-music-server-x86_64-pc-windows-msvc.spec `
             --distpath ../src-tauri/binaries `
-            --workpath build_tmp/kodama-server-x86_64-pc-windows-msvc
+            --workpath build_tmp/nest-music-server-x86_64-pc-windows-msvc
       - name: Download node.exe
         run: |
           # v22+ required: yt-dlp EJS (signature/n-sig solving for the web_music PO-token path)
@@ -169,10 +169,10 @@ jobs:
       - name: Build Python server (macOS arm64)
         working-directory: python-backend
         run: |
-          pyinstaller kodama-server-aarch64-apple-darwin.spec \
+          pyinstaller nest-music-server-aarch64-apple-darwin.spec \
             --distpath ../src-tauri/binaries \
-            --workpath build_tmp/kodama-server-aarch64-apple-darwin
-          chmod +x ../src-tauri/binaries/kodama-server-aarch64-apple-darwin
+            --workpath build_tmp/nest-music-server-aarch64-apple-darwin
+          chmod +x ../src-tauri/binaries/nest-music-server-aarch64-apple-darwin
       - name: Download node (macOS arm64)
         run: |
           # v22+ runtime node for the yt-dlp EJS + bgutil PO-token path (macOS had none before).

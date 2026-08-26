@@ -31,8 +31,8 @@ pub fn init(app: &AppHandle) {
     let hwnd: Option<*mut std::ffi::c_void> = None;
 
     let config = PlatformConfig {
-        dbus_name: "kodama",
-        display_name: "Kodama",
+        dbus_name: "nest-music",
+        display_name: "Nest Music",
         hwnd,
     };
 

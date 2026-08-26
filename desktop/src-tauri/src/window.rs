@@ -206,7 +206,7 @@ fn auth_data_dir(profile: &str) -> std::path::PathBuf {
         .chars()
         .map(|c| if c.is_alphanumeric() || c == '-' || c == '_' { c } else { '_' })
         .collect();
-    std::env::temp_dir().join("kodama-auth-webview").join(safe)
+    std::env::temp_dir().join("nest-music-auth-webview").join(safe)
 }
 
 #[cfg(target_os = "macos")]
@@ -224,7 +224,7 @@ const LOGIN_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleW
 const LOGIN_INIT_JS: &str = r#"
 (function () {
   if (location.hostname.indexOf('music.youtube.com') === -1) return;
-  var L = window.__KODAMA_LABELS__ || { confirm: 'Use this account', hint: '' };
+  var L = window.__NEST_MUSIC_LABELS__ || { confirm: 'Use this account', hint: '' };
   function setCookie(name, val) {
     try { document.cookie = name + '=' + (val || '') + ';path=/;max-age=3600'; } catch (e) {}
   }
@@ -285,7 +285,7 @@ pub async fn open_login_window(
 
     // Feed the localized bar labels to the init script (JSON-encoded so quotes are safe).
     let labels = serde_json::json!({ "confirm": confirm_label, "hint": switch_hint }).to_string();
-    let init_script = format!("window.__KODAMA_LABELS__ = {};\n{}", labels, LOGIN_INIT_JS);
+    let init_script = format!("window.__NEST_MUSIC_LABELS__ = {};\n{}", labels, LOGIN_INIT_JS);
 
     // Load the sign-in URL directly. NOTE: do NOT start blank + navigate() afterwards — Google's
     // embedded-webview check ("This browser or app may not be secure") trips on the programmatic

@@ -74,15 +74,16 @@ Hey! I made a dedicated Discord server for the App, where you can chat about the
 
 ```bash
 # 1. Clone
-git clone https://github.com/KiyoshiTheDevil/Nest Music.git
-cd Nest Music
+git clone https://github.com/Davidix07TV/Nest-Music.git
+cd Nest-Music/desktop
 
 # 2. Frontend dependencies
-npm install
+npm ci
 
 # 3. Python backend dependencies
 cd python-backend
-pip install -r requirements.txt
+py -m pip install -r requirements.txt
+py -m pip install pyinstaller
 cd ..
 
 # 4. (Optional) Authenticate with your YouTube account
@@ -97,11 +98,31 @@ cd ..
 npm run tauri dev
 ```
 
-### Build
+### Build (Windows installer)
 
-```bash
+The Tauri bundle requires the Python sidecar to be built first — Tauri expects it at
+exactly `src-tauri/binaries/nest-music-server-x86_64-pc-windows-msvc.exe` (the
+`externalBin` entry `binaries/nest-music-server` plus the Rust target triple).
+`build_server.bat` produces that file and also downloads the bundled `node.exe`
+resource into `src-tauri/resources/` (required by `tauri.windows.conf.json`).
+
+```bat
+cd desktop
+npm ci
+cd python-backend
+py -m pip install -r requirements.txt
+py -m pip install pyinstaller
+.\build_server.bat
+cd ..
 npm run tauri build
 ```
+
+The NSIS installer is written to
+`desktop/src-tauri/target/release/bundle/nsis/*-setup.exe`.
+
+On CI the same steps run automatically via the manual
+**Desktop Windows Installer** workflow (`.github/workflows/desktop-windows.yml`),
+which uploads the installer as a downloadable artifact.
 
 ---
 

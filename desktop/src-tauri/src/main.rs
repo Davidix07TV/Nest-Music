@@ -113,12 +113,16 @@ fn migrate_legacy_data_dir() {
         }
     };
     for root in roots {
-        let old = root.join("dev.kiyoshi.music");
-        let new = root.join("dev.kodama.music");
-        if old.is_dir() && !new.exists() {
-            match std::fs::rename(&old, &new) {
-                Ok(_)  => eprintln!("[migrate] moved {} -> {}", old.display(), new.display()),
-                Err(e) => eprintln!("[migrate] failed to move data dir: {e}"),
+        let old_kiyoshi = root.join("dev.kiyoshi.music");
+        let old_kodama = root.join("dev.kodama.music");
+        let new = root.join("dev.nest-music.music");
+        for old in [&old_kiyoshi, &old_kodama] {
+            if old.is_dir() && !new.exists() {
+                match std::fs::rename(old, &new) {
+                    Ok(_)  => eprintln!("[migrate] moved {} -> {}", old.display(), new.display()),
+                    Err(e) => eprintln!("[migrate] failed to move data dir: {e}"),
+                }
+                break;
             }
         }
     }
@@ -175,7 +179,7 @@ fn main() {
                 });
             }
 
-            // Deep-link (kodama://song/<id>): the bundler registers the scheme on release
+            // Deep-link (nest-music://song/<id>): the bundler registers the scheme on release
             // installs, but Linux and Windows-dev need a runtime registration.
             #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
             {
@@ -191,7 +195,7 @@ fn main() {
             start_audio_session_tagger();
 
             // ── System Tray ────────────────────────────────────────────────────
-            let show = MenuItem::with_id(app, "show", "Show Kodama", true, None::<&str>)?;
+            let show = MenuItem::with_id(app, "show", "Show Nest Music", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let sep  = PredefinedMenuItem::separator(app)?;
             let menu = Menu::with_items(app, &[&show, &sep, &quit])?;
@@ -199,7 +203,7 @@ fn main() {
             let tray = TrayIconBuilder::with_id("main")
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
-                .tooltip("Kodama")
+                .tooltip("Nest Music")
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => {
                         if let Some(win) = app.get_webview_window("main") {

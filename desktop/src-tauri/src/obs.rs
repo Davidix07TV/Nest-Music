@@ -68,7 +68,7 @@ fn tag_webview2_audio_sessions() {
             let _ = CloseHandle(handle);
 
             if is_webview {
-                let _ = ctrl.SetDisplayName(w!("Kodama"), std::ptr::null());
+                let _ = ctrl.SetDisplayName(w!("Nest Music"), std::ptr::null());
             }
         }
     }

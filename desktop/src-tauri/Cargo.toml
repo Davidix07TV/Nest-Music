@@ -1,7 +1,7 @@
 [package]
-name = "kodama"
+name = "nest-music"
 version = "1.0.0"
-description = "Kodama - YouTube Music Client"
+description = "Nest Music - YouTube Music desktop client"
 authors = []
 license = ""
 edition = "2021"

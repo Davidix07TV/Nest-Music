@@ -1,26 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os, importlib.util
 
+_ytm = importlib.util.find_spec('ytmusicapi')
+_ytm_locales = os.path.join(os.path.dirname(_ytm.origin), 'locales')
 
-import importlib.util as _iu
-import os as _os
-_ytm = _iu.find_spec('ytmusicapi')
-_ytm_locales = _os.path.join(_os.path.dirname(_ytm.origin), 'locales')
-
-# Vendored Boidu Composer — its built static site (repo ./composer/dist) is bundled as
-# data and extracted to sys._MEIPASS/composer_dist at runtime; the backend serves it from
-# there (see _composer_dist_dir in server.py). Must be built (pnpm build) before this runs.
-_composer_dist = _os.path.abspath(_os.path.join(SPECPATH, '..', 'composer', 'dist'))
+# Vendored Boidu Composer — built static site (repo ./composer/dist) bundled as data,
+# extracted to sys._MEIPASS/composer_dist at runtime (served by _composer_dist_dir in
+# server.py). Must be built (pnpm build) before this runs.
+_composer_dist = os.path.abspath(os.path.join(SPECPATH, '..', 'composer', 'dist'))
 
 # Discord feedback webhook config (gitignored). CI writes it from a secret before building;
 # bundled to _MEIPASS root so _load_feedback_webhook() finds it at runtime. Absent → no feedback.
-_feedback_cfg = _os.path.join(SPECPATH, 'feedback_config.json')
-_extra_datas = [(_feedback_cfg, '.')] if _os.path.exists(_feedback_cfg) else []
-
-# Last.fm API key + secret (gitignored, same pattern as feedback). CI writes it from secrets;
-# bundled to _MEIPASS root so the Last.fm loader finds it at runtime. Absent → "Not configured".
-_lastfm_cfg = _os.path.join(SPECPATH, 'lastfm_config.json')
-if _os.path.exists(_lastfm_cfg):
-    _extra_datas.append((_lastfm_cfg, '.'))
+_feedback_cfg = os.path.join(SPECPATH, 'feedback_config.json')
+_extra_datas = [(_feedback_cfg, '.')] if os.path.exists(_feedback_cfg) else []
 
 # PO-token stack: bundle the bgutil yt-dlp plugin + the yt-dlp-ejs solver scripts so the
 # frozen server can discover them (plugins via the yt_dlp_plugins namespace, EJS via its
@@ -65,7 +57,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='kodama-server-x86_64-pc-windows-msvc',
+    name='nest-music-server-x86_64-unknown-linux-gnu',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

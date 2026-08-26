@@ -49,7 +49,7 @@ pub fn kill_existing_server(child: &mut Option<Child>) {
         use std::os::windows::process::CommandExt;
         const CREATE_NO_WINDOW: u32 = 0x08000000;
         let _ = std::process::Command::new("taskkill")
-            .args(["/F", "/T", "/IM", "kodama-server.exe"])
+            .args(["/F", "/T", "/IM", "nest-music-server.exe"])
             .creation_flags(CREATE_NO_WINDOW)
             .output();
         if let Ok(out) = std::process::Command::new("netstat")
@@ -82,7 +82,7 @@ pub fn kill_existing_server(child: &mut Option<Child>) {
 
 #[allow(dead_code)]
 pub fn start_server(app: &tauri::AppHandle) {
-    let server_bin = if cfg!(windows) { "kodama-server.exe" } else { "kodama-server" };
+    let server_bin = if cfg!(windows) { "nest-music-server.exe" } else { "nest-music-server" };
 
     let exe_dir = std::env::current_exe()
         .ok()

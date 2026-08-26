@@ -1,5 +1,5 @@
-; Kiyoshi Music — NSIS Installer Hooks
-; Cleans up leftover temp folders on uninstall.
+; Nest Music — NSIS Installer Hooks
+; Cleans up leftover processes and temp folders on install/uninstall.
 
 !macro NSIS_HOOK_PREINSTALL
   ; On an in-app update the bgutil PO-token Node child (node.exe in the install dir) and the
@@ -9,6 +9,8 @@
   ; whose graceful shutdown didn't yet kill these children. From the fixed builds onward they
   ; are already terminated by the time the installer runs, so this is just a safety net.
   nsExec::Exec 'taskkill /F /T /IM node.exe'
+  nsExec::Exec 'taskkill /F /T /IM nest-music-server.exe'
+  ; Leftover sidecar from a previous Kodama-based build, if any.
   nsExec::Exec 'taskkill /F /T /IM kodama-server.exe'
   Sleep 500
 !macroend
@@ -20,16 +22,16 @@
 !macroend
 
 !macro NSIS_HOOK_POSTUNINSTALL
-  ; Remove kiyoshi-audio temp folder (used by the audio backend)
+  ; Remove kiyoshi-audio temp folder (used by the Python audio backend)
   RMDir /r "$TEMP\kiyoshi-audio"
 
-  ; Remove updater staging folders (e.g. "Kiyoshi Music-0.9.5-alpha-updater-XXXXXX")
-  FindFirst $R0 $R1 "$TEMP\Kiyoshi Music-*-updater-*"
-  _KiyoshiCleanLoop:
-    StrCmp $R1 "" _KiyoshiCleanDone
+  ; Remove updater staging folders (e.g. "Nest Music-1.0.0-updater-XXXXXX")
+  FindFirst $R0 $R1 "$TEMP\Nest Music-*-updater-*"
+  _NestMusicCleanLoop:
+    StrCmp $R1 "" _NestMusicCleanDone
     RMDir /r "$TEMP\$R1"
     FindNext $R0 $R1
-    Goto _KiyoshiCleanLoop
-  _KiyoshiCleanDone:
+    Goto _NestMusicCleanLoop
+  _NestMusicCleanDone:
   FindClose $R0
 !macroend
