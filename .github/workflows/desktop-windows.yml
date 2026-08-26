@@ -1,0 +1,27 @@
+name: Build Windows desktop installer
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["desktop-v*"]
+
+jobs:
+  package-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Build installer
+        run: .\gradlew.bat :desktop:packageWindows --no-daemon
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: nest-music-windows-installer
+          path: desktop/build/windows-installer/*.exe
