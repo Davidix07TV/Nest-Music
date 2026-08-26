@@ -6,7 +6,7 @@
 package com.nestmusic.music.listentogether
 
 import com.google.protobuf.MessageLite
-import com.nestmusic.music.listentogether.proto.Listentogether
+import com.metrolist.music.listentogether.proto.Listentogether
 import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

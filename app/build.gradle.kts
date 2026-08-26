@@ -101,8 +101,8 @@ android {
         applicationId = applicationIdOverride ?: baseApplicationId
         minSdk = 26
         targetSdk = 36
-        versionCode = 152
-        versionName = "13.6.3"
+        versionCode = 153
+        versionName = "1.0.2"
         resValue("string", "app_name", appNameOverride ?: "Nest Music")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -187,6 +187,8 @@ android {
             signingConfig =
                 if (file("keystore/release.keystore").exists()) {
                     signingConfigs.getByName("release")
+                } else if (workflowDebugKeystoreFile != null && workflowDebugKeystoreFile.exists()) {
+                    signingConfigs.getByName("workflowDebug")
                 } else if (persistentDebugKeystoreFile.exists()) {
                     signingConfigs.getByName("persistentDebug")
                 } else {

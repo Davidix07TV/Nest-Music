@@ -1,6 +1,6 @@
 /**
- * Metrolist Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Nest Music (C) 2026
+ * Licensed under GPL-3.0
  */
 
 package com.nestmusic.music.utils
@@ -39,9 +39,8 @@ object Updater {
     private var cachedAllReleases: List<ReleaseInfo> = emptyList()
     
     private const val CHECK_INTERVAL_MILLIS = 2 * 60 * 60 * 1000L // 2 hours
-    private const val GITHUB_API_BASE = "https://api.github.com/repos/MetrolistGroup/Metrolist"
-    private const val KMP_RELEASES_URL = "https://api.github.com/repos/MetrolistGroup/Metrolist-KMP/releases?per_page=30"
-    const val KMP_APK_NAME = "Metrolist.apk"
+    private const val GITHUB_API_BASE = "https://api.github.com/repos/Davidix07TV/Nest-Music"
+    const val KMP_APK_NAME = "NestMusic.apk"
 
     /**
      * Compares two version strings.
@@ -98,8 +97,8 @@ object Updater {
             
             // Parse architecture and variant from filename
             val (arch, variant) = when {
-                name == "Metrolist.apk" -> "universal" to "foss"
-                name == "Metrolist-with-Google-Cast.apk" -> "universal" to "gms"
+                name.contains("gms", ignoreCase = true) || name.contains("Google-Cast", ignoreCase = true) -> "universal" to "gms"
+                name.contains("foss", ignoreCase = true) -> "universal" to "foss"
                 name.startsWith("app-") && name.endsWith("-release.apk") -> {
                     val arch = name.removePrefix("app-").removeSuffix("-release.apk")
                     arch to "foss"
@@ -108,12 +107,10 @@ object Updater {
                     val arch = name.removePrefix("app-").removeSuffix("-with-Google-Cast.apk")
                     arch to "gms"
                 }
-                else -> null to null
+                else -> "universal" to "foss"
             }
             
-            if (arch != null && variant != null) {
-                assets.add(ReleaseAsset(name, downloadUrl, size, arch, variant))
-            }
+            assets.add(ReleaseAsset(name, downloadUrl, size, arch, variant))
         }
         
         return assets
@@ -136,10 +133,10 @@ object Updater {
                 
                 val releaseInfo = ReleaseInfo(
                     tagName = json.getString("tag_name"),
-                    versionName = json.getString("name"),
-                    description = json.getString("body"),
-                    releaseDate = json.getString("published_at"),
-                    assets = parseAssets(json.getJSONArray("assets"))
+                    versionName = json.optString("name").takeIf { it.isNotBlank() } ?: json.getString("tag_name"),
+                    description = json.optString("body"),
+                    releaseDate = json.optString("published_at"),
+                    assets = parseAssets(json.optJSONArray("assets") ?: JSONArray())
                 )
                 
                 cachedReleaseInfo = releaseInfo
@@ -176,10 +173,10 @@ object Updater {
                         val releaseObj = json.getJSONObject(i)
                         releases.add(ReleaseInfo(
                             tagName = releaseObj.getString("tag_name"),
-                            versionName = releaseObj.getString("name"),
-                            description = releaseObj.getString("body"),
-                            releaseDate = releaseObj.getString("published_at"),
-                            assets = parseAssets(releaseObj.getJSONArray("assets"))
+                            versionName = releaseObj.optString("name").takeIf { it.isNotBlank() } ?: releaseObj.getString("tag_name"),
+                            description = releaseObj.optString("body"),
+                            releaseDate = releaseObj.optString("published_at"),
+                            assets = parseAssets(releaseObj.optJSONArray("assets") ?: JSONArray())
                         ))
                     }
                     
@@ -197,23 +194,6 @@ object Updater {
     suspend fun getLatestKmpRelease(): Result<ReleaseInfo?> =
         withContext(Dispatchers.IO) {
             runCatching {
-                val releases = JSONArray(client.get(KMP_RELEASES_URL).bodyAsText())
-
-                for (i in 0 until releases.length()) {
-                    val release = releases.getJSONObject(i)
-                    val assets = parseAssets(release.getJSONArray("assets"))
-                    if (assets.none { it.name == KMP_APK_NAME }) continue
-
-                    val tagName = release.getString("tag_name")
-                    return@runCatching ReleaseInfo(
-                        tagName = tagName,
-                        versionName = release.optString("name").takeIf { it.isNotBlank() } ?: tagName,
-                        description = release.optString("body"),
-                        releaseDate = release.getString("published_at"),
-                        assets = assets,
-                    )
-                }
-
                 null
             }
         }
@@ -227,6 +207,7 @@ object Updater {
         return releaseInfo.assets
             .find { it.architecture == currentArch && it.variant == currentVariant }
             ?.downloadUrl
+            ?: releaseInfo.assets.firstOrNull()?.downloadUrl
     }
 
     /**
@@ -242,7 +223,6 @@ object Updater {
     suspend fun checkForUpdate(forceRefresh: Boolean = false): Result<Pair<ReleaseInfo?, Boolean>> =
         withContext(Dispatchers.IO) {
             runCatching {
-                // Check if we should fetch (2 hour interval)
                 val shouldFetch = forceRefresh || 
                     (System.currentTimeMillis() - lastCheckTime) > CHECK_INTERVAL_MILLIS
                 

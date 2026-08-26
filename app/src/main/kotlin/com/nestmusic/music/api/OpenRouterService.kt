@@ -72,7 +72,7 @@ CRITICAL RULES:
 
 CRITICAL REQUIREMENTS:
 - Use ONLY simple ASCII characters (a-z, A-Z, 0-9, basic punctuation)
-- NO special characters like a, i, u, ñ, ç, etc.
+- NO special characters like a, i, u, ï¿½, ï¿½, etc.
 - NO diacritics or accent marks
 - If text is already in Latin script, return it UNCHANGED
 - For non-Latin scripts (Hindi, Chinese, Japanese, Korean, Cyrillic, etc.), provide simple romanization
@@ -166,7 +166,7 @@ Output MUST be a JSON array with EXACTLY $lineCount strings."""
                                     addHeader("Authorization", "Bearer ${apiKey.trim()}")
                                 }
                             }.addHeader("Content-Type", "application/json")
-                            .addHeader("HTTP-Referer", "https://github.com/MetrolistGroup/Metrolist")
+                            .addHeader("HTTP-Referer", "https://github.com/Davidix07TV/Nest-Music")
                             .addHeader("X-Title", "Metrolist")
                             .post(jsonBody.toString().toRequestBody(JSON))
                             .build()
