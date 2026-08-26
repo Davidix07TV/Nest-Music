@@ -114,7 +114,7 @@ class EQProfileRepository @Inject constructor(
         }
 
         // Save to SharedPreferences
-        val profilesJson = json.encodeToString<List<SavedEQProfile>>(currentProfiles)
+        val profilesJson = json.encodeToString(currentProfiles)
         prefs.edit { putString(KEY_PROFILES, profilesJson) }
 
         _profiles.value = currentProfiles
@@ -140,7 +140,7 @@ class EQProfileRepository @Inject constructor(
             }
         }
 
-        val profilesJson = json.encodeToString<List<SavedEQProfile>>(currentProfiles)
+        val profilesJson = json.encodeToString(currentProfiles)
         prefs.edit { putString(KEY_PROFILES, profilesJson) }
 
         _profiles.value = currentProfiles
@@ -153,7 +153,7 @@ class EQProfileRepository @Inject constructor(
         val currentProfiles = _profiles.value.toMutableList()
         currentProfiles.removeAll { it.id == profileId }
 
-        val profilesJson = json.encodeToString<List<SavedEQProfile>>(currentProfiles)
+        val profilesJson = json.encodeToString(currentProfiles)
         prefs.edit { putString(KEY_PROFILES, profilesJson) }
 
         // If deleted profile was active, clear active profile
