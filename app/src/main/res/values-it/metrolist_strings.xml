@@ -280,6 +280,8 @@
     <string name="no_profiles">Nessun profilo di equalizzazione</string>
     <string name="import_profile">Importa profilo</string>
     <string name="eq_disabled">Disabilitato</string>
+    <string name="sound_effects">Effetti Sonori</string>
+    <string name="custom_profiles">Profili Personalizzati</string>
     <string name="graphic_equalizer">Equalizzatore Grafico</string>
     <string name="eq_presets">Preset Equalizzatore</string>
     <string name="eq_bass_boost">Enfasi Bassi</string>

@@ -514,6 +514,8 @@
     <string name="eq_downloading">Downloading…</string>
     <string name="import_from_file">Import from file</string>
     <string name="add_profile">Add profile</string>
+    <string name="sound_effects">Sound Effects</string>
+    <string name="custom_profiles">Custom Profiles</string>
     <string name="graphic_equalizer">Graphic Equalizer</string>
     <string name="eq_presets">EQ Presets</string>
     <string name="eq_bass_boost">Bass Boost</string>
