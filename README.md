@@ -121,7 +121,7 @@
     <td align="center">
       <pre><code>git clone https://github.com/Davidix07TV/Nest-Music
 cd Nest-Music
-./gradlew :app:assembleFossDebug</code></pre>
+./gradlew :app:assembleFossRelease</code></pre>
     </td>
   </tr>
 </table>
