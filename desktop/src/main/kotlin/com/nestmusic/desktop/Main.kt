@@ -61,7 +61,7 @@ private class NestMusicWindow : JFrame("Nest Music") {
 
     private fun section(name: String, items: Array<String>) = JPanel(BorderLayout(0, 12)).apply {
         background = bg; maximumSize = Dimension(Int.MAX_VALUE, 185)
-        add(label(name, 20, text), BorderLayout.NORTH)
+        add(label(name, 20, uiText), BorderLayout.NORTH)
         val cards = JPanel(GridLayout(1, items.size, 14, 0)); cards.background = bg
         items.forEach { cards.add(card(it)) }; add(cards, BorderLayout.CENTER)
     }
