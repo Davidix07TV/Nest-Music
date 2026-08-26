@@ -1,0 +1,57 @@
+[package]
+name = "nest-music"
+version = "1.0.0"
+description = "Nest Music - YouTube Music desktop client"
+authors = []
+license = ""
+edition = "2021"
+rust-version = "1.77"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri             = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-shell   = "2"
+tauri-plugin-opener  = "2"
+tauri-plugin-dialog  = "2"
+tauri-plugin-fs      = "2"
+tauri-plugin-http    = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+tauri-plugin-deep-link = "2"
+serde             = { version = "1", features = ["derive"] }
+serde_json        = "1"
+reqwest           = { version = "0.12", features = ["blocking", "json"] }
+url               = "2"
+tokio             = { version = "1", features = ["time"] }
+discord-rich-presence = "1.1"
+rodio      = { version = "0.20", features = ["symphonia-all"] }
+symphonia  = { version = "0.5",  features = ["all"] }
+# Opus decoder. symphonia demuxes WebM/Ogg but ships no Opus codec (still true in 0.6.1), and
+# rodio pins symphonia to 0.5 anyway, so upgrading would not have helped. See audio/decoder.rs.
+audiopus   = "0.2"
+rustfft    = "6"
+base64     = "0.22"
+# OS media controls (Windows SMTC, macOS Now Playing, Linux MPRIS) + media keys.
+souvlaki   = "0.7"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Runtime Dock icon (NSApplication) + persistent .app bundle icon (NSWorkspace) for the
+# app-icon personalization feature.
+objc  = "0.2"
+cocoa = "0.24"
+
+[target.'cfg(windows)'.dependencies]
+# xcap (bug-report screenshot) doesn't compile on macOS (xcap 0.0.14 macos backend) — Windows only.
+xcap = "0.0.14"
+windows = { version = "0.58", features = [
+    "Win32_Media_Audio",
+    "Win32_System_Com",
+    "Win32_Foundation",
+    "Win32_System_Threading",
+    "Win32_Graphics_Dwm",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }

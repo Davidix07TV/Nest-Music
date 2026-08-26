@@ -26,6 +26,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Nest-Music"
 include(":app")
+
 include(":innertube")
 include(":kugou")
 include(":lrclib")

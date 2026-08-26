@@ -296,3 +296,36 @@ This project is not affiliated with YouTube, YouTube Music, or Google. All trade
 **Last Updated**: August 2026
 
 </div>
+
+## Desktop (Windows)
+
+Nest Music includes a full desktop app for Windows, built with **Tauri 2** (React + Vite frontend, Rust shell, Python sidecar). It supports synced lyrics, offline downloads, Discord Rich Presence, Last.fm scrobbling, an OBS overlay and more.
+
+> The desktop app was formerly known as **Kodama** (by [KiyoshiTheDevil](https://github.com/KiyoshiTheDevil/Kodama)); Nest Music continues it as its own desktop client under the **AGPL-3.0** license, keeping the original attribution.
+
+### Install
+
+Download the latest installer from GitHub Actions (workflow **Desktop Windows Installer** → artifact `nest-music-windows-installer`) or build it yourself:
+
+```bat
+cd desktop
+npm ci
+cd python-backend
+py -m pip install -r requirements.txt
+py -m pip install pyinstaller
+.\build_server.bat
+cd ..
+npm run tauri build
+```
+
+The NSIS installer is written to `desktop/src-tauri/target/release/bundle/nsis/`.
+
+### Development
+
+```bat
+cd desktop
+npm ci
+npm run tauri dev
+```
+
+See `desktop/README.md` for the full desktop documentation.
