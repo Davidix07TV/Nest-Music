@@ -296,3 +296,24 @@ This project is not affiliated with YouTube, YouTube Music, or Google. All trade
 **Last Updated**: August 2026
 
 </div>
+
+## Desktop preview
+
+Nest Music now includes a lightweight JVM desktop companion for Windows, macOS, and Linux. It keeps the Nest Music visual language on a large screen and provides quick picks, library navigation, a desktop player bar, and YouTube Music search. Search results currently open in the user's default browser while the native desktop playback layer is being built.
+
+Requires Java 21. To create the first Windows `.exe`, run this on a Windows machine with a full JDK 21+ installed:
+
+```powershell
+# From the repository root
+.\gradlew.bat :desktop:packageWindows
+```
+
+The installer is generated in `desktop/build/windows-installer/`. It includes a Start Menu entry and an optional desktop shortcut. The native packaging step must run on Windows because `jpackage` creates platform-specific installers.
+
+For local development or a portable JVM build:
+
+```bash
+./gradlew :desktop:run
+./gradlew :desktop:jar
+java -jar desktop/build/libs/desktop-1.0.0.jar
+```

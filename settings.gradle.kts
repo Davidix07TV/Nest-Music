@@ -26,6 +26,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "Nest-Music"
 include(":app")
+
+// Desktop companion (JVM): a lightweight Nest Music shell for Windows, macOS and Linux.
+include(":desktop")
 include(":innertube")
 include(":kugou")
 include(":lrclib")
