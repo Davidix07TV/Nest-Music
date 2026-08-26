@@ -1,3 +1,30 @@
+---v1.1.0
+# NEST MUSIC v1.1.0
+
+## 🌅 Nuovo Tema "Sunset" Personalizzato
+- Nuovo tema Sunset ispirato al logo Nest Music con sfumature viola neon, arancione caldo/corallo e blu notte/indaco profondo.
+- Supporto completo alla modalità **Pure Black (AMOLED)** con sfondo nero assoluto e accenti luminescenti.
+- Selettore tema aggiornato con anteprima tricromatica dedicata.
+
+## 🎤 Testi Sincronizzati Avanzati in Tempo Reale
+- **Visualizzatore audio dinamico**: barre di frequenza animate e pulsanti a ritmo di musica per la riga attiva.
+- **Transizioni e scaling reattivo**: evidenziazione fluida delle parole e della riga canora corrente con effetto spring.
+- **Indicatore dinamico per pause strumentali**: chip circolare con conto alla rovescia in secondi e punti ritmici pulsanti tra le strofe.
+- **Sincronizzazione avanzata traduzioni e romanizzazione**.
+
+## 📱 Nuovi Widget Home Screen
+- Integrazione completa del logo vettoriale e del branding Nest Music.
+- Design rinnovato per tutti i widget: **Lettore Completo**, **Compatto 4x1**, **Quadrato 2x2**, e **Giradischi / Turntable** con vinile a tema tramonto.
+- Pillole di riproduzione moderne, copertine arrotondate ad alta risoluzione e barra di progresso elegante.
+
+## 🎛️ Equalizzatore Grafico Migliorato
+- **11 Preset Audio Professionali**: *Sunset Vibes*, *Bass Boost+*, *Deep Bass*, *Vocal Clarity*, *Acoustic*, *Electronic*, *Rock*, *Pop*, *Classical & Jazz*, *Treble Boost*, *Flat*.
+- **Equalizzatore Grafico a 10 Bande Interattivo** (31Hz, 63Hz, 125Hz, 250Hz, 500Hz, 1kHz, 2kHz, 4kHz, 8kHz, 16kHz) con risposta in frequenza in tempo reale.
+- **Controlli ed effetti sonori**: guadagno Preamp (-12 a +12 dB), Bass Boost (0 a +12 dB) e Surround 3D.
+- Possibilità di salvare curve personalizzate e ripristinare la risposta Flat con un solo tocco.
+
+~ Nest Music Team
+
 ---v13.6.3
 
 This is a hotfix release to fix borked lyrics and media controller. We apologize for the inconvenience.  
