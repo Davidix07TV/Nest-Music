@@ -72,14 +72,17 @@ class EQProfileRepository @Inject constructor(
     private fun loadProfiles() {
         try {
             val profilesJson = prefs.getString(KEY_PROFILES, null)
-            if (profilesJson != null) {
-                val loadedProfiles = json.decodeFromString<List<SavedEQProfile>>(profilesJson)
-                _profiles.value = loadedProfiles
-
-                // Load active profile
-                val activeId = prefs.getString(KEY_ACTIVE_PROFILE_ID, null)
-                _activeProfile.value = loadedProfiles.find { it.id == activeId }
+            val loadedProfiles = if (profilesJson != null) {
+                json.decodeFromString<List<SavedEQProfile>>(profilesJson)
+            } else {
+                emptyList()
             }
+            _profiles.value = loadedProfiles
+
+            // Load active profile
+            val activeId = prefs.getString(KEY_ACTIVE_PROFILE_ID, null)
+            _activeProfile.value = BuiltInEQPresets.ALL_PRESETS.find { it.id == activeId }
+                ?: loadedProfiles.find { it.id == activeId }
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Error loading EQ profiles")
             _profiles.value = emptyList()
@@ -161,25 +164,31 @@ class EQProfileRepository @Inject constructor(
     }
 
     /**
+     * Get a profile by its ID (checks built-ins then user custom profiles)
+     */
+    fun getProfileById(id: String): SavedEQProfile? {
+        return BuiltInEQPresets.ALL_PRESETS.find { it.id == id }
+            ?: _profiles.value.find { it.id == id }
+    }
+
+    /**
      * Set a profile as active (only one profile can be active at a time)
      * Pass null to deactivate all profiles
      */
     suspend fun setActiveProfile(profileId: String?) = withContext(Dispatchers.IO) {
-        val currentProfiles = _profiles.value
-
         if (profileId == null) {
             // Deactivate all profiles
             _activeProfile.value = null
             prefs.edit { remove(KEY_ACTIVE_PROFILE_ID) }
         } else {
-            val profile = currentProfiles.find { it.id == profileId }
+            val profile = getProfileById(profileId)
             _activeProfile.value = profile
             prefs.edit { putString(KEY_ACTIVE_PROFILE_ID, profileId) }
         }
     }
 
     /**
-     * Get all saved profiles
+     * Get all saved custom profiles
      */
     fun getAllProfiles(): List<SavedEQProfile> {
         return _profiles.value
@@ -206,10 +215,10 @@ class EQProfileRepository @Inject constructor(
             id = id,
             name = name,
             deviceModel = name,
-            bands = parametricEQ.bands,  // Already ParametricEQBand
+            bands = parametricEQ.bands,
             preamp = parametricEQ.preamp,
             isActive = false,
-            isCustom = true // Ensure this flag is set!
+            isCustom = true
         )
 
         saveProfile(customProfile)
@@ -220,7 +229,6 @@ class EQProfileRepository @Inject constructor(
      * Within each group, sort by timestamp (newest first)
      */
     fun getSortedProfiles(): List<SavedEQProfile> {
-        // Only custom profiles are supported now
         return _profiles.value
             .filter { it.isCustom }
             .sortedByDescending { it.addedTimestamp }

@@ -7,7 +7,9 @@ package com.nestmusic.music.ui.component
 
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,12 +17,15 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +41,9 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -111,6 +118,54 @@ private fun String.toGraphemeClusters(): List<String> {
         end = it.next()
     }
     return result
+}
+
+/**
+ * Real-time audio visualizer displaying lively pulsating rhythm bars for active lyrics line
+ */
+@Composable
+internal fun RealtimeLyricsVisualizer(
+    color: Color,
+    isPlaying: Boolean,
+    modifier: Modifier = Modifier
+) {
+    var animFrame by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(isPlaying) {
+        if (isPlaying) {
+            while (isActive) {
+                withFrameMillis { timeMs ->
+                    animFrame = timeMs
+                }
+            }
+        }
+    }
+
+    Canvas(modifier = modifier.size(width = 22.dp, height = 14.dp)) {
+        val barCount = 4
+        val barWidth = 3.dp.toPx()
+        val spacing = (size.width - (barCount * barWidth)) / (barCount - 1).coerceAtLeast(1)
+        val maxHeight = size.height
+
+        for (i in 0 until barCount) {
+            val phase = i * 1.35f
+            val time = animFrame / 150.0
+            val normalizedHeight = if (isPlaying) {
+                (0.3f + 0.7f * abs(sin(time + phase).toFloat())).coerceIn(0.22f, 1f)
+            } else {
+                0.3f
+            }
+            val barHeight = maxHeight * normalizedHeight
+            val left = i * (barWidth + spacing)
+            val top = maxHeight - barHeight
+
+            drawRoundRect(
+                color = color,
+                topLeft = Offset(left, top),
+                size = Size(barWidth, barHeight),
+                cornerRadius = CornerRadius(barWidth / 2f, barWidth / 2f)
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -196,7 +251,42 @@ internal fun LyricsLine(
     }) {
         @Composable
         fun LyricContent() {
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = agentAlignment) {
+            val lineScale by animateFloatAsState(
+                targetValue = if (isActiveLine && isSynced && !item.isBackground) 1.025f else 1.0f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMedium
+                ),
+                label = "lineScale"
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        scaleX = lineScale
+                        scaleY = lineScale
+                        transformOrigin = when (lyricsTextPosition) {
+                            LyricsPosition.LEFT -> TransformOrigin(0f, 0.5f)
+                            LyricsPosition.RIGHT -> TransformOrigin(1f, 0.5f)
+                            LyricsPosition.CENTER -> TransformOrigin(0.5f, 0.5f)
+                        }
+                    },
+                horizontalAlignment = agentAlignment
+            ) {
+                if (isActiveLine && isSynced && !item.isBackground) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    ) {
+                        RealtimeLyricsVisualizer(
+                            color = expressiveAccent,
+                            isPlaying = playerConnection.player.isPlaying
+                        )
+                    }
+                }
+
                 val inactiveAlpha = if (item.isBackground) 0.08f else 0.2f
                 val activeAlpha = 1f
                 val focusedAlpha = if (item.isBackground) 0.5f else 0.3f
@@ -281,9 +371,9 @@ internal fun LyricsLine(
                         Text(
                             text = it,
                             fontSize = 18.sp,
-                            color = expressiveAccent.copy(alpha = 0.6f),
+                            color = if (isActiveLine) expressiveAccent.copy(alpha = 0.85f) else expressiveAccent.copy(alpha = 0.45f),
                             textAlign = agentTextAlign,
-                            fontWeight = FontWeight.Normal,
+                            fontWeight = if (isActiveLine) FontWeight.Medium else FontWeight.Normal,
                             modifier = Modifier.padding(top = 2.dp)
                         )
                     }
@@ -294,9 +384,9 @@ internal fun LyricsLine(
                     Text(
                         text = it,
                         fontSize = 16.sp,
-                        color = expressiveAccent.copy(alpha = 0.5f),
+                        color = if (isActiveLine) expressiveAccent.copy(alpha = 0.8f) else expressiveAccent.copy(alpha = 0.4f),
                         textAlign = agentTextAlign,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = if (isActiveLine) FontWeight.Medium else FontWeight.Normal,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }

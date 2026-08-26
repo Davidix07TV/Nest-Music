@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Turntable Widget - Circular design with play and navigation buttons -->
+<!-- Turntable Widget - Circular design with Nest Music branding, play and navigation buttons -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/background"
     android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="36dp"
         android:layout_gravity="top|end"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="6dp"
         android:orientation="horizontal"
         android:background="@drawable/widget_turntable_nav_bg"

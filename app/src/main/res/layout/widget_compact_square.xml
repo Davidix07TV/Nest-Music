@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Compact 2x2 Widget - Album art with play button overlay -->
+<!-- Compact 2x2 Widget - Album art with play button overlay and Nest Music branding -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:padding="12dp"
+    android:padding="10dp"
     android:theme="@style/Theme.Widget.Metrolist">
 
     <!-- Album Art Container -->
@@ -18,22 +18,32 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/widget_turntable_default_art"
             android:contentDescription="@string/album_art" />
+
+        <!-- Nest Music Corner Badge -->
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_nest_music_logo"
+            android:contentDescription="Nest Music"
+            android:alpha="0.85" />
 
         <!-- Play Button Overlay - Bottom Center -->
         <FrameLayout
             android:id="@+id/widget_compact_play_container"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="6dp"
             android:background="@drawable/widget_play_button_circular">
 
             <ImageView
                 android:id="@+id/widget_compact_play_pause"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_widget_play_low"
                 android:contentDescription="@string/play_pause" />

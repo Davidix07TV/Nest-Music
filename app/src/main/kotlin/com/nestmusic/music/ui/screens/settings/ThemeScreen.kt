@@ -80,6 +80,10 @@ import com.nestmusic.music.constants.PureBlackMiniPlayerKey
 import com.nestmusic.music.constants.SelectedThemeColorKey
 import com.nestmusic.music.ui.theme.DefaultThemeColor
 import com.nestmusic.music.ui.theme.MetrolistTheme
+import com.nestmusic.music.ui.theme.SunsetDeepBlue
+import com.nestmusic.music.ui.theme.SunsetOrange
+import com.nestmusic.music.ui.theme.SunsetPurple
+import com.nestmusic.music.ui.theme.SunsetThemeColor
 import com.nestmusic.music.utils.rememberEnumPreference
 import com.nestmusic.music.utils.rememberPreference
 
@@ -90,6 +94,7 @@ data class ThemePalette(
 
 val PaletteColors = listOf(
     ThemePalette(R.string.palette_dynamic, Color.Transparent), // Sentinel for System/Dynamic colors
+    ThemePalette(R.string.palette_sunset, SunsetThemeColor),   // Nest Music Logo-inspired Sunset Theme
     ThemePalette(R.string.palette_crimson, Color(0xFFEC5464)), // Slightly shifted from DefaultThemeColor (0xFFED5564) to avoid conflict
     ThemePalette(R.string.palette_rose, Color(0xFFD81B60)),
     ThemePalette(R.string.palette_purple, Color(0xFF8E24AA)),
@@ -632,6 +637,33 @@ fun PaletteItem(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(24.dp)
+                )
+            }
+        } else if (palette.seedColor == SunsetThemeColor) {
+            // Draw Sunset logo-inspired 3-color palette preview (Purple, Orange, Deep Midnight Blue)
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val width = size.width
+                val height = size.height
+                
+                // Sunset Purple (top segment)
+                drawRect(
+                    color = SunsetPurple,
+                    topLeft = Offset(0f, 0f),
+                    size = Size(width, height * 0.45f)
+                )
+                
+                // Sunset Orange (bottom left segment)
+                drawRect(
+                    color = SunsetOrange,
+                    topLeft = Offset(0f, height * 0.45f),
+                    size = Size(width * 0.55f, height * 0.55f)
+                )
+                
+                // Sunset Deep Midnight Blue (bottom right segment)
+                drawRect(
+                    color = SunsetDeepBlue,
+                    topLeft = Offset(width * 0.55f, height * 0.45f),
+                    size = Size(width * 0.45f, height * 0.55f)
                 )
             }
         } else {

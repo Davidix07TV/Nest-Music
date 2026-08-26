@@ -359,22 +359,22 @@ class MetrolistWidgetManager @Inject constructor(
     }
     
     private fun getCircularDefaultIcon(): Bitmap {
-        // Get the launcher icon and make it circular
-        val drawable = context.packageManager.getApplicationIcon(context.packageName)
         val size = 300
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
+        val drawable = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.widget_turntable_default_art)
+            ?: context.packageManager.getApplicationIcon(context.packageName)
         drawable.setBounds(0, 0, size, size)
         drawable.draw(canvas)
         return getCircularBitmap(bitmap)
     }
     
     private fun getRoundedDefaultIcon(cornerRadius: Float): Bitmap {
-        // Get the launcher icon and make it rounded
-        val drawable = context.packageManager.getApplicationIcon(context.packageName)
         val size = 300
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
+        val drawable = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.widget_turntable_default_art)
+            ?: context.packageManager.getApplicationIcon(context.packageName)
         drawable.setBounds(0, 0, size, size)
         drawable.draw(canvas)
         return getRoundedCornerBitmap(bitmap, cornerRadius)

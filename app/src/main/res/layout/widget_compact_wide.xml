@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Compact 4x1 Widget - Single row with album art, song info, like and play buttons -->
+<!-- Compact 4x1 Widget - Single row with Nest Music logo, album art, song info, like and play buttons -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/background"
     android:layout_width="match_parent"
@@ -19,7 +19,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/widget_turntable_default_art"
         android:contentDescription="@string/album_art" />
 
     <!-- Song Info -->
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="8dp"
         android:orientation="vertical"
         android:gravity="center_vertical">
 
@@ -48,17 +48,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/tap_to_play"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textColor="@color/widget_text_secondary"
             android:maxLines="1"
             android:ellipsize="end"
             android:layout_marginTop="2dp" />
     </LinearLayout>
 
+    <!-- Nest Music Small Logo Indicator -->
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_nest_music_logo"
+        android:contentDescription="Nest Music"
+        android:alpha="0.75" />
+
     <!-- Like Button -->
     <FrameLayout
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/widget_like_button_bg">
 
@@ -66,7 +75,7 @@
             android:id="@+id/widget_wide_like_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp"
+            android:padding="8dp"
             android:scaleType="fitCenter"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_widget_heart_outline_nav"
@@ -76,14 +85,14 @@
     <!-- Play Button -->
     <FrameLayout
         android:id="@+id/widget_wide_play_container"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="@drawable/widget_play_button_circular">
 
         <ImageView
             android:id="@+id/widget_wide_play_pause"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_widget_play_low"
             android:contentDescription="@string/play_pause" />
