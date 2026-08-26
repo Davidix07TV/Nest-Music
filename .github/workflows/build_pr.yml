@@ -4,17 +4,14 @@ on:
   pull_request:
     branches:
       - "**"
-    # Weblate PRs only touch localized string files, which cannot break a
-    # build that the base branch already compiles. The default (unsuffixed)
-    # `values/` directory is deliberately not listed, so English string
-    # changes still build.
     paths-ignore:
       - "app/src/main/res/values-*/strings.xml"
       - "app/src/main/res/values-*/metrolist_strings.xml"
       - "fastlane/**"
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,7 +33,7 @@ jobs:
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          cache-read-only: true
+          cache-read-only: false
           cache-cleanup: on-success
 
       - name: Grant execute permission for gradlew
@@ -47,7 +44,7 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: app/pr-debug.keystore
-          key: pr-debug-keystore-${{ github.event.number }}
+          key: pr-debug-keystore-${{ github.event.number || github.ref }}
 
       - name: Generate PR debug keystore if not cached
         if: steps.pr_keystore.outputs.cache-hit != 'true'
@@ -60,7 +57,7 @@ jobs:
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -dname "CN=Metrolist PR ${{ github.event.number }},O=Metrolist,C=US"
+            -dname "CN=Nest Music PR ${{ github.event.number || 'manual' }},O=NestMusic,C=US"
 
       - name: Save PR debug keystore
         if: steps.pr_keystore.outputs.cache-hit != 'true'
@@ -69,19 +66,19 @@ jobs:
           path: app/pr-debug.keystore
           key: ${{ steps.pr_keystore.outputs.cache-primary-key }}
 
-      - name: Build GMS Debug APK
-        run: ./gradlew --console=plain assembleGmsDebug --warning-mode summary
+      - name: Build FOSS Release APK
+        run: ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
-          NESTMUSIC_APPLICATION_ID: com.nestmusic.music.pr.p${{ github.event.number }}
-          NESTMUSIC_APP_NAME: Nest Music PR ${{ github.event.number }}
+          NESTMUSIC_APPLICATION_ID: com.nestmusic.music
+          NESTMUSIC_APP_NAME: Nest Music
           NESTMUSIC_DEBUG_KEYSTORE_PATH: pr-debug.keystore
-          PULL_REQUEST: "true"
+          PULL_REQUEST: "false"
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v6
         with:
-          name: app-universal-debug-pr-${{ github.event.number }}
-          path: app/build/outputs/apk/gms/debug/*.apk
+          name: app-foss-release
+          path: app/build/outputs/apk/foss/release/*.apk
