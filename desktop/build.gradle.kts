@@ -6,7 +6,7 @@ plugins {
 group = "com.nestmusic"
 version = "1.0.0"
 
-repositories { mavenCentral() }
+// Repositories are defined centrally in settings.gradle.kts.
 
 kotlin { jvmToolchain(21) }
 
