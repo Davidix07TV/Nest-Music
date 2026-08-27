@@ -299,7 +299,7 @@ pub async fn open_login_window(
                 .unwrap(),
         ),
     )
-    .title("Kodama – Anmelden")
+    .title("Nest Music – Anmelden")
     .inner_size(900.0, 680.0)
         .center()
     .decorations(true)
@@ -451,7 +451,7 @@ pub async fn ensure_session_keeper(app: tauri::AppHandle, profile_name: String) 
         "session-keeper",
         tauri::WebviewUrl::External("https://music.youtube.com/".parse().unwrap()),
     )
-    .title("Kodama session")
+    .title("Nest Music session")
     .inner_size(900.0, 680.0)
     .visible(false)
     .skip_taskbar(true)
@@ -613,7 +613,7 @@ pub async fn open_composer_window(
         "unison-composer",
         tauri::WebviewUrl::External(url.parse::<url::Url>().map_err(|e| e.to_string())?),
     )
-    .title("Boidu Composer — Kodama")
+    .title("Boidu Composer — Nest Music")
     .inner_size(1280.0, 860.0)
     .min_inner_size(900.0, 600.0)
     .center()

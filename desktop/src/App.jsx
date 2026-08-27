@@ -63,7 +63,7 @@ const NEWS_URL = "https://raw.githubusercontent.com/KiyoshiTheDevil/Kodama/maste
 // the player + lyrics views look consistent. Not a user-facing feature.
 const DEMO_TRACK_ID = "lrpAl2Eca70"; // mechanical corpse (feat. GUMI) — tommy.
 const DEMO_SEEK_S   = 33;            // pose at ~0:33
-const DEMO_NAME     = "Kodama";
+const DEMO_NAME     = "Nest Music";
 const DEMO_PROFILE  = { name: "demo", displayName: DEMO_NAME, avatar: "" };
 
 // Anonymous active-user heartbeat endpoint (Cloudflare Worker, see analytics/).
@@ -1151,8 +1151,8 @@ function Sidebar({ view, activeNavId, setView, onSearch, collapsed, onToggleColl
           </>
         ) : (
           <>
-            <img src="/Kodama%20Logo.png" alt="Kodama" width="20" height="20" className="shrink-0" />
-            <span className="text-t15 font-medium whitespace-nowrap">Kodama</span>
+            <img src="/Nest%20Music%20Logo.png" alt="Nest Music" width="20" height="20" className="shrink-0 rounded-md" />
+            <span className="text-t15 font-medium whitespace-nowrap">Nest Music</span>
             <div className="ml-auto flex items-center gap-0.5 shrink-0">
               <Button
                 variant="ghost" size="sm" isIconOnly
@@ -2759,7 +2759,7 @@ function Player({ track, setTrack, queue, setQueue, audioRef, isPlaying, setIsPl
 function LoginLogo() {
   return (
     <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-      <img src="/Kodama%20Logo.png" alt="Kodama" style={{ width: 56, height: 56 }} />
+      <img src="/Nest%20Music%20Logo.png" alt="Nest Music" style={{ width: 56, height: 56, borderRadius: 12 }} />
     </div>
   );
 }
@@ -2982,8 +2982,8 @@ function LanguagePickerScreen({ currentLanguage, onConfirm }) {
       <CardRoot variant="secondary" className="flex flex-col gap-0! shrink-0"
         style={{ width: 420, maxWidth: "92vw", padding: 36, maxHeight: "calc(100vh - 40px)", boxShadow: "var(--elevation-4)" }}>
         {/* Logo + heading */}
-        <img src="/Kodama%20Logo.png" alt="Kodama" style={{ width: 64, height: 64, alignSelf: "center", marginBottom: 14 }} />
-        <div style={{ fontSize: "var(--t20)", fontWeight: 700, textAlign: "center", marginBottom: 6 }}>Kodama</div>
+        <img src="/Nest%20Music%20Logo.png" alt="Nest Music" style={{ width: 64, height: 64, alignSelf: "center", marginBottom: 14, borderRadius: 14 }} />
+        <div style={{ fontSize: "var(--t20)", fontWeight: 700, textAlign: "center", marginBottom: 6 }}>Nest Music</div>
         <div style={{ fontSize: "var(--t13)", color: "var(--text-muted)", textAlign: "center", marginBottom: 24 }}>{subtitle}</div>
 
         {/* Language rows */}
@@ -3131,11 +3131,11 @@ function FfmpegSetupScreen({ onDone }) {
 
       <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 24, width: 360 }}>
         {/* Logo */}
-        <img src="/Kodama%20Logo.png" alt="Kodama" width="56" height="56" style={{ filter: "drop-shadow(0 0 20px rgba(238,168,255,0.4))" }} />
+        <img src="/Nest%20Music%20Logo.png" alt="Nest Music" width="56" height="56" style={{ filter: "drop-shadow(0 0 20px rgba(100,200,255,0.4))", borderRadius: 12 }} />
 
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 8 }}>
-            {phase === "checking"    && "Kodama"}
+            {phase === "checking"    && "Nest Music"}
             {phase === "needed"      && t("ffmpegSetupTitle")}
             {phase === "downloading" && t("ffmpegDownloadingTitle")}
             {phase === "error"       && t("ffmpegErrorTitle")}
@@ -3256,8 +3256,8 @@ function SplashScreen({ fading }) {
       pointerEvents: "none",
     }}>
       <style>{`@keyframes kodamaPulse{0%,100%{transform:scale(0.92);opacity:.7}50%{transform:scale(1.06);opacity:1}}`}</style>
-      <img src="/Kodama%20Logo.png" alt="Kodama" width="96" height="96"
-        style={{ animation: "kodamaPulse 1.5s ease-in-out infinite" }} />
+      <img src="/Nest%20Music%20Logo.png" alt="Nest Music" width="96" height="96"
+        style={{ animation: "kodamaPulse 1.5s ease-in-out infinite", borderRadius: 20 }} />
     </div>
   );
 }
@@ -4091,7 +4091,7 @@ export default function App() {
     };
 
     if (!currentTrack) {
-      setWinTitle("Kodama");
+      setWinTitle("Nest Music");
       return;
     }
 
@@ -4101,7 +4101,7 @@ export default function App() {
       setWinTitle(trackTitle);
     } else {
       // Paused: keep the track title but reset after 30 s of inactivity
-      const timer = setTimeout(() => setWinTitle("Kodama"), 30_000);
+      const timer = setTimeout(() => setWinTitle("Nest Music"), 30_000);
       return () => clearTimeout(timer);
     }
   }, [currentTrack, isPlaying]);

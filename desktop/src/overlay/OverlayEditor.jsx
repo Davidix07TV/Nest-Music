@@ -1314,7 +1314,7 @@ export default function OverlayEditor({
           and sits above the layer list now: it belongs to the document, not to the toolbar. */}
       <div className="shrink-0 flex items-center gap-1 h-[52px] pl-[22px] pr-3 border-b border-border" {...(standalone ? { "data-tauri-drag-region": true } : {})}>
         <div className="flex items-center gap-2 pr-2 shrink-0">
-          <img src="/Kodama%20Logo.png" alt="" width="18" height="18" />
+          <img src="/Nest%20Music%20Logo.png" alt="" width="18" height="18" className="rounded-sm" />
           <span className="text-t13 font-semibold text-primary">{t("ovlEditorTitle")}</span>
           {/* Set like a superscript beside the wordmark: raised against the cap height rather
               than centred on it, so it reads as a qualifier on the name instead of a second
