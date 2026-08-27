@@ -240,7 +240,7 @@ Pull requests are welcome! Please ensure your changes align with the project goa
 <h3>Nest Music is built upon the excellent work of the Metrolist and Kodama project.</h3>
 
 **Original Projects**:
-[Metrolist](https://github.com/MetrolistGroup/Metrolist) by MetrolistGroup
+[Metrolist](https://github.com/MetrolistGroup/Metrolist) by MetrolistGroup and
 [Kodama](https://github.com/KiyoshiTheDevil/Kodama) by KiyoshiTheDevil
 
 **This fork**: Rebranded as Nest Music with UI/UX improvements and ongoing maintenance.
