@@ -145,11 +145,11 @@ struct BrowseResponse: Decodable {
     }
     struct BrowseSection: Decodable {
         let musicCarouselShelfRenderer: MusicCarouselShelfRenderer?
-        let musicShelfRenderer: SearchResponse.Section.MusicShelfRenderer?
+        let musicShelfRenderer: SearchResponse.MusicShelfRenderer?
     }
     struct MusicCarouselShelfRenderer: Decodable {
         let header: CarouselHeader?
-        let contents: [SearchResponse.Section.ShelfContent]?
+        let contents: [SearchResponse.ShelfContent]?
     }
     struct CarouselHeader: Decodable {
         let musicCarouselShelfBasicHeaderRenderer: MusicCarouselShelfBasicHeaderRenderer?
@@ -262,7 +262,6 @@ struct NavigationEndpoint: Decodable {
 struct PlayerResponse: Decodable {
     let playabilityStatus: PlayabilityStatus
     let streamingData: StreamingData?
-    let videoDetails: VideoDetails?
 
     struct PlayabilityStatus: Decodable {
         let status: String?
@@ -277,22 +276,7 @@ struct PlayerResponse: Decodable {
         let url: String?
         let mimeType: String?
         let bitrate: Int?
-        let contentLength: String?
         let audioQuality: String?
         let averageBitrate: Int?
-        let audioSampleRate: String?
-        let audioChannels: Int?
-        let signatureCipher: String?
-        let cipher: String?
-    }
-    struct VideoDetails: Decodable {
-        let videoId: String?
-        let title: String?
-        let author: String?
-        let lengthSeconds: String?
-        let thumbnail: PlayerThumbnail?
-    }
-    struct PlayerThumbnail: Decodable {
-        let thumbnails: [ThumbnailRenderer.Thumbnails.Thumbnail]?
     }
 }

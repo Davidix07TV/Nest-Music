@@ -32,31 +32,29 @@ struct RootView: View {
     @Environment(\.nestColors) private var colors
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            TabView(selection: $selectedTab) {
-                HomeView(onSongTap: play)
-                    .tabItem { Label(MainTab.home.rawValue, systemImage: MainTab.home.icon) }
-                    .tag(MainTab.home)
+        TabView(selection: $selectedTab) {
+            HomeView(onSongTap: play)
+                .tabItem { Label(MainTab.home.rawValue, systemImage: MainTab.home.icon) }
+                .tag(MainTab.home)
 
-                SearchView(onSongTap: play)
-                    .tabItem { Label(MainTab.search.rawValue, systemImage: MainTab.search.icon) }
-                    .tag(MainTab.search)
+            SearchView(onSongTap: play)
+                .tabItem { Label(MainTab.search.rawValue, systemImage: MainTab.search.icon) }
+                .tag(MainTab.search)
 
-                ListenTogetherView()
-                    .tabItem { Label(MainTab.together.rawValue, systemImage: MainTab.together.icon) }
-                    .tag(MainTab.together)
+            ListenTogetherView()
+                .tabItem { Label(MainTab.together.rawValue, systemImage: MainTab.together.icon) }
+                .tag(MainTab.together)
 
-                LibraryView()
-                    .tabItem { Label(MainTab.library.rawValue, systemImage: MainTab.library.icon) }
-                    .tag(MainTab.library)
-            }
-            .tint(colors.primary)
-
+            LibraryView()
+                .tabItem { Label(MainTab.library.rawValue, systemImage: MainTab.library.icon) }
+                .tag(MainTab.library)
+        }
+        .tint(colors.primary)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             if engine.currentSong != nil {
                 MiniPlayerView(engine: engine) {
                     showNowPlaying = true
                 }
-                .padding(.bottom, 1)
             }
         }
         .sheet(isPresented: $showNowPlaying) {

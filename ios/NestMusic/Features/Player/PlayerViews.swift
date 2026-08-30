@@ -5,6 +5,7 @@
 //  Mini player (docked above the tab bar) and full now-playing screen.
 //
 
+import Foundation
 import SwiftUI
 
 /// Compact player bar shown when a song is loaded.
