@@ -1,1 +1,93 @@
+# Codemagic build configuration for the Nest Music iOS app.
+#
+# Codemagic compiles the app on a cloud macOS runner (no local Mac needed) and
+# produces an unsigned .ipa that can be sideloaded via AltStore/Sideloadly, plus
+# runs the unit tests on a simulator.
+#
+# To produce a SIGNED .ipa installable via TestFlight/App Store, uncomment the
+# `integrations` + `ios_signing` block below (requires an Apple Developer
+# account connected in the Codemagic UI) and the two signing steps.
 
+workflows:
+  nest-music-ios:
+    name: Nest Music iOS (build + test)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    # integrations:
+    #   app_store_connect: nest-music   # add your App Store Connect integration name here
+
+    environment:
+      xcode: latest
+      vars:
+        PROJECT: ios/NestMusic.xcodeproj
+        SCHEME: NestMusic
+        BUNDLE_ID: com.nestmusic.music
+
+      # ios_signing:
+      #   distribution_type: development   # development | ad_hoc | app_store
+      #   bundle_identifier: com.nestmusic.music
+
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: master
+          include: true
+          source: true
+        - pattern: arena/*
+          include: true
+          source: true
+      cancel_previous_builds: true
+
+    scripts:
+      - name: Build unsigned app (device SDK)
+        script: |
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package unsigned .ipa
+        script: |
+          APP_PATH="build/Build/Products/Release-iphoneos/NestMusic.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "::error::App bundle not found at $APP_PATH"
+            find build -name "*.app" -maxdepth 6
+            exit 1
+          fi
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r -y NestMusic-unsigned.ipa Payload
+          ls -lh NestMusic-unsigned.ipa
+
+      # Uncomment once Apple code signing is configured:
+      # - name: Set up code signing
+      #   script: xcode-project use-profiles
+      # - name: Build signed .ipa
+      #   script: |
+      #     xcode-project build-ipa \
+      #       --project "$PROJECT" \
+      #       --scheme "$SCHEME"
+
+      - name: Run unit tests on Simulator
+        script: |
+          xcode-project run-tests \
+            --project "$PROJECT" \
+            --scheme "$SCHEME" \
+            --test-xcargs "CODE_SIGNING_ALLOWED=NO"
+        test_report: build/ios/test/*.xml
+
+    artifacts:
+      - NestMusic-unsigned.ipa
+      - build/Build/Products/Release-iphoneos/NestMusic.app
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
