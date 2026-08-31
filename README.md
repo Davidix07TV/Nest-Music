@@ -188,7 +188,7 @@ Yes! The app supports caching and downloading songs for offline use (available s
 
 ### Prerequisites
 - [Android SDK](https://developer.android.com/studio)
-- [Java 17+](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+- [Java 21+](https://adoptium.net/temurin/releases/?version=21) (Temurin recommended)
 - [Gradle 9.7+](https://gradle.org/)
 
 ### Build Steps
