@@ -1,5 +1,4 @@
-import { useProjectStore } from "@/stores/project";
-import type { SimpleTab } from "@/stores/project";
+import { useProjectStore, type SimpleTab } from "@/stores/project";
 import { Button } from "@/ui/button";
 import { Tabs } from "@heroui/react";
 import { IconHelp, IconMinus, IconRoute, IconSettings, IconSquare, IconX } from "@/ui/icons/fa";
@@ -72,10 +71,6 @@ const WindowControls: React.FC<{ height: number }> = ({ height }) => {
   );
 };
 
-// Unified top bar = titlebar + navigation: it is the window drag region, holds the logo,
-// the segmented tab navigation (HeroUI ToggleButtonGroup), the app actions and — when
-// running inside Tauri — the custom window controls. Replaces the old separate header,
-// tab-bar AND native titlebar in a single row.
 const AppHeader: React.FC<AppHeaderProps> = ({ onSettingsOpen, onHelpOpen, onTourStart }) => {
   const activeTab = useProjectStore((s) => s.activeTab);
   const setActiveTab = useProjectStore((s) => s.setActiveTab);

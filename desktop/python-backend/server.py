@@ -246,9 +246,6 @@ IMG_CACHE_DIR = os.path.join(_base_dir, "imgcache")
 os.makedirs(IMG_CACHE_DIR, exist_ok=True)
 IMG_CACHE_TTL = 30 * 24 * 3600  # 30 days
 
-# ─── Last.fm integration ─────────────────────────────────────────────────────
-# API key + shared secret: env vars first, then a local (git-ignored)
-# lastfm_config.json in the data dir. Features are disabled if unset.
 LASTFM_API_KEY = os.environ.get("LASTFM_API_KEY", "")
 LASTFM_API_SECRET = os.environ.get("LASTFM_API_SECRET", "")
 if not (LASTFM_API_KEY and LASTFM_API_SECRET):
@@ -437,10 +434,6 @@ def _load_composer_autocache():
         return True
 _composer_autocache = _load_composer_autocache()
 
-# ─── Node.js PATH — set once at startup ──────────────────────────────────────
-# yt-dlp needs Node.js for nsig (n-parameter) decryption on ALL requests,
-# not only authenticated ones.  Calling this here guarantees it runs before
-# the first request regardless of auth status.
 def _ensure_node_in_path():
     """Add bundled node.exe directory to PATH so yt-dlp can find it via shutil.which."""
     import shutil
@@ -468,7 +461,6 @@ def _ensure_node_in_path():
 
 _ensure_node_in_path()
 
-# ─── Debug log ring buffer ───────────────────────────────────────────────────
 import logging as _logging
 
 _server_start_time = time.time()
@@ -524,7 +516,6 @@ _logging.getLogger().setLevel(_logging.INFO)
 _logging.getLogger("werkzeug").addHandler(_ring_handler)
 _logging.getLogger("werkzeug").setLevel(_logging.INFO)
 
-# ─── Musixmatch (inoffizielle API) ───────────────────────────────────────────
 _mx_token = None
 _mx_token_expires = 0
 MX_APP_ID  = "web-desktop-app-v1.0"
@@ -825,11 +816,6 @@ def load_profile(name):
     threading.Thread(target=_refresh_ytm_psidts, kwargs={"force": True}, daemon=True).start()
     return True
 
-# ─── Keep browser sessions alive (rotating __Secure-1PSIDTS / 3PSIDTS) ─────────
-# Since ~Aug 2025 YouTube rejects stale anti-bot tokens after a few hours, which logged
-# users out. We periodically fetch fresh tokens with the profile's own cookies and inject
-# them into the live ytmusicapi cookie header (in memory; the SAPISIDHASH auth header is
-# recomputed per request from the long-lived SAPISID).
 _psidts_last_refresh = 0.0
 
 def _refresh_ytm_psidts(force=False):
@@ -1191,8 +1177,6 @@ autoload()
 # Keep the active browser session's anti-bot cookies fresh in the background.
 threading.Thread(target=_psidts_refresher_loop, daemon=True).start()
 
-# ─── Profile endpoints ───────────────────────────────────────────────────────
-
 @app.route("/profiles")
 def list_profiles():
     return jsonify({"profiles": get_profiles(), "current": _current_profile})
@@ -1264,7 +1248,6 @@ def set_profile_avatar():
         json.dump(meta, f)
     return jsonify({"ok": True})
 
-# ─── Last.fm endpoints ───────────────────────────────────────────────────────
 @app.route("/lastfm/status")
 def lastfm_status():
     meta = _read_active_meta()
@@ -1791,10 +1774,6 @@ def get_lyrics():
             keyword = f"{title} {artist}".strip()
             duration_ms = int(float(duration) * 1000) if duration else 0
 
-            # Step 1: search for song to get hash.
-            # Uses songsearch.kugou.com, not mobilecdn.kugou.com: the latter now serves a
-            # certificate that does not match its own hostname, so every request to it fails
-            # TLS verification -- which is why Kugou lyrics stopped working entirely.
             search_r = req.get(
                 "https://songsearch.kugou.com/song_search_v2",
                 params={"keyword": keyword, "page": 1, "pagesize": 5},
@@ -1808,7 +1787,6 @@ def get_lyrics():
                 if songs:
                     hash_val = songs[0].get("FileHash", "")
 
-                    # Step 2: get lyrics candidates
                     cand_r = req.get(
                         "https://lyrics.kugou.com/search",
                         params={
@@ -1824,7 +1802,6 @@ def get_lyrics():
                         if candidates:
                             cand = candidates[0]
 
-                            # Step 3: download LRC
                             dl_r = req.get(
                                 "https://lyrics.kugou.com/download",
                                 params={
@@ -1857,14 +1834,12 @@ def get_lyrics():
     if not result and source in ("auto", "unison"):
         try:
             item = None
-            # Step 1: try direct lookup by videoId (most reliable)
             if video_id:
                 r = req.get("https://unison.boidu.dev/lyrics", params={"v": video_id}, timeout=8)
                 if r.ok:
                     d = r.json()
                     if d.get("success") and isinstance(d.get("data"), dict):
                         item = d["data"]
-            # Step 2: fallback to fuzzy search by title + artist
             if not item:
                 search_params = {"song": title, "artist": artist}
                 if album: search_params["album"] = album
@@ -2047,10 +2022,6 @@ def unison_versions():
         })
     return jsonify({"versions": versions})
 
-# ─── Unison write proxy (signed requests) ─────────────────────────────────────
-# The frontend signs the request body with the user's ECDSA key (WebCrypto) and the
-# backend forwards the signed envelope verbatim to Unison. The private key never leaves
-# the frontend; this keeps the CSP tight (no direct browser→unison connection needed).
 def _unison_forward(method, path):
     import requests as req
     body = request.get_json(silent=True)
@@ -2090,12 +2061,6 @@ def unison_displayname(key_id):
         pass
     return jsonify({"displayName": None})
 
-# ─── Composer Bridge ──────────────────────────────────────────────────────────
-# Kodama acts as the local "Composer Bridge" for Boidu's Composer (composer.boidu.dev),
-# feeding it YouTube audio it extracts itself (yt-dlp). The composer fetches
-# {bridgeUrl}/health and {bridgeUrl}/audio/<videoId>; we serve those under
-# /composer-bridge. CORS must allow the composer origin so its JS can read the bytes
-# and the x-track-* metadata headers.
 _COMPOSER_ORIGIN = "https://composer.boidu.dev"
 
 def _bridge_headers(resp):
@@ -2224,10 +2189,6 @@ def composer_bridge_autocache():
                 pass
     return jsonify({"enabled": _composer_autocache})
 
-# --- Vendored Boidu Composer (served locally, same origin as the bridge) ------------
-# Kodama ships a locally-built copy of the composer (repo ./composer, built to ./composer/dist
-# with base "/composer-app/"). Serving it here means the composer window loads from the same
-# origin as /composer-bridge, so there is no cross-origin/CORS involved at all.
 def _composer_dist_dir():
     # 1. explicit override — Tauri can point this at the bundled resource dir in production.
     env = os.environ.get("KODAMA_COMPOSER_DIST")
@@ -2673,14 +2634,6 @@ def _is_hard_error(err_str):
 def _is_unavailable(err_str):
     return any(k in err_str for k in ("Video unavailable", "This video is not available"))
 
-# ─── PO Token path (bgutil, script mode) ─────────────────────────────────────
-# The authenticated web/web_music clients only hand out real audio formats when
-# a GVS PO token is supplied. Generating one needs three things beyond yt-dlp:
-#   1) the bgutil generator (Node, script mode) -> mints the token
-#   2) yt-dlp-ejs (bundled with the yt-dlp[default] extra) -> solves signature/nsig
-#   3) a Node >= 22 runtime, passed explicitly (auto-detection does not register it)
-# If any piece is missing the whole path is skipped and the legacy tiers run as
-# before, so this can never make extraction worse than it was.
 _MIN_NODE_MAJOR = 22
 
 def _node_major(node_path):
@@ -3710,7 +3663,6 @@ def get_song_credits(video_id):
     # Use www.youtube.com InnerTube /next — returns full page description (not the
     # truncated YTMusic shortDescription from music.youtube.com/youtubei/v1/player)
     try:
-        # Public InnerTube key (same one used by the YouTube web client itself)
         url = "https://www.youtube.com/youtubei/v1/next?key=AIzaSy" + "AO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
         payload = {
             "videoId": video_id,
@@ -4341,8 +4293,6 @@ def song_stats(video_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ─── Song Cache / Offline Playback ──────────────────────────────────────────
-
 def _song_audio_path(video_id):
     """Return the path to the cached audio file (.opus or .m4a)."""
     safe = video_id.replace("/", "_").replace("\\", "_")
@@ -4550,8 +4500,6 @@ def delete_cached_songs_batch():
         _download_status.pop(video_id, None)
     return jsonify({"ok": True, "removed": len(video_ids)})
 
-
-# ─── Audio Export (Save to user-chosen location) ─────────────────────────────
 
 _export_status = {}  # video_id -> "exporting" | "done" | "error"
 
@@ -4986,8 +4934,6 @@ def ffmpeg_available():
     return jsonify({"available": _find_ffmpeg() is not False})
 
 
-# ─── FFmpeg auto-download ─────────────────────────────────────────────────────
-
 @app.route("/ffmpeg/status")
 def ffmpeg_status():
     """Returns whether ffmpeg is available next to the server binary."""
@@ -5002,14 +4948,6 @@ def ffmpeg_check_update():
     update = bool(installed and latest and _ver_tuple(latest) > _ver_tuple(installed))
     return jsonify({"installed": installed, "latest": latest, "updateAvailable": update})
 
-
-# ─── Video Sync Offset (song ↔ official-video alignment, for a future video mode) ────────────
-# Some tracks have both an audio-only "song" (ATV) release and an "official video" (OMV) release
-# that differ in length/mastering but are meant to play in sync (YT Music's own app does this).
-# ytmusicapi exposes the link between the two (get_watch_playlist's "counterpart" field) but NOT
-# a numeric offset — so we compute it ourselves via FFT cross-correlation of short audio clips
-# from both, matching the technique validated in a throwaway prototype against a real track
-# (Fatoni - "Nachos", videoId 3otp2_VhCWk / counterpart zE7pbV9J39c, offset ≈ -5.9s).
 
 VIDEO_SYNC_CLIP_SECONDS = 100  # from t=0 — long enough for a reliable correlation peak
 VIDEO_SYNC_MAX_LAG_SECONDS = 30  # plausible search range for the offset
@@ -5227,14 +5165,6 @@ def video_sync_offset(video_id):
     return jsonify(_compute_video_sync_offset(video_id))
 
 
-# ─── Video Sync Stream (resolve a playable URL for the counterpart video) ────────────────────
-# The song's own audio keeps playing through the existing Rust pipeline — the video element is
-# muted and just supplies the picture — so this does NOT need a muxed (video+audio) stream: a
-# plain <video src=…> plays a single-track (video-only) MP4 file just fine, no MSE required.
-# Dropping the "must also have audio" constraint that a normal player would need unlocks much
-# higher resolutions, since YouTube only offers progressive (muxed) formats up to ~360-720p —
-# anything above that is video-only. maxHeight (from the frontend's quality picker) caps it back
-# down for users on a weaker/metered connection; omitted/0 means best available.
 def _video_fmt_for_quality(max_height=None):
     h = f"[height<=?{int(max_height)}]" if max_height else ""
     return (
@@ -5329,7 +5259,6 @@ def video_sync_stream(video_id):
     return jsonify({"error": err_str}), 500
 
 
-# ─── yt-dlp updater ─────────────────────────────────────────────────────────
 def _active_ytdlp_version():
     try:
         import yt_dlp
@@ -5631,7 +5560,6 @@ def debug_info():
     })
 
 
-# ─── OBS Overlay Server ───────────────────────────────────────────────────────
 import queue as _qmod
 from werkzeug.serving import make_server as _make_wsgi_server
 
@@ -6337,12 +6265,6 @@ def overlay_status():
     return jsonify({"running": _ov_server_obj is not None, "clients": len(_ov_clients)})
 
 
-# ─── Remote Control (LAN) ──────────────────────────────────────────────────────
-# A phone on the same network controls playback. The main server already listens on
-# 0.0.0.0, so phone-facing routes live here — gated by a session token AND per-device
-# desktop approval. Desktop-only control routes (_enable/_status/_device/_push/_poll)
-# are restricted to localhost. State bridges in-process: the app frontend pushes the
-# now-playing state and drains the command queue; the phone reads state + enqueues cmds.
 import secrets as _secrets
 
 _remote_enabled = False

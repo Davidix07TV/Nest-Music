@@ -6,7 +6,7 @@
  * a "media-control" command that the main window already knows how to execute (the same
  * channel the OS media keys use). See ./bridge.js.
  */
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, SliderRoot, SliderTrack, SliderFill, SliderThumb } from "@heroui/react";
 import { Play, Pause, SkipBack, SkipForward, MiniPlayerExit, X } from "../icons.jsx";
 import { translate } from "../i18n.js";

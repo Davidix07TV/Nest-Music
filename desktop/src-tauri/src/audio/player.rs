@@ -24,11 +24,6 @@ pub enum AudioCmd {
     Crossfade { url: String, seek_to: f64, duration: f64 },
 }
 
-// Build a ready-to-play decoder source for any of our URL kinds (used by Play's progressive
-// path and by crossfade). Progressive = stream over HTTP; file:// / http = read fully first.
-// Returns the source plus, for the streaming case only, a handle to watch the buffer fill.
-// The other two branches have the whole file in hand before they return, so there is nothing
-// to watch — the caller reports them as fully buffered.
 fn build_streaming_source(
     url: &str,
     seek_to: f64,

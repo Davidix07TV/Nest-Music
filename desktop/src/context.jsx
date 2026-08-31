@@ -70,25 +70,20 @@ export async function openComposer(videoId) {
   return invoke("open_composer_window", { videoId: videoId || null, overrides });
 }
 
-// ─── Language ─────────────────────────────────────────────────────────────────
 export const LangContext = createContext("de");
 export const useLang = () => {
   const lang = useContext(LangContext);
   return (key, vars) => translate(lang, key, vars);
 };
 
-// ─── Animation Context ────────────────────────────────────────────────────────
 export const AnimationContext = createContext(true);
 export const useAnimations = () => useContext(AnimationContext);
 
-// ─── Zoom Context ─────────────────────────────────────────────────────────────
 export const ZoomContext = createContext(1);
 export const useZoom = () => useContext(ZoomContext);
 
-// ─── Font Scale Context ───────────────────────────────────────────────────────
 export const FontScaleContext = createContext(1);
 export const useFontScale = () => useContext(FontScaleContext);
 
-// ─── Track numbering (Spotify-style row numbers in playlists) ──────────────────
 export const TrackNumberContext = createContext(false);
 export const useTrackNumbers = () => useContext(TrackNumberContext);

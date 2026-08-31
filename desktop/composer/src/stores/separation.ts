@@ -12,8 +12,7 @@ import type { SeparationError, SeparationStatus, Stem } from "@/audio/separation
 import { hasOnlyFiniteSamples } from "@/audio/separation/validate-channels";
 import { SeparationWorker } from "@/audio/separation/worker-host";
 import { useAudioStore } from "@/stores/audio";
-import type { VocalModelVariant } from "@/stores/settings";
-import { useSettingsStore } from "@/stores/settings";
+import { useSettingsStore, type VocalModelVariant } from "@/stores/settings";
 import { create } from "zustand";
 
 interface SeparationState {

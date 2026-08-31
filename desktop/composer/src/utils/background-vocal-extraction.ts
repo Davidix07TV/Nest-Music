@@ -1,8 +1,6 @@
-import { applyBackground } from "@/domain/line/background";
-import type { BackgroundSource } from "@/domain/line/background";
+import { applyBackground, type BackgroundSource } from "@/domain/line/background";
 import { isLinked } from "@/domain/instance/predicates";
-import type { LyricLine } from "@/domain/line/model";
-import { reconcileLine } from "@/domain/line/model";
+import { reconcileLine, type LyricLine } from "@/domain/line/model";
 import { isLineSynced, isWordSynced } from "@/domain/line/predicates";
 import { reconstructLineText, wordContentSpans } from "@/domain/line/reconstruct-text";
 import { remapWordTextsPreservingTiming } from "@/domain/word/remap-text";

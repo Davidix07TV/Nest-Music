@@ -1784,9 +1784,6 @@ export function SettingsPanel({ onClose, onSectionChange, accent, onAccentChange
 }
 
 
-// ─── Queue Panel ────────────────────────────────────────────────────────────
-// ─── Queue Row (standalone to prevent drag breaking on re-render) ────────────
-
 function FfmpegUpdateRow() {
   const t = useLang();
   const [info, setInfo] = useState(null);      // { installed, latest, updateAvailable }

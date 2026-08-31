@@ -419,6 +419,4 @@ export function ArtistView({ browseId, onPlay, currentTrack, isPlaying, onOpenAl
   );
 }
 
-// ─── Profile Manager ────────────────────────────────────────────────────────
-
 // Extracted outside LoginScreen to avoid remount on every parent render

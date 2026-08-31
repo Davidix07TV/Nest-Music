@@ -99,5 +99,3 @@ export function LyricsProviderList({ providers, onChange }) {
     </div>
   );
 }
-
-// ─── Debug shared helpers ────────────────────────────────────────────────────

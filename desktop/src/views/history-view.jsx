@@ -1,7 +1,7 @@
 // Recently-played history view (local, per-profile). Rendered via PlaylistLayout, with a
 // particle burst on entry removal. Extracted from App.jsx.
 import { useState, useEffect } from "react";
-import { API, useLang, useAnimations } from "../context.jsx";
+import { useLang, useAnimations } from "../context.jsx";
 import { PlaylistLayout } from "./track-table.jsx";
 import { particleBurst } from "../effects/particle-burst.js";
 import { Trash } from "../icons.jsx";

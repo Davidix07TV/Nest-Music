@@ -5,14 +5,6 @@ import type { WordTiming } from "@/domain/word/timing";
 import { showGroupActionToast } from "@/utils/group-toast";
 import { wouldDivergenceCauseRetiming } from "@/utils/word-diff";
 
-// Wraps a word-array write so that linked-line word-count changes prompt the
-// user (Apply / Detach / Cancel) when at least one sibling would have its
-// per-word timing rewritten by the propagation. Falls through to a direct
-// updateLineWithHistory write for:
-//   - non-linked lines
-//   - count-unchanged edits (no structural change)
-//   - linked lines where every sibling already has timing identical to source
-//     (the propagation would be a no-op against unchanged-word timings)
 async function handleWordChangeWithDivergenceCheck(
   lineId: string,
   newWords: WordTiming[],

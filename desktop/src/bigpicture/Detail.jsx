@@ -2,7 +2,7 @@
 // albums come back in one fetch — same endpoints the desktop UI uses), then shows the cover,
 // a Play all / Shuffle action column and a focusable track list. Selecting anything plays the
 // whole collection as the queue via the player bridge and jumps to Now Playing.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FocusContext, useFocusable } from "@noriginmedia/norigin-spatial-navigation";
 import { API, thumbHi } from "../context.jsx";
 import { sendPlay, sendEnqueue } from "./playerBridge.js";

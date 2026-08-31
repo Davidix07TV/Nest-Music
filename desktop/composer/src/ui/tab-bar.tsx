@@ -1,5 +1,4 @@
-import { useProjectStore } from "@/stores/project";
-import type { SimpleTab } from "@/stores/project";
+import { useProjectStore, type SimpleTab } from "@/stores/project";
 import { useSettingsStore } from "@/stores/settings";
 import { InlineKeyBadge } from "@/ui/inline-key-badge";
 

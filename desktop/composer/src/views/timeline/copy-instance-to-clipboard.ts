@@ -3,14 +3,6 @@ import type { LyricLine } from "@/domain/line/model";
 import type { ClipboardData, ClipboardEntry } from "@/views/timeline/selection-types";
 import { useTimelineStore } from "@/views/timeline/timeline-store";
 
-// Builds a ClipboardData payload covering every word and bg word of the
-// (groupId, instanceIdx) instance, then sets it as the active clipboard and
-// opens the paste-preview ghost so the user can place it manually.
-//
-// Used by Cmd+D and "Add instance at playhead" when the playhead has no room
-// for the new instance: instead of silently appending at end-of-list, we copy
-// the source instance and let the user place it via the existing paste-preview
-// flow.
 function copyInstanceToClipboardAndPreview(lines: LyricLine[], groupId: string, instanceIdx: number): boolean {
   const instanceLineIndices: number[] = [];
   for (let i = 0; i < lines.length; i++) {

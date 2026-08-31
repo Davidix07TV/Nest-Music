@@ -29,7 +29,7 @@ import { DebugFloatingWindow } from "./settings/debug-tab.jsx";
 import { SettingsSidebarContent } from "./settings/sidebar-nav.jsx";
 import { lockSettingsSection, setSettingsSectionStore } from "./settings/section-store.js";
 import { SettingsPanel } from "./settings/panel.jsx";
-import { ZOOM_STEPS, FONT_STEPS, applyFontScale, readFontScale } from "./settings/scale.js";
+import { ZOOM_STEPS, applyFontScale, readFontScale } from "./settings/scale.js";
 import { DEFAULT_SHORTCUTS } from "./settings/shortcuts.js";
 import { APP_ICON_DEFAULT } from "./settings/app-icons.js";
 import { LyricsPrefsProvider, useLyricsPrefs, PlaybackPrefsProvider, usePlaybackPrefs } from "./preferences.jsx";
@@ -124,7 +124,6 @@ function cmpVersion(a, b) {
 // titlebar/drag-region is Windows-only. (Borderless windows swallow clicks on macOS.)
 const IS_MAC = /Mac OS X|Macintosh/.test(navigator.userAgent || "");
 
-// ─── Update Checker (GitHub Releases) ───────────────────────────────────────
 const APP_TAG = "v1.0.0";
 const GITHUB_RELEASES_API = "https://api.github.com/repos/KiyoshiTheDevil/Kodama/releases?per_page=1";
 
@@ -1021,8 +1020,6 @@ function Sidebar({ view, activeNavId, setView, onSearch, collapsed, onToggleColl
     // "quit" is handled by press-and-hold (startQuitHold), not onAction.
   };
 
-  // Shared account-menu popover — used by both the expanded profile button and the
-  // collapsed avatar trigger. min-w-56 keeps it readable when the trigger is tiny.
   const accountMenu = (
     <DropdownPopover placement="top start"
       className="data-[entering]:animate-in data-[entering]:fade-in-0 data-[entering]:zoom-in-95 data-[entering]:slide-in-from-bottom-3 data-[entering]:duration-300 data-[entering]:ease-out data-[exiting]:animate-out data-[exiting]:fade-out-0 data-[exiting]:zoom-out-95 data-[exiting]:slide-out-to-bottom-3 data-[exiting]:duration-200 data-[exiting]:ease-in"
@@ -3019,7 +3016,6 @@ function LanguagePickerScreen({ currentLanguage, onConfirm }) {
   );
 }
 
-// ─── FFmpeg Setup Screen ──────────────────────────────────────────────────────
 function FfmpegSetupScreen({ onDone }) {
   const t = useLang();
   const [phase, setPhase]       = useState("checking"); // checking | needed | downloading | done | error
@@ -3449,17 +3445,12 @@ export default function App() {
   const updateDownloadAbortRef = useRef(null);
   const mutePrevVolumeRef = useRef(0.5);
 
-  // ─── Toast Notifications (HeroUI toast system) ───────────────────────────────
-  // Thin wrapper so all existing addToast(message, type) call sites keep working.
   const addToast = useCallback((message, type = "info") => {
     if (type === "error") toast.danger(message, { timeout: 6000 });
     else if (type === "success") toast.success(message, { timeout: 3500 });
     else toast(message, { timeout: 3500 });
   }, []);
 
-  // ─── Update Check (Tauri plugin-updater) ────────────────────────────────────
-  // showFeedback=true: show toasts on "up to date" and on error (manual check)
-  // showFeedback=false (default): silent — only sets updateInfo if update is found (startup)
   const checkForUpdates = useCallback(async (showFeedback = false) => {
     const lang = localStorage.getItem("kiyoshi-lang") || "de";
     try {
@@ -3780,7 +3771,6 @@ export default function App() {
     return () => { cancelled = true; };
   }, [accentDynamic, currentTrack?.thumbnail, accent, accentSat, accentLight]);
 
-  // ─── Usage stats: total app usage time + total song playtime (persisted, global) ───
   const usageSecRef = useRef(Number(localStorage.getItem("kiyoshi-total-usage") || 0));
   const playtimeSecRef = useRef(Number(localStorage.getItem("kiyoshi-total-playtime") || 0));
   // App usage: count seconds while the window is visible.
@@ -3805,7 +3795,6 @@ export default function App() {
     return () => { localStorage.setItem("kiyoshi-total-playtime", String(playtimeSecRef.current)); clearInterval(id); };
   }, [isPlaying]);
 
-  // ─── Last.fm scrobbling ──────────────────────────────────────────────────────
   const lastfmConnectedRef = useRef(false);
   const scrobbleRef = useRef({ videoId: null, played: 0, scrobbled: false, startTs: 0 });
   const lfmMeta = (tr) => ({
@@ -3854,12 +3843,6 @@ export default function App() {
     return () => clearInterval(id);
   }, [isPlaying, currentTrack?.videoId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ─── YT Music history sync (opt-in) ──────────────────────────────────────────
-  // Registers the play in the account's real YT Music watch history (backend pings the
-  // playbackTracking URL from ytmusicapi's get_song), so it counts toward YT Music's own
-  // Recap/stats — separate from, and independent of, Kodama's own local History list.
-  // Same accumulate-then-fire-once threshold as Last.fm scrobbling above, reusing the same
-  // "counts as played" definition rather than inventing a second one.
   const ytHistoryRef = useRef({ videoId: null, played: 0, sent: false });
   useEffect(() => {
     ytHistoryRef.current = { videoId: currentTrack?.videoId || null, played: 0, sent: false };
@@ -5167,8 +5150,6 @@ export default function App() {
 
   const [artistView, setArtistView] = useState(null);
 
-  // Always-fresh snapshot of current nav state — used by open* callbacks to push history.
-  // Updated synchronously on every render so callbacks always read the latest values.
   const navStateRef = useRef({ view: "home", collection: null, artistView: null });
   navStateRef.current = { view, collection, artistView };
 
