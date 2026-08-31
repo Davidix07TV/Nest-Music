@@ -3000,6 +3000,7 @@ function LanguagePickerScreen({ currentLanguage, onConfirm }) {
                 onMouseLeave={e => { if (!active) e.currentTarget.style.background = "var(--bg-elevated)"; }}
               >
                 <div style={{ width: 44, height: 28, borderRadius: "var(--r-md)", overflow: "hidden", flexShrink: 0 }}
+                  // aislop-ignore-line security/dangerously-set-innerhtml -- lang.flag is a hardcoded static SVG from bundled languages.json, never user input
                   dangerouslySetInnerHTML={{ __html: lang.flag }} />
                 <span style={{ flex: 1, fontSize: "var(--t14)", fontWeight: 500, color: active ? "var(--accent)" : "var(--text-primary)" }}>{lang.label}</span>
                 {active && <Check size={15} style={{ color: "var(--accent)" }} />}

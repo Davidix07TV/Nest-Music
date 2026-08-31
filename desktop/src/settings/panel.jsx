@@ -1432,6 +1432,7 @@ export function SettingsPanel({ onClose, onSectionChange, accent, onAccentChange
                         language === lang.code ? "border-accent bg-accent-dim" : "border-transparent bg-surface-1 hover:bg-hover"
                       )}
                     >
+                      {/* aislop-ignore-line security/dangerously-set-innerhtml -- lang.flag is a hardcoded static SVG from bundled languages.json, never user input */}
                       <div dangerouslySetInnerHTML={{ __html: lang.flag }} className="w-12 h-[30px] shrink-0 rounded overflow-hidden border border-border" />
                       <div className="flex-1 min-w-0">
                         <div className={cn("text-t13 font-medium", language === lang.code ? "text-accent" : "text-primary")}>{lang.label}</div>
