@@ -14,20 +14,23 @@ struct SearchView: View {
     @State private var query = ""
     @State private var results: [SearchItem] = []
     @State private var suggestions: [String] = []
-    @State private var state: State = .idle
+    @State private var loadState: LoadState = .idle
 
-    private enum State {
+    // Note: this enum is intentionally named `LoadState` (not `State`) to avoid
+    // shadowing SwiftUI's `State` property wrapper, which would silently turn
+    // the `@State` properties above into plain (immutable) stored properties.
+    private enum LoadState {
         case idle, loading, loaded, error
     }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                if state == .idle {
+                if loadState == .idle {
                     MessageView(icon: "magnifyingglass", title: "Search", message: "Songs, artists, albums and playlists.")
-                } else if state == .loading {
+                } else if loadState == .loading {
                     LoadingView()
-                } else if state == .error {
+                } else if loadState == .error {
                     MessageView(icon: "wifi.exclamationmark", title: "Search failed", message: "Check your connection and try again.")
                 } else {
                     List {
@@ -59,12 +62,12 @@ struct SearchView: View {
     private func runSearch() async {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
-        state = .loading
+        loadState = .loading
         do {
             results = try await InnerTubeClient.shared.search(query: trimmed)
-            state = .loaded
+            loadState = .loaded
         } catch {
-            state = .error
+            loadState = .error
         }
     }
 
