@@ -86,8 +86,52 @@ workflows:
             --test-xcargs "CODE_SIGNING_ALLOWED=NO"
         test_report: build/ios/test/*.xml
 
+      # Build the app for the iOS Simulator, boot it headlessly, launch the app
+      # and capture screenshots. This lets you SEE the UI (Home, etc.) in the
+      # cloud without owning a Mac or an iPhone.
+      - name: Build for Simulator
+        script: |
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build-sim \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Capture simulator screenshots
+        script: |
+          set -e
+          mkdir -p screenshots
+
+          # Pick the first available iPhone simulator UDID.
+          UDID=$(xcrun simctl list devices available \
+            | grep -E "iPhone [0-9]" \
+            | grep -oE "[0-9A-Fa-f-]{36}" \
+            | head -1)
+          echo "Using simulator UDID: $UDID"
+
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+
+          APP_PATH=$(find build-sim/Build/Products -name "NestMusic.app" -maxdepth 3 | head -1)
+          echo "App bundle: $APP_PATH"
+          xcrun simctl install "$UDID" "$APP_PATH"
+
+          xcrun simctl launch "$UDID" "$BUNDLE_ID"
+
+          # Give the home feed time to load, then capture it.
+          sleep 12
+          xcrun simctl io "$UDID" screenshot screenshots/01-home.png
+
+          ls -la screenshots/
+
     artifacts:
       - NestMusic-unsigned.ipa
       - build/Build/Products/Release-iphoneos/NestMusic.app
+      - screenshots/*.png
       - /tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
