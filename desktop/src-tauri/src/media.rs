@@ -117,7 +117,6 @@ fn clear() {
     });
 }
 
-// ── Tauri commands (called from the frontend; marshal onto the main thread) ──
 #[tauri::command]
 pub fn media_update(
     app: AppHandle,

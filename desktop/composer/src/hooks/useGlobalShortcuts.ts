@@ -1,5 +1,4 @@
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import type { Shortcut } from "@/hooks/useKeyboardShortcuts";
+import { useKeyboardShortcuts, type Shortcut } from "@/hooks/useKeyboardShortcuts";
 import { getEffectiveBinding, useShortcutBindingsStore } from "@/stores/shortcut-bindings";
 import { useAudioStore } from "@/stores/audio";
 import type { SimpleTab } from "@/stores/project";

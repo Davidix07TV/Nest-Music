@@ -29,7 +29,6 @@ export function AccountSettingsTab({ accounts, activeAccount, onSwitch, onAdd, o
 
   const nameChanged = !!active && !!nameDraft.trim() && nameDraft.trim() !== (active.displayName || "");
 
-  // ─── Usage statistics ────────────────────────────────────────────────────────
   const [stats, setStats] = useState({ usage: 0, playtime: 0, liked: null, playlists: null, history: 0 });
   useEffect(() => {
     let history = 0;

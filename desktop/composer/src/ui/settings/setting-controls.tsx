@@ -1,5 +1,4 @@
-import { useSettingsStore } from "@/stores/settings";
-import type { SettingsState } from "@/stores/settings";
+import { useSettingsStore, type SettingsState } from "@/stores/settings";
 import { cn } from "@/utils/cn";
 
 // -- Setting Controls ---------------------------------------------------------

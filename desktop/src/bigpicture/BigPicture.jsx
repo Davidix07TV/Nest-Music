@@ -1,8 +1,3 @@
-// Big Picture mode — full-screen lean-back UI driven by a controller (verified Standard Mapping)
-// and keyboard, with a spatial-navigation focus ring (norigin v2). Toggle with F10.
-//
-// Phase 1: a Home grid + a real Now Playing screen (wired to the live player via playerBridge).
-// Later phases add browsing/search/detail screens + a proper entry point (instead of F10).
 import { useCallback, useEffect, useRef, useState } from "react";
 import { init, pause, resume, FocusContext, useFocusable } from "@noriginmedia/norigin-spatial-navigation";
 import { useController } from "./useController.js";

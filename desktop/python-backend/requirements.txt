@@ -1,6 +1,7 @@
 ytmusicapi==1.12.1
 flask
 flask-cors
+werkzeug
 requests
 yt-dlp
 # EJS challenge-solver scripts (signature / n-sig) — required for the web_music

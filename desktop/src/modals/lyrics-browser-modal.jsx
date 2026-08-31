@@ -54,9 +54,6 @@ function LyricsBrowserModal({ track, providers, currentSource, currentSubmitter,
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // Providers land one by one, so the list fills in as they answer instead of staying
-      // empty until the slowest one is done — a version can be picked as soon as it shows up.
-      // The Unison expansion below then replaces the list once everything has arrived.
       const res = await fetchLyrics(
         track.title, track.artists, track.album, parseDurationToSeconds(track.duration),
         providers, track.videoId || "", undefined,

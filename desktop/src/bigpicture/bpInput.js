@@ -1,6 +1,3 @@
-// Tracks the last-used input device so the keybind bar can show the matching glyphs (controller
-// buttons vs. keyboard caps). Controller callbacks set "pad"; real keydowns set "key" (synthetic
-// key events dispatched by the controller path are tagged bpSynthetic and ignored here).
 import { useSyncExternalStore } from "react";
 
 let _mode = "key"; // "pad" | "key"

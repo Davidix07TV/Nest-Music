@@ -1,21 +1,11 @@
-// Video-sync mode: shows the official-video release, muted, while its OWN audio track plays
-// through the normal Rust pipeline in place of the song's (App.jsx swaps the source on the
-// audio/video switch) — so volume, visualizer, Discord RPC etc. all stay on the one audio path
-// that already exists, nothing plays through the WebView's own audio output. The backend
-// resolves the counterpart video and computes a fixed offset via audio cross-correlation
-// (python-backend/server.py's /video-sync/* routes); App.jsx applies that offset ONCE, as the
-// seek target for the swap, so playback lands on the corresponding moment in the other version.
-// This module just fetches that data once per track and keeps the <video> element's own position
-// corrected against ordinary clock drift against whatever audio is currently loaded.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { API } from "./context.jsx";
 import { fetchLyrics } from "./lyrics/fetch.js";
-import { DEFAULT_LYRICS_PROVIDERS } from "./lyrics/providers.js";
+import { DEFAULT_LYRICS_PROVIDERS, DEFAULT_LYRICS_PROVIDERS as BROWSER_PROVIDERS } from "./lyrics/providers.js";
 import { parseDurationToSeconds } from "./lyrics/parse.js";
 import { isRtlLang, hasJapaneseText } from "./i18n.js";
 import { LyricsToolChips, OffsetChips, SourceChip } from "./lyrics/tool-chips.jsx";
 import { LyricsBrowserModal } from "./modals/lyrics-browser-modal.jsx";
-import { DEFAULT_LYRICS_PROVIDERS as BROWSER_PROVIDERS } from "./lyrics/providers.js";
 import { useLyricOffset } from "./lyrics/offset.js";
 import { paintLineWords } from "./lyrics/paint.js";
 

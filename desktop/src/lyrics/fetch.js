@@ -144,8 +144,4 @@ async function fetchLyrics(title, artist, album, duration, providers = DEFAULT_L
   return bestResult ? { ...bestResult, failedIds, allResults } : { failedIds, allResults };
 }
 
-// ─── Unison signed write helpers ─────────────────────────────────────────────
-// The frontend signs each request with the stored identity (WebCrypto) and posts the
-// signed envelope to the backend, which forwards it to Unison.
-
 export { fetchLyrics };

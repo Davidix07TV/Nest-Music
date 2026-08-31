@@ -21,8 +21,7 @@ import { stripSplitCharacter } from "@/utils/split-character";
 import { AgentManager } from "@/views/edit/agent-manager";
 import { decideEditTextAction } from "@/views/edit/decide-edit-text-action";
 import { detachInstancesFromLines } from "@/views/edit/diff-edit-text";
-import { parseLyrics } from "@/views/edit/parse-lyrics";
-import type { ParsedLine } from "@/views/edit/parse-lyrics";
+import { parseLyrics, type ParsedLine } from "@/views/edit/parse-lyrics";
 import {
   importParsedLyrics,
   type ImportParsedLyricsContext,

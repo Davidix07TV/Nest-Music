@@ -1,0 +1,137 @@
+# Codemagic build configuration for the Nest Music iOS app.
+#
+# Codemagic compiles the app on a cloud macOS runner (no local Mac needed) and
+# produces an unsigned .ipa that can be sideloaded via AltStore/Sideloadly, plus
+# runs the unit tests on a simulator.
+#
+# To produce a SIGNED .ipa installable via TestFlight/App Store, uncomment the
+# `integrations` + `ios_signing` block below (requires an Apple Developer
+# account connected in the Codemagic UI) and the two signing steps.
+
+workflows:
+  nest-music-ios:
+    name: Nest Music iOS (build + test)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    # integrations:
+    #   app_store_connect: nest-music   # add your App Store Connect integration name here
+
+    environment:
+      xcode: latest
+      vars:
+        PROJECT: ios/NestMusic.xcodeproj
+        SCHEME: NestMusic
+        BUNDLE_ID: com.nestmusic.music
+
+      # ios_signing:
+      #   distribution_type: development   # development | ad_hoc | app_store
+      #   bundle_identifier: com.nestmusic.music
+
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: master
+          include: true
+          source: true
+        - pattern: arena/*
+          include: true
+          source: true
+      cancel_previous_builds: true
+
+    scripts:
+      - name: Build unsigned app (device SDK)
+        script: |
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package unsigned .ipa
+        script: |
+          APP_PATH="build/Build/Products/Release-iphoneos/NestMusic.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "::error::App bundle not found at $APP_PATH"
+            find build -name "*.app" -maxdepth 6
+            exit 1
+          fi
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r -y NestMusic-unsigned.ipa Payload
+          ls -lh NestMusic-unsigned.ipa
+
+      # Uncomment once Apple code signing is configured:
+      # - name: Set up code signing
+      #   script: xcode-project use-profiles
+      # - name: Build signed .ipa
+      #   script: |
+      #     xcode-project build-ipa \
+      #       --project "$PROJECT" \
+      #       --scheme "$SCHEME"
+
+      - name: Run unit tests on Simulator
+        script: |
+          xcode-project run-tests \
+            --project "$PROJECT" \
+            --scheme "$SCHEME" \
+            --test-xcargs "CODE_SIGNING_ALLOWED=NO"
+        test_report: build/ios/test/*.xml
+
+      # Build the app for the iOS Simulator, boot it headlessly, launch the app
+      # and capture screenshots. This lets you SEE the UI (Home, etc.) in the
+      # cloud without owning a Mac or an iPhone.
+      - name: Build for Simulator
+        script: |
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build-sim \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Capture simulator screenshots
+        script: |
+          set -e
+          mkdir -p screenshots
+
+          # Pick the first available iPhone simulator UDID.
+          UDID=$(xcrun simctl list devices available \
+            | grep -E "iPhone [0-9]" \
+            | grep -oE "[0-9A-Fa-f-]{36}" \
+            | head -1)
+          echo "Using simulator UDID: $UDID"
+
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+
+          APP_PATH=$(find build-sim/Build/Products -name "NestMusic.app" -maxdepth 3 | head -1)
+          echo "App bundle: $APP_PATH"
+          xcrun simctl install "$UDID" "$APP_PATH"
+
+          xcrun simctl launch "$UDID" "$BUNDLE_ID"
+
+          # Give the home feed time to load, then capture it.
+          sleep 12
+          xcrun simctl io "$UDID" screenshot screenshots/01-home.png
+
+          ls -la screenshots/
+
+    artifacts:
+      - NestMusic-unsigned.ipa
+      - build/Build/Products/Release-iphoneos/NestMusic.app
+      - screenshots/*.png
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM

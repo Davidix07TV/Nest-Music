@@ -1,5 +1,3 @@
-// The track-table view stack: a selection-action button, the shared table row, and the
-// PlaylistLayout (used by playlist / album / liked / downloads / history). Extracted from App.jsx.
 import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@heroui/react";
@@ -263,7 +261,6 @@ export function TableRow({ track, index, isPlaying, onPlay, onOpenArtist, onOpen
     : row;
 }
 
-// ─── Shared playlist/collection layout ────────────────────────────────────
 export function PlaylistLayout({ title, thumbnail, tracks, total, loading, progress, cached, onPlay, currentTrack, isPlaying, onBack, isLiked, onOpenArtist, onOpenAlbum, isAlbum, albumArtists, albumArtistBrowseId, year, onRefresh, onTrackContextMenu, cachedSongIds, downloadingIds, premiumSongIds, onDownloadSong, onDownloadAll, onRemoveAll, hideExplicit, onToggleLike, likedIds, selectedTracks, onToggleSelect, onSelectAll, extraActions, typeLabel, contextMenuTrackId }) {
   const accentColor = useAccentColor(thumbnail);
   const t = useLang();

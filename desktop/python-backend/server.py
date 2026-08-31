@@ -31,7 +31,7 @@ class _LogTee:
         try:
             if self._stream is not None:
                 self._stream.write(data)
-        except Exception:
+        except Exception:  # aislop-ignore-line ai-slop/swallowed-exception -- cannot log from the stream tee itself
             pass
         self._buf += data
         while "\n" in self._buf:
@@ -43,13 +43,13 @@ class _LogTee:
         try:
             if self._stream is not None:
                 self._stream.flush()
-        except Exception:
+        except Exception:  # aislop-ignore-line ai-slop/swallowed-exception -- cannot log from the stream tee itself
             pass
 
 try:
     sys.stdout = _LogTee(sys.stdout)
     sys.stderr = _LogTee(sys.stderr)
-except Exception:
+except Exception:  # aislop-ignore-line ai-slop/swallowed-exception -- stdout/stderr tee is best-effort at startup
     pass
 
 # ── Feedback / bug reports → Discord webhook ─────────────────────────────────
@@ -73,7 +73,7 @@ def _load_feedback_webhook():
                 with open(p, encoding="utf-8") as f:
                     return (json.load(f).get("webhook") or "").strip()
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return ""
 FEEDBACK_WEBHOOK_URL = _load_feedback_webhook()
 
@@ -87,7 +87,7 @@ def get_news():
             with open(p, encoding="utf-8") as f:
                 return jsonify(json.load(f))
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return jsonify([])
 
 @app.route("/feedback", methods=["POST"])
@@ -168,7 +168,7 @@ def submit_feedback():
                 files["file_shot"] = ("screenshot.png", png, "image/png")
                 embed["image"] = {"url": "attachment://screenshot.png"}
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
     payload = {"username": "Kodama Feedback", "embeds": [embed]}
     if include_logs and _LOG_RING:
         log_text = "\n".join(list(_LOG_RING)[-80:])
@@ -246,9 +246,6 @@ IMG_CACHE_DIR = os.path.join(_base_dir, "imgcache")
 os.makedirs(IMG_CACHE_DIR, exist_ok=True)
 IMG_CACHE_TTL = 30 * 24 * 3600  # 30 days
 
-# ─── Last.fm integration ─────────────────────────────────────────────────────
-# API key + shared secret: env vars first, then a local (git-ignored)
-# lastfm_config.json in the data dir. Features are disabled if unset.
 LASTFM_API_KEY = os.environ.get("LASTFM_API_KEY", "")
 LASTFM_API_SECRET = os.environ.get("LASTFM_API_SECRET", "")
 if not (LASTFM_API_KEY and LASTFM_API_SECRET):
@@ -268,7 +265,7 @@ if not (LASTFM_API_KEY and LASTFM_API_SECRET):
                     LASTFM_API_SECRET = LASTFM_API_SECRET or _lfc.get("api_secret", "")
                 break
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
 LASTFM_API_ROOT = "https://ws.audioscrobbler.com/2.0/"
 
@@ -353,7 +350,7 @@ def _activate_ytdlp_update():
         if wheels and wheels[-1] not in sys.path:
             sys.path.insert(0, wheels[-1])
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
 _activate_ytdlp_update()
 
@@ -437,10 +434,6 @@ def _load_composer_autocache():
         return True
 _composer_autocache = _load_composer_autocache()
 
-# ─── Node.js PATH — set once at startup ──────────────────────────────────────
-# yt-dlp needs Node.js for nsig (n-parameter) decryption on ALL requests,
-# not only authenticated ones.  Calling this here guarantees it runs before
-# the first request regardless of auth status.
 def _ensure_node_in_path():
     """Add bundled node.exe directory to PATH so yt-dlp can find it via shutil.which."""
     import shutil
@@ -468,7 +461,6 @@ def _ensure_node_in_path():
 
 _ensure_node_in_path()
 
-# ─── Debug log ring buffer ───────────────────────────────────────────────────
 import logging as _logging
 
 _server_start_time = time.time()
@@ -494,6 +486,7 @@ class _RingBufferHandler(_logging.Handler):
                     "source": "backend",
                 })
         except Exception:
+            # aislop-ignore-line ai-slop/swallowed-exception -- cannot log from the log handler itself (recursion)
             pass
 
 
@@ -524,7 +517,6 @@ _logging.getLogger().setLevel(_logging.INFO)
 _logging.getLogger("werkzeug").addHandler(_ring_handler)
 _logging.getLogger("werkzeug").setLevel(_logging.INFO)
 
-# ─── Musixmatch (inoffizielle API) ───────────────────────────────────────────
 _mx_token = None
 _mx_token_expires = 0
 MX_APP_ID  = "web-desktop-app-v1.0"
@@ -586,7 +578,7 @@ def _try_musixmatch(title, artist, duration=None):
             if richsync:
                 return {"source": "Musixmatch", "richsync": richsync, "synced": None, "plain": None}
     except Exception as e:
-        print(f"[lyrics] Musixmatch richsync error: {e}", flush=True)
+        _logging.warning(f"[lyrics] Musixmatch richsync error: {e}")
 
     # Fallback: Line-Sync (LRC)
     try:
@@ -598,7 +590,7 @@ def _try_musixmatch(title, artist, duration=None):
             return {"source": "Musixmatch", "richsync": None,
                     "synced": lb["subtitle"]["subtitle_body"], "plain": None}
     except Exception as e:
-        print(f"[lyrics] Musixmatch subtitle error: {e}", flush=True)
+        _logging.warning(f"[lyrics] Musixmatch subtitle error: {e}")
 
     return None
 
@@ -612,7 +604,7 @@ def _dir_size_and_count(path):
                 total += os.path.getsize(fp)
                 count += 1
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return total, count
 
 
@@ -644,7 +636,7 @@ def _save_playlist_disk(playlist_id, data):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
 def _purge_playlist_cache(playlist_id):
     _playlist_cache.pop(playlist_id, None)
@@ -680,7 +672,7 @@ def _save_album_disk(browse_id, data):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
 def profile_path(name):
     return os.path.join(PROFILES_DIR, f"{name}.json")
@@ -825,11 +817,6 @@ def load_profile(name):
     threading.Thread(target=_refresh_ytm_psidts, kwargs={"force": True}, daemon=True).start()
     return True
 
-# ─── Keep browser sessions alive (rotating __Secure-1PSIDTS / 3PSIDTS) ─────────
-# Since ~Aug 2025 YouTube rejects stale anti-bot tokens after a few hours, which logged
-# users out. We periodically fetch fresh tokens with the profile's own cookies and inject
-# them into the live ytmusicapi cookie header (in memory; the SAPISIDHASH auth header is
-# recomputed per request from the long-lived SAPISID).
 _psidts_last_refresh = 0.0
 
 def _refresh_ytm_psidts(force=False):
@@ -870,7 +857,7 @@ def _refresh_ytm_psidts(force=False):
                     elif '"LOGGED_IN":false' in txt:
                         authed = False
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
         # NOTE: the *SIDTS timestamp tokens (which expire after ~1-2h) do NOT rotate on plain
         # HTTP requests — only a real browser engine reissues them. That's handled separately by
         # the hidden session-keeper WebView (see window.rs / /auth/refresh-cookies). Here we just
@@ -911,7 +898,7 @@ def _refresh_ytm_psidts(force=False):
             with open(p, "w") as f:
                 json.dump(raw, f, indent=2)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
         _psidts_last_refresh = now
         if authed is not None:
             _LAST_AUTHED = authed
@@ -955,7 +942,7 @@ def refresh_cookies():
         with open(p, "w") as f:
             json.dump(raw, f, indent=2)
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     _psidts_last_refresh = time.time()
     has_ts = "__Secure-1PSIDTS" in cookie_str or "__Secure-3PSIDTS" in cookie_str
     _logging.info(f"[cookies] WebView refresh applied (PSIDTS present: {has_ts})")
@@ -1015,7 +1002,7 @@ def _get_ydl_cookiefile():
                     if "youtube" in domain or not domain:
                         cookie_dict[c.name] = c.value
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
         # ── 3. Ping youtube.com to refresh __Secure-1PSIDTS (anti-bot token) ───
         # ytmusicapi talks to music.youtube.com; yt-dlp stream extraction needs
@@ -1174,7 +1161,7 @@ def fetch_account_info(profile_name):
             with open(meta_path, "w") as f:
                 json.dump(meta, f)
     except Exception as e:
-        print(f"[i] Account-Info nicht abrufbar: {e}")
+        _logging.warning(f"[i] Account-Info nicht abrufbar: {e}")
 
 def autoload():
     migrate_legacy()
@@ -1190,8 +1177,6 @@ autoload()
 
 # Keep the active browser session's anti-bot cookies fresh in the background.
 threading.Thread(target=_psidts_refresher_loop, daemon=True).start()
-
-# ─── Profile endpoints ───────────────────────────────────────────────────────
 
 @app.route("/profiles")
 def list_profiles():
@@ -1264,7 +1249,6 @@ def set_profile_avatar():
         json.dump(meta, f)
     return jsonify({"ok": True})
 
-# ─── Last.fm endpoints ───────────────────────────────────────────────────────
 @app.route("/lastfm/status")
 def lastfm_status():
     meta = _read_active_meta()
@@ -1707,7 +1691,7 @@ def get_lyrics():
                 with open(cache_path, "r", encoding="utf-8") as f:
                     return jsonify(json.load(f))
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
     import requests as req
     result = None
@@ -1725,7 +1709,7 @@ def get_lyrics():
                 elif d.get("plainLyrics"):
                     result = {"source": "LRCLIB", "synced": None, "plain": d["plainLyrics"]}
         except Exception as e:
-            print(f"[lyrics] LRCLIB error: {e}", flush=True)
+            _logging.warning(f"[lyrics] LRCLIB error: {e}")
 
     # 2. Better Lyrics
     if not result and source in ("auto", "better"):
@@ -1739,7 +1723,7 @@ def get_lyrics():
                 if d.get("ttml"):
                     result = {"source": "Better Lyrics", "ttml": d["ttml"]}
         except Exception as e:
-            print(f"[lyrics] Better Lyrics error: {e}", flush=True)
+            _logging.warning(f"[lyrics] Better Lyrics error: {e}")
 
     # 2b. Better Lyrics "Portato" — same API, /qq path, sourced from QQ Music.
     # Returns QRC (word-timed) wrapped in QQ's XML envelope rather than TTML.
@@ -1791,10 +1775,6 @@ def get_lyrics():
             keyword = f"{title} {artist}".strip()
             duration_ms = int(float(duration) * 1000) if duration else 0
 
-            # Step 1: search for song to get hash.
-            # Uses songsearch.kugou.com, not mobilecdn.kugou.com: the latter now serves a
-            # certificate that does not match its own hostname, so every request to it fails
-            # TLS verification -- which is why Kugou lyrics stopped working entirely.
             search_r = req.get(
                 "https://songsearch.kugou.com/song_search_v2",
                 params={"keyword": keyword, "page": 1, "pagesize": 5},
@@ -1808,7 +1788,6 @@ def get_lyrics():
                 if songs:
                     hash_val = songs[0].get("FileHash", "")
 
-                    # Step 2: get lyrics candidates
                     cand_r = req.get(
                         "https://lyrics.kugou.com/search",
                         params={
@@ -1824,7 +1803,6 @@ def get_lyrics():
                         if candidates:
                             cand = candidates[0]
 
-                            # Step 3: download LRC
                             dl_r = req.get(
                                 "https://lyrics.kugou.com/download",
                                 params={
@@ -1842,14 +1820,14 @@ def get_lyrics():
                                     if lrc.strip():
                                         result = {"source": "Kugou", "synced": lrc, "plain": None}
         except Exception as e:
-            print(f"[lyrics] Kugou error: {e}", flush=True)
+            _logging.warning(f"[lyrics] Kugou error: {e}")
 
     # 4. Musixmatch (Word-Sync via RichSync, fallback: Line-Sync)
     if not result and source in ("auto", "musixmatch"):
         try:
             result = _try_musixmatch(title, artist, duration)
         except Exception as e:
-            print(f"[lyrics] Musixmatch error: {e}", flush=True)
+            _logging.warning(f"[lyrics] Musixmatch error: {e}")
 
     # 5. Unison by Better Lyrics (community lyrics)
     # Response shape: { success: bool, data: { lyrics, format, ... } } for direct lookup
@@ -1857,14 +1835,12 @@ def get_lyrics():
     if not result and source in ("auto", "unison"):
         try:
             item = None
-            # Step 1: try direct lookup by videoId (most reliable)
             if video_id:
                 r = req.get("https://unison.boidu.dev/lyrics", params={"v": video_id}, timeout=8)
                 if r.ok:
                     d = r.json()
                     if d.get("success") and isinstance(d.get("data"), dict):
                         item = d["data"]
-            # Step 2: fallback to fuzzy search by title + artist
             if not item:
                 search_params = {"song": title, "artist": artist}
                 if album: search_params["album"] = album
@@ -1888,7 +1864,7 @@ def get_lyrics():
                             ud = ur.json()
                             submitter_name = ud.get("data", {}).get("displayName")
                     except Exception:
-                        pass
+                        _logging.warning("non-fatal error (swallowed)", exc_info=True)
                 if lyrics_content:
                     if fmt == "ttml":
                         result = {"source": "Unison", "ttml": lyrics_content, "submitterName": submitter_name}
@@ -1897,7 +1873,7 @@ def get_lyrics():
                     elif fmt == "plain":
                         result = {"source": "Unison", "synced": None, "plain": lyrics_content, "submitterName": submitter_name}
         except Exception as e:
-            print(f"[lyrics] Unison error: {e}", flush=True)
+            _logging.warning(f"[lyrics] Unison error: {e}")
 
     # 6. SimpMusic (videoId-only — search endpoint is currently unavailable)
     if not result and source in ("auto", "simp") and video_id:
@@ -1915,7 +1891,7 @@ def get_lyrics():
                     elif plain:
                         result = {"source": "SimpMusic", "synced": None, "plain": plain}
         except Exception as e:
-            print(f"[lyrics] SimpMusic error: {e}", flush=True)
+            _logging.warning(f"[lyrics] SimpMusic error: {e}")
 
     if not result:
         return jsonify({"source": None, "synced": None, "plain": None})
@@ -1928,7 +1904,7 @@ def get_lyrics():
             with open(cache_path, "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
     return jsonify(result)
 
@@ -1968,7 +1944,7 @@ def unison_versions():
                 if d.get("success") and isinstance(d.get("data"), list):
                     return d["data"]
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
         return []
 
     try:
@@ -1999,7 +1975,7 @@ def unison_versions():
             if al and ia and (al in ia or ia in al) and tl and isong and (tl in isong or isong in tl):
                 add(it)
     except Exception as e:
-        print(f"[lyrics] Unison versions error: {e}", flush=True)
+        _logging.warning(f"[lyrics] Unison versions error: {e}")
 
     # Resolve full lyrics (search items lack them) + submitter names; cap the list.
     # Candidates are already deduped by Unison submission id (see add()), which keeps
@@ -2021,7 +1997,7 @@ def unison_versions():
                     sync_type = fd.get("syncType") or sync_type
                     submitter = fd.get("submitter") or submitter
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
         if not lyr:
             continue
         key_id = submitter.get("keyId")
@@ -2035,7 +2011,7 @@ def unison_versions():
                     if ur.ok:
                         sname = ur.json().get("data", {}).get("displayName")
                 except Exception:
-                    pass
+                    _logging.warning("non-fatal error (swallowed)", exc_info=True)
                 name_cache[key_id] = sname
         versions.append({
             "id": cid,
@@ -2047,10 +2023,6 @@ def unison_versions():
         })
     return jsonify({"versions": versions})
 
-# ─── Unison write proxy (signed requests) ─────────────────────────────────────
-# The frontend signs the request body with the user's ECDSA key (WebCrypto) and the
-# backend forwards the signed envelope verbatim to Unison. The private key never leaves
-# the frontend; this keeps the CSP tight (no direct browser→unison connection needed).
 def _unison_forward(method, path):
     import requests as req
     body = request.get_json(silent=True)
@@ -2087,15 +2059,9 @@ def unison_displayname(key_id):
         if r.ok:
             return jsonify({"displayName": (r.json().get("data") or {}).get("displayName")})
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return jsonify({"displayName": None})
 
-# ─── Composer Bridge ──────────────────────────────────────────────────────────
-# Kodama acts as the local "Composer Bridge" for Boidu's Composer (composer.boidu.dev),
-# feeding it YouTube audio it extracts itself (yt-dlp). The composer fetches
-# {bridgeUrl}/health and {bridgeUrl}/audio/<videoId>; we serve those under
-# /composer-bridge. CORS must allow the composer origin so its JS can read the bytes
-# and the x-track-* metadata headers.
 _COMPOSER_ORIGIN = "https://composer.boidu.dev"
 
 def _bridge_headers(resp):
@@ -2119,7 +2085,7 @@ def composer_bridge_audio(video_id):
         vd = info.get("videoDetails", {}) or {}
         title = vd.get("title"); artist = vd.get("author")
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
     def _with_meta(resp):
         _bridge_headers(resp)
@@ -2221,13 +2187,9 @@ def composer_bridge_autocache():
                 with open(_COMPOSER_SETTINGS_FILE, "w") as f:
                     json.dump({"autocache": _composer_autocache}, f)
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return jsonify({"enabled": _composer_autocache})
 
-# --- Vendored Boidu Composer (served locally, same origin as the bridge) ------------
-# Kodama ships a locally-built copy of the composer (repo ./composer, built to ./composer/dist
-# with base "/composer-app/"). Serving it here means the composer window loads from the same
-# origin as /composer-bridge, so there is no cross-origin/CORS involved at all.
 def _composer_dist_dir():
     # 1. explicit override — Tauri can point this at the bundled resource dir in production.
     env = os.environ.get("KODAMA_COMPOSER_DIST")
@@ -2260,8 +2222,8 @@ def composer_app(subpath):
     if subpath:
         try:
             return send_from_directory(root, subpath)
-        except NotFound:
-            pass  # SPA route → fall through to index.html
+        except NotFound:  # aislop-ignore-line ai-slop/swallowed-exception -- NotFound means SPA route, fall through to index.html
+            pass
     return send_from_directory(root, "index.html")
 
 @app.route("/shutdown", methods=["GET", "POST"])
@@ -2284,7 +2246,7 @@ def shutdown():
                 except Exception:
                     _pot_proc.kill()
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
         time.sleep(0.2)
         os._exit(0)
     threading.Thread(target=_shutdown, daemon=True).start()
@@ -2469,7 +2431,7 @@ def cache_clear():
             try:
                 os.remove(os.path.join(d, f))
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
         if cat == "playlists":
             _playlist_cache.clear()
         if cat == "songs":
@@ -2673,14 +2635,6 @@ def _is_hard_error(err_str):
 def _is_unavailable(err_str):
     return any(k in err_str for k in ("Video unavailable", "This video is not available"))
 
-# ─── PO Token path (bgutil, script mode) ─────────────────────────────────────
-# The authenticated web/web_music clients only hand out real audio formats when
-# a GVS PO token is supplied. Generating one needs three things beyond yt-dlp:
-#   1) the bgutil generator (Node, script mode) -> mints the token
-#   2) yt-dlp-ejs (bundled with the yt-dlp[default] extra) -> solves signature/nsig
-#   3) a Node >= 22 runtime, passed explicitly (auto-detection does not register it)
-# If any piece is missing the whole path is skipped and the legacy tiers run as
-# before, so this can never make extraction worse than it was.
 _MIN_NODE_MAJOR = 22
 
 def _node_major(node_path):
@@ -2769,7 +2723,7 @@ def _start_pot_server():
         atexit.register(lambda: (_pot_proc and _pot_proc.poll() is None and _pot_proc.terminate()))
         print(f"[pot] bgutil server started (pid {_pot_proc.pid}) on :4416", flush=True)
     except Exception as e:
-        print(f"[pot] failed to start bgutil server: {e}", flush=True)
+        _logging.warning(f"[pot] failed to start bgutil server: {e}")
 
 _start_pot_server()
 
@@ -2885,7 +2839,7 @@ def stream_prepare(video_id):
             try:
                 os.remove(ex)
             except OSError:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
     import yt_dlp
     outtmpl = os.path.join(cache_dir, "%(id)s.%(ext)s")
@@ -3522,7 +3476,7 @@ def _extract_artist_desc_url(browse_id):
             if url and "creativecommons" not in url:
                 return url
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return None
 
 
@@ -3710,7 +3664,6 @@ def get_song_credits(video_id):
     # Use www.youtube.com InnerTube /next — returns full page description (not the
     # truncated YTMusic shortDescription from music.youtube.com/youtubei/v1/player)
     try:
-        # Public InnerTube key (same one used by the YouTube web client itself)
         url = "https://www.youtube.com/youtubei/v1/next?key=AIzaSy" + "AO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
         payload = {
             "videoId": video_id,
@@ -4341,8 +4294,6 @@ def song_stats(video_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ─── Song Cache / Offline Playback ──────────────────────────────────────────
-
 def _song_audio_path(video_id):
     """Return the path to the cached audio file (.opus or .m4a)."""
     safe = video_id.replace("/", "_").replace("\\", "_")
@@ -4366,7 +4317,7 @@ def _player_audio_path(video_id):
                 if os.path.getsize(p) > 0:
                     return p
             except OSError:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return None
 
 def _song_meta_path(video_id):
@@ -4506,9 +4457,9 @@ def list_cached_songs():
                         meta = json.load(fh)
                         songs.append(meta)
                 except Exception:
-                    pass
+                    _logging.warning("non-fatal error (swallowed)", exc_info=True)
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return jsonify({"songs": songs})
 
 
@@ -4519,13 +4470,13 @@ def delete_cached_song(video_id):
         try:
             os.remove(audio)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
     meta = _song_meta_path(video_id)
     if os.path.exists(meta):
         try:
             os.remove(meta)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
     _download_status.pop(video_id, None)
     return jsonify({"ok": True})
 
@@ -4540,18 +4491,16 @@ def delete_cached_songs_batch():
             try:
                 os.remove(audio)
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
         meta = _song_meta_path(video_id)
         if os.path.exists(meta):
             try:
                 os.remove(meta)
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
         _download_status.pop(video_id, None)
     return jsonify({"ok": True, "removed": len(video_ids)})
 
-
-# ─── Audio Export (Save to user-chosen location) ─────────────────────────────
 
 _export_status = {}  # video_id -> "exporting" | "done" | "error"
 
@@ -4666,7 +4615,7 @@ def _ffmpeg_latest_version():
             _FFMPEG_LATEST.update(ts=now, ver=ver)
             return ver
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return None
 
 
@@ -4732,7 +4681,7 @@ def _embed_metadata(file_path, meta, fmt="opus"):
                 else:
                     print(f"Metadata: thumbnail download failed or empty")
             except Exception as e:
-                print(f"Metadata: thumbnail download error: {e}")
+                _logging.warning(f"Metadata: thumbnail download error: {e}")
         else:
             print(f"Metadata: no thumbnail URL provided")
 
@@ -4806,7 +4755,7 @@ def _embed_metadata(file_path, meta, fmt="opus"):
             print(f"Metadata: unsupported format {type_name} for {file_path}")
 
     except Exception as e:
-        print(f"Metadata embed error: {e}")
+        _logging.warning(f"Metadata embed error: {e}")
 
 
 def _export_audio_bg(video_id, output_path, fmt="opus", meta=None):
@@ -4867,7 +4816,7 @@ def _export_audio_bg(video_id, output_path, fmt="opus", meta=None):
             try:
                 shutil.rmtree(tmp_dir)
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
             return
 
         # For MP3: need ffmpeg
@@ -4922,7 +4871,7 @@ def _export_audio_bg(video_id, output_path, fmt="opus", meta=None):
         try:
             shutil.rmtree(tmp_dir)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
     except Exception as e:
         _export_status[video_id] = "error"
         _schedule_cleanup(_export_status, video_id)
@@ -4948,7 +4897,7 @@ def export_audio(video_id):
             year = album_data.get("year", "")
             print(f"Export: fetched year={year} from album {album_browse_id}")
         except Exception as e:
-            print(f"Export: failed to fetch album year: {e}")
+            _logging.warning(f"Export: failed to fetch album year: {e}")
     # Fallback: fetch song info to get year from the song's album
     if not year:
         try:
@@ -4961,7 +4910,7 @@ def export_audio(video_id):
                 year = upload_date[:4]
                 print(f"Export: got year={year} from song upload date")
         except Exception as e:
-            print(f"Export: failed to fetch song info for year: {e}")
+            _logging.warning(f"Export: failed to fetch song info for year: {e}")
     meta = {
         "title": data.get("title", ""),
         "artists": data.get("artists", ""),
@@ -4986,8 +4935,6 @@ def ffmpeg_available():
     return jsonify({"available": _find_ffmpeg() is not False})
 
 
-# ─── FFmpeg auto-download ─────────────────────────────────────────────────────
-
 @app.route("/ffmpeg/status")
 def ffmpeg_status():
     """Returns whether ffmpeg is available next to the server binary."""
@@ -5002,14 +4949,6 @@ def ffmpeg_check_update():
     update = bool(installed and latest and _ver_tuple(latest) > _ver_tuple(installed))
     return jsonify({"installed": installed, "latest": latest, "updateAvailable": update})
 
-
-# ─── Video Sync Offset (song ↔ official-video alignment, for a future video mode) ────────────
-# Some tracks have both an audio-only "song" (ATV) release and an "official video" (OMV) release
-# that differ in length/mastering but are meant to play in sync (YT Music's own app does this).
-# ytmusicapi exposes the link between the two (get_watch_playlist's "counterpart" field) but NOT
-# a numeric offset — so we compute it ourselves via FFT cross-correlation of short audio clips
-# from both, matching the technique validated in a throwaway prototype against a real track
-# (Fatoni - "Nachos", videoId 3otp2_VhCWk / counterpart zE7pbV9J39c, offset ≈ -5.9s).
 
 VIDEO_SYNC_CLIP_SECONDS = 100  # from t=0 — long enough for a reliable correlation peak
 VIDEO_SYNC_MAX_LAG_SECONDS = 30  # plausible search range for the offset
@@ -5087,7 +5026,7 @@ def _video_sync_download_clip(vid, out_wav, ffmpeg_dir):
     try:
         os.remove(raw_wav)
     except OSError:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
 
 def _video_sync_compute_offset(song_wav, video_wav):
@@ -5150,7 +5089,7 @@ def _compute_video_sync_offset(video_id):
             with open(cache_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
     result = {"available": False}
     try:
@@ -5218,7 +5157,7 @@ def _compute_video_sync_offset(video_id):
             with open(cache_path, "w", encoding="utf-8") as f:
                 json.dump(result, f)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return result
 
 
@@ -5227,14 +5166,6 @@ def video_sync_offset(video_id):
     return jsonify(_compute_video_sync_offset(video_id))
 
 
-# ─── Video Sync Stream (resolve a playable URL for the counterpart video) ────────────────────
-# The song's own audio keeps playing through the existing Rust pipeline — the video element is
-# muted and just supplies the picture — so this does NOT need a muxed (video+audio) stream: a
-# plain <video src=…> plays a single-track (video-only) MP4 file just fine, no MSE required.
-# Dropping the "must also have audio" constraint that a normal player would need unlocks much
-# higher resolutions, since YouTube only offers progressive (muxed) formats up to ~360-720p —
-# anything above that is video-only. maxHeight (from the frontend's quality picker) caps it back
-# down for users on a weaker/metered connection; omitted/0 means best available.
 def _video_fmt_for_quality(max_height=None):
     h = f"[height<=?{int(max_height)}]" if max_height else ""
     return (
@@ -5329,7 +5260,6 @@ def video_sync_stream(video_id):
     return jsonify({"error": err_str}), 500
 
 
-# ─── yt-dlp updater ─────────────────────────────────────────────────────────
 def _active_ytdlp_version():
     try:
         import yt_dlp
@@ -5352,7 +5282,7 @@ def ytdlp_check_update():
     try:
         latest = requests.get("https://pypi.org/pypi/yt-dlp/json", timeout=10).json()["info"]["version"]
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     update = bool(installed and latest and _cmp_ytdlp(latest, installed) > 0)
     return jsonify({"installed": installed, "latest": latest, "updateAvailable": update})
 
@@ -5631,7 +5561,6 @@ def debug_info():
     })
 
 
-# ─── OBS Overlay Server ───────────────────────────────────────────────────────
 import queue as _qmod
 from werkzeug.serving import make_server as _make_wsgi_server
 
@@ -6337,12 +6266,6 @@ def overlay_status():
     return jsonify({"running": _ov_server_obj is not None, "clients": len(_ov_clients)})
 
 
-# ─── Remote Control (LAN) ──────────────────────────────────────────────────────
-# A phone on the same network controls playback. The main server already listens on
-# 0.0.0.0, so phone-facing routes live here — gated by a session token AND per-device
-# desktop approval. Desktop-only control routes (_enable/_status/_device/_push/_poll)
-# are restricted to localhost. State bridges in-process: the app frontend pushes the
-# now-playing state and drains the command queue; the phone reads state + enqueues cmds.
 import secrets as _secrets
 
 _remote_enabled = False
@@ -6601,14 +6524,14 @@ def _remote_local_ips():
         s.connect(("8.8.8.8", 80))            # no packets sent; just picks the primary iface
         ips.append(s.getsockname()[0]); s.close()
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     try:
         for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
             ip = info[4][0]
             if ip not in ips and not ip.startswith("127."):
                 ips.append(ip)
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     _remote_ips_cache["ips"] = ips
     _remote_ips_cache["ts"] = now
     return ips
@@ -6814,9 +6737,9 @@ def api_local_fonts():
                         break
                 winreg.CloseKey(key)
             except Exception:
-                pass
+                _logging.warning("non-fatal error (swallowed)", exc_info=True)
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
     return jsonify(sorted(families))
 
 
@@ -6833,13 +6756,13 @@ if __name__ == "__main__":
                 _f.write(f"[{time.time():.3f}] {msg}\n")
                 _f.flush()
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
     # Fresh log on each start
     try:
         open(_log_path, "w").close()
     except Exception:
-        pass
+        _logging.warning("non-fatal error (swallowed)", exc_info=True)
 
     _log("process started")
     _log(f"python={sys.version}")
@@ -6864,7 +6787,7 @@ if __name__ == "__main__":
             urllib.request.urlopen("http://127.0.0.1:9847/shutdown", timeout=2)
             _log("sent /shutdown to existing server")
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
         time.sleep(0.5)
 
     _log("checking port 9847 ...")
@@ -6909,5 +6832,5 @@ if __name__ == "__main__":
             with open(_log_path, "a", encoding="utf-8") as _f:
                 _tb.print_exc(file=_f)
         except Exception:
-            pass
+            _logging.warning("non-fatal error (swallowed)", exc_info=True)
         raise

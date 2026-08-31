@@ -1,5 +1,4 @@
-import type { LineFields, LyricLine } from "@/domain/line/model";
-import { reconcileLine } from "@/domain/line/model";
+import { reconcileLine, type LineFields, type LyricLine } from "@/domain/line/model";
 import { reconstructLineText } from "@/domain/line/reconstruct-text";
 import type { WordTiming } from "@/domain/word/timing";
 import { getSplitCharacter } from "@/utils/split-character";

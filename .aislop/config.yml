@@ -1,0 +1,32 @@
+# aislop quality gate policy.
+#
+# NOTE ON LANGUAGE COVERAGE
+# aislop analyses 10 language targets: TypeScript, JavaScript, Expo/React Native,
+# Python, Go, Rust, Ruby, PHP, C#, C/C++. It does NOT analyse Swift (ios/) or
+# Kotlin (app/, the Android sources). For a repo that is mostly unsupported
+# languages it withholds the score rather than inventing one — so this gate
+# currently scores the TypeScript/JavaScript and Python under desktop/ and
+# reports the Swift/Kotlin trees as "not scoreable".
+
+version: 1
+
+engines:
+  format: true
+  lint: true
+  code-quality: true
+  ai-slop: true
+  architecture: false
+  security: true
+
+ci:
+  # Baseline measured 2026-08-31: score 67 on the desktop/ TypeScript+Python
+  # tree (the only scoreable languages here). The gate also fails on any
+  # error-severity finding (currently 4 confirmed defects + 2 security issues
+  # in pre-existing desktop code), so it is expected to be RED until those are
+  # resolved or the threshold is lowered below the baseline.
+  failBelow: 70
+  format: json
+
+# Do not send any data to scanaislop.com telemetry.
+telemetry:
+  enabled: false
