@@ -196,7 +196,7 @@ import com.nestmusic.music.ui.theme.DefaultThemeColor
 import com.nestmusic.music.ui.theme.NestMusicTheme
 import com.nestmusic.music.ui.theme.extractThemeColor
 import com.nestmusic.music.ui.utils.LocalIsTv
-import com.nestmusic.music.ui.utils.TvFocusIndication
+
 import com.nestmusic.music.ui.utils.TvOverscanVertical
 import com.nestmusic.music.ui.utils.appBarScrollBehavior
 import com.nestmusic.music.ui.utils.isTvDevice
@@ -1006,7 +1006,7 @@ class MainActivity : ComponentActivity() {
                 val baseBg = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
 
                 val tvFocusHighlight = MaterialTheme.colorScheme.primary
-                val tvIndication = remember(tvFocusHighlight) { TvFocusIndication(tvFocusHighlight) }
+                val tvIndication = remember { MaterialTheme.colorScheme.primary }
                 val defaultIndication = LocalIndication.current
 
                 CompositionLocalProvider(
@@ -1021,7 +1021,7 @@ class MainActivity : ComponentActivity() {
                     LocalListenTogetherManager provides listenTogetherManager,
                     LocalChangelogState provides showChangelog,
                     LocalIsTv provides isTv,
-                    LocalIndication provides if (isTv) tvIndication else defaultIndication,
+                    LocalIndication provides defaultIndication,
                 ) {
                     if (showChangelog.value) {
                         ChangelogScreen(onDismiss = { showChangelog.value = false })
