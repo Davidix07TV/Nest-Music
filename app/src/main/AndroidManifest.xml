@@ -40,7 +40,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:theme="@style/Theme.Metrolist"
+        android:theme="@style/Theme.NestMusic"
         tools:targetApi="tiramisu">
         <uses-library
             android:name="org.apache.http.legacy"
@@ -49,7 +49,7 @@
         <activity
             android:name=".ui.screens.CrashActivity"
             android:exported="false"
-            android:theme="@style/Theme.Metrolist"
+            android:theme="@style/Theme.NestMusic"
             android:excludeFromRecents="true"
             android:process=":crash" />
 
@@ -58,7 +58,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
-            android:theme="@style/Theme.Metrolist"
+            android:theme="@style/Theme.NestMusic"
             android:windowSoftInputMode="adjustResize">
             <!-- Android TV / Google TV launcher entry -->
             <intent-filter>
@@ -245,7 +245,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:noHistory="true"
-            android:theme="@style/Theme.Metrolist.Transparent" />
+            android:theme="@style/Theme.NestMusic.Transparent" />
 
         <service
             android:name=".playback.MusicService"

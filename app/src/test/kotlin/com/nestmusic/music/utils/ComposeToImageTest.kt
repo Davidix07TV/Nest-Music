@@ -65,6 +65,6 @@ class ComposeToImageTest {
             theme: Theme?,
         ): Drawable = BitmapDrawable(this, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
 
-        override fun getString(id: Int): String = "Metrolist"
+        override fun getString(id: Int): String = "Nest Music"
     }
 }

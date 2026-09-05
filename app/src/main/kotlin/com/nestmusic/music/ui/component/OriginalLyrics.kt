@@ -489,7 +489,7 @@ fun OriginalLyrics(
 
     val lazyListState = rememberLazyListState()
 
-    // Professional animation states for smooth Metrolist-style transitions
+    // Professional animation states for smooth Nest Music-style transitions
     var isAnimating by remember { mutableStateOf(false) }
     var isAutoScrollEnabled by rememberSaveable { mutableStateOf(true) }
 
@@ -2215,11 +2215,11 @@ fun OriginalLyrics(
     }
 }
 
-// Professional page animation constants inspired by Metrolist design - slower for smoothness
-private const val METROLIST_AUTO_SCROLL_DURATION = 1500L // Much slower auto-scroll for smooth transitions
-private const val METROLIST_INITIAL_SCROLL_DURATION = 1000L // Slower initial positioning
-private const val METROLIST_SEEK_DURATION = 800L // Slower user interaction
-private const val METROLIST_FAST_SEEK_DURATION = 600L // Less aggressive seeking
+// Professional page animation constants inspired by Nest Music design - slower for smoothness
+private const val NESTMUSIC_AUTO_SCROLL_DURATION = 1500L // Much slower auto-scroll for smooth transitions
+private const val NESTMUSIC_INITIAL_SCROLL_DURATION = 1000L // Slower initial positioning
+private const val NESTMUSIC_SEEK_DURATION = 800L // Slower user interaction
+private const val NESTMUSIC_FAST_SEEK_DURATION = 600L // Less aggressive seeking
 
 // Lyrics constants
 val LyricsPreviewTime = 2.seconds

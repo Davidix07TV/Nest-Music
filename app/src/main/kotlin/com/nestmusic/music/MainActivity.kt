@@ -193,7 +193,7 @@ import com.nestmusic.music.ui.screens.settings.DarkMode
 import com.nestmusic.music.ui.screens.settings.NavigationTab
 import com.nestmusic.music.ui.theme.ColorSaver
 import com.nestmusic.music.ui.theme.DefaultThemeColor
-import com.nestmusic.music.ui.theme.MetrolistTheme
+import com.nestmusic.music.ui.theme.NestMusicTheme
 import com.nestmusic.music.ui.theme.extractThemeColor
 import com.nestmusic.music.ui.utils.LocalIsTv
 import com.nestmusic.music.ui.utils.TvFocusIndication
@@ -459,7 +459,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MetrolistApp(
+            NestMusicApp(
                 latestVersionName = latestVersionName,
                 onLatestVersionNameChange = { latestVersionName = it },
                 playerConnection = playerConnectionSnapshot,
@@ -473,7 +473,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun MetrolistApp(
+    private fun NestMusicApp(
         latestVersionName: String,
         onLatestVersionNameChange: (String) -> Unit,
         playerConnection: PlayerConnection?,
@@ -651,7 +651,7 @@ class MainActivity : ComponentActivity() {
                 }
         }
 
-        MetrolistTheme(
+        NestMusicTheme(
             darkTheme = useDarkTheme,
             pureBlack = pureBlack,
             themeColor = themeColor,

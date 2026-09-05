@@ -37,7 +37,7 @@ include(":shazamkit")
 include(":paxsenix")
 
 // Use a local copy of NewPipe Extractor by uncommenting the lines below.
-// We assume, that Metrolist and NewPipe Extractor have the same parent directory.
+// We assume, that Nest Music and NewPipe Extractor have the same parent directory.
 // If this is not the case, please change the path in includeBuild().
 //
 // For this to work you also need to change the implementation in innertube/build.gradle.kts

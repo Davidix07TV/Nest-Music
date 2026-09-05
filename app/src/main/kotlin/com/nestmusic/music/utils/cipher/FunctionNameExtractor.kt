@@ -10,7 +10,7 @@ import java.security.MessageDigest
  * Falls back to hardcoded configs for known player.js hashes when regex fails.
  */
 object FunctionNameExtractor {
-    private const val TAG = "Metrolist_CipherFnExtract"
+    private const val TAG = "NestMusic_CipherFnExtract"
 
     // ==================== DATA CLASSES ====================
 

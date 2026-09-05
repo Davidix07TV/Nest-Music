@@ -218,7 +218,7 @@ import com.nestmusic.music.utils.cipher.CipherDeobfuscator
 import com.nestmusic.music.utils.dataStore
 import com.nestmusic.music.utils.get
 import com.nestmusic.music.utils.reportException
-import com.nestmusic.music.widget.MetrolistWidgetManager
+import com.nestmusic.music.widget.NestMusicWidgetManager
 import com.nestmusic.music.widget.MusicWidgetReceiver
 import com.nestmusic.music.widget.PlaylistWidgetReceiver
 import com.nestmusic.music.ui.utils.resize
@@ -288,7 +288,7 @@ class MusicService :
     lateinit var eqProfileRepository: EQProfileRepository
 
     @Inject
-    lateinit var widgetManager: MetrolistWidgetManager
+    lateinit var widgetManager: NestMusicWidgetManager
 
     @Inject
     lateinit var listenTogetherManager: com.nestmusic.music.listentogether.ListenTogetherManager

@@ -26,7 +26,7 @@ import java.net.URL
  *   { "959dabb2": "2026-06-12", "445213fb": "2026-06-10", ... }
  */
 object PlayerDatesStore {
-    private const val TAG = "Metrolist_CipherDates"
+    private const val TAG = "NestMusic_CipherDates"
 
     private const val REMOTE_URL =
         "https://raw.githubusercontent.com/ZemerTeam/zemer-cipher/master/player_dates.json"

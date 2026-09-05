@@ -12,7 +12,7 @@ object SearchRoutes {
 
     // Prefix query payloads so a literal "null" search is not confused with
     // an absent or undefined Navigation argument.
-    private const val QUERY_ROUTE_PREFIX = "__metrolist_search_query__"
+    private const val QUERY_ROUTE_PREFIX = "__nestmusic_search_query__"
 
     // Encode the prefixed query as a route path segment before navigating.
     fun resultRoute(query: String): String =

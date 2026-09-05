@@ -487,7 +487,7 @@ object YTPlayerUtils {
         if (streamPlayerResponse.playabilityStatus.status != "OK") {
             val errorReason = streamPlayerResponse.playabilityStatus.reason
             // YouTube often surfaces generic reasons (e.g. "error 2000") for restricted or
-            // unavailable streams; Metrolist cannot recover those without official playback.
+            // unavailable streams; Nest Music cannot recover those without official playback.
             Timber.tag(logTag).e("Playability status not OK: $errorReason")
             if (isUploadedTrack) {
                 println("[PLAYBACK_DEBUG] FAILURE: Playability not OK for uploaded track - status=${streamPlayerResponse.playabilityStatus.status}, reason=$errorReason")
