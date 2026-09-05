@@ -28,6 +28,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -192,10 +193,16 @@ import com.nestmusic.music.ui.screens.settings.DarkMode
 import com.nestmusic.music.ui.screens.settings.NavigationTab
 import com.nestmusic.music.ui.theme.ColorSaver
 import com.nestmusic.music.ui.theme.DefaultThemeColor
-import com.nestmusic.music.ui.theme.MetrolistTheme
+import com.nestmusic.music.ui.theme.NestMusicTheme
 import com.nestmusic.music.ui.theme.extractThemeColor
+import com.nestmusic.music.ui.utils.LocalIsTv
+
+import com.nestmusic.music.ui.utils.TvOverscanVertical
 import com.nestmusic.music.ui.utils.appBarScrollBehavior
+import com.nestmusic.music.ui.utils.isTvDevice
 import com.nestmusic.music.ui.utils.resetHeightOffset
+import com.nestmusic.music.ui.utils.tvFocusRing
+import com.nestmusic.music.ui.utils.tvOverscanPadding
 import com.nestmusic.music.utils.ReleaseInfo
 import com.nestmusic.music.utils.SearchRoutes
 import com.nestmusic.music.utils.SyncUtils
@@ -452,7 +459,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MetrolistApp(
+            NestMusicApp(
                 latestVersionName = latestVersionName,
                 onLatestVersionNameChange = { latestVersionName = it },
                 playerConnection = playerConnectionSnapshot,
@@ -466,7 +473,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun MetrolistApp(
+    private fun NestMusicApp(
         latestVersionName: String,
         onLatestVersionNameChange: (String) -> Unit,
         playerConnection: PlayerConnection?,
@@ -474,6 +481,7 @@ class MainActivity : ComponentActivity() {
         downloadUtil: DownloadUtil,
         syncUtils: SyncUtils,
     ) {
+        val isTv = remember { this@MainActivity.isTvDevice() }
         val checkForUpdates by rememberPreference(CheckForUpdatesKey, defaultValue = true)
         var kmpRelease by remember { mutableStateOf<ReleaseInfo?>(null) }
         var kmpUpgradeDismissed by rememberSaveable { mutableStateOf(false) }
@@ -643,7 +651,7 @@ class MainActivity : ComponentActivity() {
                 }
         }
 
-        MetrolistTheme(
+        NestMusicTheme(
             darkTheme = useDarkTheme,
             pureBlack = pureBlack,
             themeColor = themeColor,
@@ -790,7 +798,7 @@ class MainActivity : ComponentActivity() {
                 val isLandscape = configuration.containerDpSize.width > configuration.containerDpSize.height
                 val isTablet = configuration.containerDpSize.width >= 600.dp
 
-                val showRail = (isLandscape || isTablet) && !inSearchScreen
+                val showRail = if (isTv) true else (isLandscape || isTablet) && !inSearchScreen
 
                 val navPadding =
                     if (shouldShowNavigationBar && !showRail) {
@@ -812,6 +820,7 @@ class MainActivity : ComponentActivity() {
                             bottomInset +
                                 (if (!showRail && shouldShowNavigationBar) navPadding else 0.dp) +
                                 (if (useNewMiniPlayerDesign) MiniPlayerBottomSpacing else 0.dp) +
+                                (if (isTv) TvOverscanVertical else 0.dp) +
                                 MiniPlayerHeight,
                         expandedBound = maxHeight,
                     )
@@ -828,11 +837,13 @@ class MainActivity : ComponentActivity() {
                         shouldShowNavigationBar,
                         playerBottomSheetState.isDismissed,
                         showRail,
+                        isTv,
                     ) {
                         var bottom = bottomInset
                         if (shouldShowNavigationBar && !showRail) {
                             bottom += NavigationBarHeight
                         }
+                        if (isTv) bottom += TvOverscanVertical
                         if (!playerBottomSheetState.isDismissed) bottom += MiniPlayerHeight
                         windowsInsets
                             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
@@ -994,6 +1005,10 @@ class MainActivity : ComponentActivity() {
 
                 val baseBg = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
 
+                val tvFocusHighlight = MaterialTheme.colorScheme.primary
+                val tvIndication = remember { MaterialTheme.colorScheme.primary }
+                val defaultIndication = LocalIndication.current
+
                 CompositionLocalProvider(
                     LocalDatabase provides database,
                     LocalNavController provides navController,
@@ -1005,6 +1020,8 @@ class MainActivity : ComponentActivity() {
                     LocalSyncUtils provides syncUtils,
                     LocalListenTogetherManager provides listenTogetherManager,
                     LocalChangelogState provides showChangelog,
+                    LocalIsTv provides isTv,
+                    LocalIndication provides defaultIndication,
                 ) {
                     if (showChangelog.value) {
                         ChangelogScreen(onDismiss = { showChangelog.value = false })
@@ -1018,7 +1035,9 @@ class MainActivity : ComponentActivity() {
                                 enter = fadeIn(animationSpec = tween(durationMillis = 300)),
                                 exit = fadeOut(animationSpec = tween(durationMillis = 200)),
                             ) {
-                                Row {
+                                Row(
+                                    modifier = Modifier.tvOverscanPadding(vertical = 0.dp),
+                                ) {
                                     TopAppBar(
                                         title = {
                                             Text(
@@ -1028,28 +1047,40 @@ class MainActivity : ComponentActivity() {
                                         },
                                         actions = {
                                             if (showHistoryButton) {
-                                                IconButton(onClick = { navController.navigate("history") }) {
+                                                IconButton(
+                                                    onClick = { navController.navigate("history") },
+                                                    modifier = Modifier.tvFocusRing(),
+                                                ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.history),
                                                         contentDescription = stringResource(R.string.history),
                                                     )
                                                 }
                                             }
-                                            IconButton(onClick = { navController.navigate("stats") }) {
+                                            IconButton(
+                                                onClick = { navController.navigate("stats") },
+                                                modifier = Modifier.tvFocusRing(),
+                                            ) {
                                                 Icon(
                                                     painter = painterResource(R.drawable.stats),
                                                     contentDescription = stringResource(R.string.stats),
                                                 )
                                             }
                                             if (listenTogetherInTopBar) {
-                                                IconButton(onClick = { navController.navigate("listen_together_from_topbar") }) {
+                                                IconButton(
+                                                    onClick = { navController.navigate("listen_together_from_topbar") },
+                                                    modifier = Modifier.tvFocusRing(),
+                                                ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.group_outlined),
                                                         contentDescription = stringResource(R.string.together),
                                                     )
                                                 }
                                             }
-                                            IconButton(onClick = { showAccountDialog = true }) {
+                                            IconButton(
+                                                onClick = { showAccountDialog = true },
+                                                modifier = Modifier.tvFocusRing(),
+                                            ) {
                                                 BadgedBox(badge = {
                                                     if (latestVersionName != BuildConfig.VERSION_NAME) {
                                                         Badge()
@@ -1253,7 +1284,7 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
                     ) {
-                        Row(Modifier.fillMaxSize()) {
+                        Row(Modifier.fillMaxSize().tvOverscanPadding()) {
                             val onRailItemClick: (Screens, Boolean) -> Unit =
                                 remember(navController, coroutineScope, topAppBarScrollBehavior, playerBottomSheetState) {
                                     { screen: Screens, isSelected: Boolean ->

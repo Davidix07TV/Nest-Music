@@ -167,7 +167,7 @@ Output MUST be a JSON array with EXACTLY $lineCount strings."""
                                 }
                             }.addHeader("Content-Type", "application/json")
                             .addHeader("HTTP-Referer", "https://github.com/Davidix07TV/Nest-Music")
-                            .addHeader("X-Title", "Metrolist")
+                            .addHeader("X-Title", "Nest Music")
                             .post(jsonBody.toString().toRequestBody(JSON))
                             .build()
 

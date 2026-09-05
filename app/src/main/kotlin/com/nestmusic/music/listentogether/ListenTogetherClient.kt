@@ -860,7 +860,7 @@ class ListenTogetherClient
                 wakeLock =
                     powerManager?.newWakeLock(
                         PowerManager.PARTIAL_WAKE_LOCK,
-                        "Metrolist:ListenTogether",
+                        "NestMusic:ListenTogether",
                     )
             }
             // Always release before acquiring so that the timeout is reset on each call.

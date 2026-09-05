@@ -569,7 +569,7 @@ function discoverAndInit() {
     }
 
     companion object {
-        private const val TAG = "Metrolist_CipherWebView"
+        private const val TAG = "NestMusic_CipherWebView"
         private const val JS_INTERFACE = "CipherBridge"
 
         // Loading + parsing ~2.8 MB player.js on a slow device takes seconds; a renderer that

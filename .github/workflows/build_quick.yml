@@ -42,7 +42,7 @@ jobs:
         run: ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease
         env:
           NESTMUSIC_APPLICATION_ID: com.nestmusic.music.test
-          METROLIST_APP_NAME: Metrolist Testing
+          NESTMUSIC_APP_NAME: Nest Music Testing
           PULL_REQUEST: "false"
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
