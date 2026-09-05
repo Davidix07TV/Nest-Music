@@ -11,10 +11,12 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import android.content.Intent
@@ -40,6 +42,7 @@ import com.nestmusic.music.constants.DataSyncIdKey
 import com.nestmusic.music.constants.InnerTubeCookieKey
 import com.nestmusic.music.constants.VisitorDataKey
 import com.nestmusic.music.ui.component.IconButton
+import com.nestmusic.music.ui.utils.LocalIsTv
 import com.nestmusic.music.ui.utils.backToMain
 import com.nestmusic.music.utils.reportException
 import com.nestmusic.music.utils.safeDataStoreEdit
@@ -53,6 +56,7 @@ import timber.log.Timber
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
+    val isTv = LocalIsTv.current
     val coroutineScope = rememberCoroutineScope()
     var isCompletingLogin by remember { mutableStateOf(false) }
 
@@ -166,6 +170,9 @@ fun LoginScreen(navController: NavController) {
                     setSupportZoom(true)
                     builtInZoomControls = true
                     displayZoomControls = false
+                    if (isTv) {
+                        textZoom = 125
+                    }
                 }
                 addJavascriptInterface(
                     object {
@@ -192,7 +199,17 @@ fun LoginScreen(navController: NavController) {
     )
 
     TopAppBar(
-        title = { Text(stringResource(R.string.login)) },
+        title = {
+            Column {
+                Text(stringResource(R.string.login))
+                if (isTv) {
+                    Text(
+                        text = stringResource(R.string.tv_login_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        },
         navigationIcon = {
             IconButton(
                 onClick = { completeLogin(navController::navigateUp) },

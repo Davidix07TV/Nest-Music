@@ -1025,4 +1025,8 @@
     <string name="stream_source_web_creator_desc">Creator web client.</string>
     <string name="stream_source_android_creator">ANDROID_CREATOR</string>
     <string name="stream_source_android_creator_desc">Android creator client. Off by default; needs DroidGuard.</string>
+
+    <!-- Android TV -->
+    <string name="tv_login_hint">Use the D-pad to navigate and press OK to type</string>
+    <string name="tv_no_microphone">Music recognition isn\'t available: this device has no microphone</string>
 </resources>
