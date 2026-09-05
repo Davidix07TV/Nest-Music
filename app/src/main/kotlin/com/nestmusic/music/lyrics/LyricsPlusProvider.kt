@@ -287,7 +287,7 @@ object LyricsPlusProvider : LyricsProvider {
 
     /**
      * Converts a LyricsPlus JSON response to
-     * Metrolist's extended LRC:
+     * Nest Music's extended LRC:
      *
      *   [mm:ss.cc]{agent:v1}line text     ? multi-voice agent tag
      *   <word:startSec:endSec|word:...>   ? word-sync block (Word mode only)

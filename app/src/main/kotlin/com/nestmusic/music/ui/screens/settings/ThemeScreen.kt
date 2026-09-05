@@ -79,7 +79,7 @@ import com.nestmusic.music.constants.PureBlackKey
 import com.nestmusic.music.constants.PureBlackMiniPlayerKey
 import com.nestmusic.music.constants.SelectedThemeColorKey
 import com.nestmusic.music.ui.theme.DefaultThemeColor
-import com.nestmusic.music.ui.theme.MetrolistTheme
+import com.nestmusic.music.ui.theme.NestMusicTheme
 import com.nestmusic.music.utils.rememberEnumPreference
 import com.nestmusic.music.utils.rememberPreference
 
@@ -674,7 +674,7 @@ fun ThemeMockup(
         DarkMode.OFF -> false
     }
 
-    MetrolistTheme(
+    NestMusicTheme(
         darkTheme = useDark,
         pureBlack = pureBlack,
         themeColor = themeColor
@@ -782,7 +782,7 @@ fun ThemeMockupPortrait(
         DarkMode.OFF -> false
     }
 
-    MetrolistTheme(
+    NestMusicTheme(
         darkTheme = useDark,
         pureBlack = pureBlack,
         themeColor = themeColor

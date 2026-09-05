@@ -24,7 +24,7 @@ import java.io.File
  * refreshes swap wholesale.
  */
 object PlayerConfigStore {
-    private const val TAG = "Metrolist_CipherConfig"
+    private const val TAG = "NestMusic_CipherConfig"
     private const val ASSET_NAME = "player_configs.json"
 
     private const val FARADAY_URL =

@@ -15,7 +15,7 @@ import java.io.File
  * that are required to access stream URLs on web clients.
  */
 object PlayerJsFetcher {
-    private const val TAG = "Metrolist_CipherFetcher"
+    private const val TAG = "NestMusic_CipherFetcher"
     private const val IFRAME_API_URL = "https://www.youtube.com/iframe_api"
     private const val PLAYER_JS_URL_TEMPLATE = "https://www.youtube.com/s/player/%s/player_ias.vflset/en_GB/base.js"
     private const val CACHE_TTL_MS = 6 * 60 * 60 * 1000L // 6 hours

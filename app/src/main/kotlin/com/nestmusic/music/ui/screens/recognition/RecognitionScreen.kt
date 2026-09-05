@@ -83,6 +83,7 @@ import coil3.compose.AsyncImage
 import com.nestmusic.music.LocalDatabase
 import com.nestmusic.music.R
 import com.nestmusic.music.db.entities.RecognitionHistory
+import com.nestmusic.music.ui.component.EmptyPlaceholder
 import com.nestmusic.music.ui.component.IconButton
 import com.nestmusic.music.ui.utils.backToMain
 import com.nestmusic.music.utils.SearchRoutes
@@ -101,6 +102,10 @@ fun RecognitionScreen(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val coroutineScope = rememberCoroutineScope()
+    val hasMicrophone =
+        remember {
+            context.packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE)
+        }
 
     // Only reset in Ready state: Listening/Processing belong to a running widget-service
     // recognition that must not be cancelled; Success/NoMatch/Error are results pending
@@ -158,6 +163,7 @@ fun RecognitionScreen(
 
     LaunchedEffect(Unit) {
         if (autoStart &&
+            hasMicrophone &&
             com.nestmusic.music.recognition.MusicRecognitionService.recognitionStatus.value
                 is RecognitionStatus.Ready
         ) {
@@ -233,6 +239,12 @@ fun RecognitionScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
+            if (!hasMicrophone) {
+                EmptyPlaceholder(
+                    icon = R.drawable.mic,
+                    text = stringResource(R.string.tv_no_microphone),
+                )
+            } else {
             AnimatedContent(
                 targetState = recognitionStatus,
                 transitionSpec = {
@@ -292,6 +304,7 @@ fun RecognitionScreen(
                         )
                     }
                 }
+            }
             }
         }
     }
