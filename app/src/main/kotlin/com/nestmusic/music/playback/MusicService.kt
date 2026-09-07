@@ -4994,12 +4994,14 @@ class MusicService :
                         progress = progress,
                         outgoing = false,
                     )
-                    playerTransitionProcessors[fadingPlayer]?.setTransition(
-                        eqMode = activeMixEqMode,
-                        effect = activeMixEffect,
-                        progress = progress,
-                        outgoing = true,
-                    )
+                    fadingPlayer?.let { outgoingPlayer ->
+                        playerTransitionProcessors[outgoingPlayer]?.setTransition(
+                            eqMode = activeMixEqMode,
+                            effect = activeMixEffect,
+                            progress = progress,
+                            outgoing = true,
+                        )
+                    }
 
                     try {
                         player.volume = startVolume * fadeIn
