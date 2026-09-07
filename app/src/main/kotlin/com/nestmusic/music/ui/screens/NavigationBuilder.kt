@@ -374,6 +374,26 @@ fun NavGraphBuilder.navigationBuilder(
     }
 
     composable(
+        route = "transition/{prevId}/{nextId}",
+        arguments =
+            listOf(
+                navArgument("prevId") {
+                    type = NavType.StringType
+                },
+                navArgument("nextId") {
+                    type = NavType.StringType
+                },
+            ),
+    ) { backStackEntry ->
+        TransitionEditorScreen(
+            navController = navController,
+            savedStateHandle = backStackEntry.savedStateHandle,
+        )
+    }
+
+    // Kept for deep links created by the first beta, where the editor inferred
+    // the incoming track from the current player queue.
+    composable(
         route = "transition/{prevId}",
         arguments =
             listOf(

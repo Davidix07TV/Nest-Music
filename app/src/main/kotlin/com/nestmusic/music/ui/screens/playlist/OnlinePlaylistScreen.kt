@@ -97,6 +97,9 @@ import com.nestmusic.music.ui.component.ExpandableText
 import com.nestmusic.music.ui.component.IconButton
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.YouTubeListItem
+import com.nestmusic.music.ui.component.MixToggleButton
+import com.nestmusic.music.ui.component.TransitionPill
+import com.nestmusic.music.ui.component.transitionRoute
 import com.nestmusic.music.ui.menu.YouTubePlaylistMenu
 import com.nestmusic.music.ui.menu.YouTubeSelectionSongMenu
 import com.nestmusic.music.ui.menu.YouTubeSongMenu
@@ -155,6 +158,7 @@ fun OnlinePlaylistScreen(
         }
 
     var inSelectMode by remember { mutableStateOf(false) }
+    var mixMode by rememberSaveable { mutableStateOf(false) }
     val selection =
         remember {
             mutableStateListOf<String>()
@@ -256,6 +260,9 @@ fun OnlinePlaylistScreen(
                                 coroutineScope = coroutineScope,
                                 continuation = viewModel.continuation,
                                 isPodcastPlaylist = isPodcastPlaylist,
+                                mixMode = mixMode,
+                                onMixModeChange = { mixMode = !mixMode },
+                                mixEnabled = !isListenTogetherGuest,
                                 modifier = Modifier.animateItem(),
                             )
                         }
@@ -270,76 +277,92 @@ fun OnlinePlaylistScreen(
                             }
                         }
 
-                        YouTubeListItem(
-                            item = songItem,
-                            isActive = mediaMetadata?.id == songItem.id,
-                            isPlaying = isPlaying,
-                            isSelected = inSelectMode && songItem.id in selection,
-                            modifier =
-                                Modifier
-                                    .combinedClickable(
-                                        enabled = !hideExplicit || !songItem.explicit,
-                                        onClick = {
-                                            if (inSelectMode) {
-                                                onCheckedChange(songItem.id !in selection)
-                                            } else if (songItem.id == mediaMetadata?.id) {
-                                                playerConnection.togglePlayPause()
-                                            } else {
-                                                playerConnection.playQueue(
-                                                    YouTubePlaylistQueue(
-                                                        playlistId = playlist.id,
-                                                        playlistTitle = playlist.title,
-                                                        initialSongs = filteredSongs.map { it.second },
-                                                        initialContinuation = viewModel.continuation,
-                                                        startIndex = index,
-                                                    ),
-                                                )
-                                            }
-                                        },
-                                        onLongClick = {
-                                            if (!inSelectMode) {
-                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                inSelectMode = true
-                                                onCheckedChange(true)
-                                                selectionAnchorSongId = songItem.id
-                                            } else {
-                                                val anchorIndex =
-                                                    selectionAnchorSongId?.let { anchorSongId ->
-                                                        filteredSongs.indexOfFirst { it.second.id == anchorSongId }
-                                                    } ?: -1
-
-                                                if (anchorIndex == -1) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            YouTubeListItem(
+                                item = songItem,
+                                isActive = mediaMetadata?.id == songItem.id,
+                                isPlaying = isPlaying,
+                                isSelected = inSelectMode && songItem.id in selection,
+                                modifier =
+                                    Modifier
+                                        .combinedClickable(
+                                            enabled = !hideExplicit || !songItem.explicit,
+                                            onClick = {
+                                                if (inSelectMode) {
+                                                    onCheckedChange(songItem.id !in selection)
+                                                } else if (songItem.id == mediaMetadata?.id) {
+                                                    playerConnection.togglePlayPause()
+                                                } else {
+                                                    playerConnection.playQueue(
+                                                        YouTubePlaylistQueue(
+                                                            playlistId = playlist.id,
+                                                            playlistTitle = playlist.title,
+                                                            initialSongs = filteredSongs.map { it.second },
+                                                            initialContinuation = viewModel.continuation,
+                                                            startIndex = index,
+                                                        ),
+                                                    )
+                                                }
+                                            },
+                                            onLongClick = {
+                                                if (!inSelectMode) {
+                                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                    inSelectMode = true
                                                     onCheckedChange(true)
                                                     selectionAnchorSongId = songItem.id
                                                 } else {
-                                                    val range = if (anchorIndex <= index) anchorIndex..index else index..anchorIndex
-                                                    for (rangeIndex in range) {
-                                                        val rangeSongId = filteredSongs[rangeIndex].second.id
-                                                        if (rangeSongId !in selection) {
-                                                            selection.add(rangeSongId)
+                                                    val anchorIndex =
+                                                        selectionAnchorSongId?.let { anchorSongId ->
+                                                            filteredSongs.indexOfFirst { it.second.id == anchorSongId }
+                                                        } ?: -1
+
+                                                    if (anchorIndex == -1) {
+                                                        onCheckedChange(true)
+                                                        selectionAnchorSongId = songItem.id
+                                                    } else {
+                                                        val range = if (anchorIndex <= index) anchorIndex..index else index..anchorIndex
+                                                        for (rangeIndex in range) {
+                                                            val rangeSongId = filteredSongs[rangeIndex].second.id
+                                                            if (rangeSongId !in selection) {
+                                                                selection.add(rangeSongId)
+                                                            }
                                                         }
                                                     }
                                                 }
+                                            },
+                                        ).animateItem(),
+                                trailingContent = {
+                                    if (inSelectMode) {
+                                        Checkbox(
+                                            checked = songItem.id in selection,
+                                            onCheckedChange = onCheckedChange,
+                                        )
+                                    } else {
+                                        IconButton(onClick = {
+                                            menuState.show {
+                                                YouTubeSongMenu(songItem, menuState::dismiss)
                                             }
-                                        },
-                                    ).animateItem(),
-                            trailingContent = {
-                                if (inSelectMode) {
-                                    Checkbox(
-                                        checked = songItem.id in selection,
-                                        onCheckedChange = onCheckedChange,
-                                    )
-                                } else {
-                                    IconButton(onClick = {
-                                        menuState.show {
-                                            YouTubeSongMenu(songItem, menuState::dismiss)
+                                        }) {
+                                            Icon(painterResource(R.drawable.more_vert), null)
                                         }
-                                    }) {
-                                        Icon(painterResource(R.drawable.more_vert), null)
                                     }
+                                },
+                            )
+                            filteredSongs.getOrNull(index + 1)?.second?.let { nextSong ->
+                                if (mixMode) {
+                                    TransitionPill(
+                                        prevId = songItem.id,
+                                        nextId = nextSong.id,
+                                        onClick = {
+                                            navController.navigate(
+                                                transitionRoute(songItem.id, nextSong.id),
+                                            )
+                                        },
+                                        modifier = Modifier.padding(start = 72.dp, end = 16.dp, bottom = 6.dp),
+                                    )
                                 }
-                            },
-                        )
+                            }
+                        }
                     }
 
                     if (isLoadingMore) {
@@ -489,6 +512,9 @@ private fun OnlinePlaylistHeader(
     coroutineScope: CoroutineScope,
     continuation: String?,
     isPodcastPlaylist: Boolean = false,
+    mixMode: Boolean = false,
+    onMixModeChange: () -> Unit = {},
+    mixEnabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val navController = LocalNavController.current
@@ -713,6 +739,12 @@ private fun OnlinePlaylistHeader(
                     )
                 }
             }
+
+            MixToggleButton(
+                selected = mixMode,
+                enabled = mixEnabled,
+                onClick = onMixModeChange,
+            )
 
             // Menu Button - Smaller secondary button
             Surface(

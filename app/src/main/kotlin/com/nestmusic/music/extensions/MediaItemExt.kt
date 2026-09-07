@@ -16,7 +16,13 @@ import com.nestmusic.music.models.toMediaMetadata
 import com.nestmusic.music.ui.utils.resize
 
 val MediaItem.metadata: MediaMetadata?
-    get() = localConfiguration?.tag as? MediaMetadata
+    get() {
+        val tagged = localConfiguration?.tag as? MediaMetadata
+        val bpmFromExtras = mediaMetadata.extras?.takeIf { it.containsKey("bpm") }?.getInt("bpm")
+        return tagged?.let { metadata ->
+            if (metadata.bpm == null && bpmFromExtras != null) metadata.copy(bpm = bpmFromExtras) else metadata
+        }
+    }
 
 fun Song.toMediaItem() = MediaItem.Builder()
     .setMediaId(song.id)
@@ -37,6 +43,7 @@ fun Song.toMediaItem() = MediaItem.Builder()
             .setIsPlayable(true)
             .setExtras(Bundle().apply {
                 putString("artwork_uri", song.thumbnailUrl)
+                toMediaMetadata().bpm?.let { putInt("bpm", it) }
             })
             .build()
     )
@@ -61,6 +68,7 @@ fun SongItem.toMediaItem() = MediaItem.Builder()
             .setIsPlayable(true)
             .setExtras(Bundle().apply {
                 putString("artwork_uri", thumbnail.resize(1080, 1080))
+                bpm?.let { putInt("bpm", it) }
             })
             .build()
     )
@@ -85,6 +93,7 @@ fun MediaMetadata.toMediaItem() = MediaItem.Builder()
             .setIsPlayable(true)
             .setExtras(Bundle().apply {
                 thumbnailUrl?.let { putString("artwork_uri", it) }
+                bpm?.let { putInt("bpm", it) }
             })
             .build()
     )

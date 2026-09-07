@@ -25,6 +25,7 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
 import com.nestmusic.music.playback.audio.VolumeNormalizationAudioProcessor
+import com.nestmusic.music.playback.audio.TransitionAudioProcessor
 import com.nestmusic.music.utils.safeDataStoreEdit
 import android.net.ConnectivityManager
 import android.os.Binder
@@ -309,13 +310,17 @@ class MusicService :
 
     // Resolved per-pair transition for the swap currently in progress (may
     // come from a user-defined override in TransitionStore).
-    private var activeMixStyle = MixStyle.FADE
+    private var activeMixStyle = MixStyle.AUTO
     private var activeMixDurationMs = 5000L
+    private var activeMixVolumeCurve = MixVolumeCurve.LINEAR
+    private var activeMixEqMode = MixEqMode.NONE
+    private var activeMixEffect = MixEffect.NONE
 
     private val secondaryPlayerListener =
         object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 Timber.tag(TAG).e(error, "Secondary player error")
+                secondaryPlayer?.let { playerTransitionProcessors.remove(it) }
                 secondaryPlayer?.stop()
                 secondaryPlayer?.clearMediaItems()
                 secondaryPlayer = null
@@ -417,6 +422,7 @@ class MusicService :
     val playerFlow = _playerFlow.asStateFlow()
 
     private val playerSilenceProcessors = HashMap<Player, SilenceDetectorAudioProcessor>()
+    private val playerTransitionProcessors = HashMap<Player, TransitionAudioProcessor>()
 
     private val instantSilenceSkipEnabled = MutableStateFlow(false)
 
@@ -968,6 +974,7 @@ class MusicService :
                 sleepTimer?.let { player.removeListener(it) }
                 playerNormalizationProcessors.remove(player)
                 playerSilenceProcessors.remove(player)
+                playerTransitionProcessors.remove(player)
                 player.release()
 
                 val newPlayer = createExoPlayer()
@@ -1305,6 +1312,7 @@ class MusicService :
         }
         val eqProcessor = CustomEqualizerAudioProcessor()
         equalizerService.addAudioProcessor(eqProcessor)
+        val transitionProcessor = TransitionAudioProcessor()
 
         val silenceProcessor = SilenceDetectorAudioProcessor { handleLongSilenceDetected() }
 
@@ -1327,7 +1335,15 @@ class MusicService :
             ExoPlayer
                 .Builder(this)
                 .setMediaSourceFactory(createMediaSourceFactory())
-                .setRenderersFactory(createRenderersFactory(normalizationProcessor, eqProcessor, silenceProcessor, useAudioTrackPlaybackParams))
+                .setRenderersFactory(
+                    createRenderersFactory(
+                        normalizationProcessor,
+                        eqProcessor,
+                        transitionProcessor,
+                        silenceProcessor,
+                        useAudioTrackPlaybackParams,
+                    ),
+                )
                 .setLoadControl(
                     // Start playback once ~750ms is buffered (media3's default is 1000ms) so first
                     // audio is audible a touch sooner. min/max/after-rebuffer match the media3 1.x
@@ -1353,6 +1369,7 @@ class MusicService :
 
         playerNormalizationProcessors[player] = normalizationProcessor
         playerSilenceProcessors[player] = silenceProcessor
+        playerTransitionProcessors[player] = transitionProcessor
 
         if (prefs != null) {
             val offload = prefs[AudioOffload] ?: false
@@ -3901,6 +3918,7 @@ class MusicService :
     private fun createRenderersFactory(
         normalizationProcessor: VolumeNormalizationAudioProcessor,
         eqProcessor: CustomEqualizerAudioProcessor,
+        transitionProcessor: TransitionAudioProcessor,
         silenceProcessor: SilenceDetectorAudioProcessor,
         useAudioTrackPlaybackParams: Boolean,
     ) = object : DefaultRenderersFactory(this) {
@@ -3961,6 +3979,7 @@ class MusicService :
                     arrayOf(
                         normalizationProcessor,
                         eqProcessor,
+                        transitionProcessor,
                         silenceProcessor,
                     ),
                     SilenceSkippingAudioProcessor(2_000_000, 20_000, 256),
@@ -4226,6 +4245,7 @@ class MusicService :
         sleepTimer?.let { player.removeListener(it) }
         playerNormalizationProcessors.remove(player)
         playerSilenceProcessors.remove(player)
+        playerTransitionProcessors.remove(player)
         initialBufferRecoveryJob?.cancel()
         controllerFuture?.let { MediaController.releaseFuture(it) }
         controllerFuture = null
@@ -4727,17 +4747,23 @@ class MusicService :
             } else {
                 null
             }
+        // Auto is a real editor preset, but it intentionally means "use the
+        // same rules as the global crossfade" rather than forcing a pair
+        // override on playback.
+        val explicitTransition = transition?.takeUnless { isDefaultAutoTransition(it) }
+        val mediaCrossfadeDuration = explicitTransition?.durationMs ?: crossfadeDuration.toLong()
 
-        val mediaCrossfadeDuration = transition?.durationMs ?: crossfadeDuration.toLong()
-
-        if (!crossfadeEnabled && transition == null) return
+        if (!crossfadeEnabled && explicitTransition == null) return
         if (mediaCrossfadeDuration <= 0 || player.duration == C.TIME_UNSET || player.duration <= mediaCrossfadeDuration) return
         // Gapless albums are only skipped for the generic crossfade; an explicit
         // per-pair transition is an intentional user choice and always applies.
-        if (transition == null && crossfadeGapless && isNextItemGapless()) return
+        if (explicitTransition == null && crossfadeGapless && isNextItemGapless()) return
+        val mixPointOffsetMs = explicitTransition?.mixPointOffsetMs ?: 0L
         if (!player.hasNextMediaItem() && !repeatOne) return
 
-        val triggerTime = player.duration - mediaCrossfadeDuration
+        val triggerTime =
+            (player.duration - mediaCrossfadeDuration - mixPointOffsetMs)
+                .coerceAtLeast(0L)
         val mediaTimeRemaining = triggerTime - player.currentPosition
         if (mediaTimeRemaining <= 0) return
 
@@ -4765,6 +4791,14 @@ class MusicService :
         scheduleCrossfade()
     }
 
+    private fun isDefaultAutoTransition(transition: TransitionStore.Transition): Boolean =
+        transition.style.displayStyle() == MixStyle.AUTO &&
+            transition.durationMs == crossfadeDuration.toLong() &&
+            transition.volumeCurve == MixVolumeCurve.LINEAR &&
+            transition.eqMode == MixEqMode.NONE &&
+            transition.effect == MixEffect.NONE &&
+            transition.mixPointOffsetMs == 0L
+
     private fun isNextItemGapless(): Boolean {
         val current = player.currentMediaItem?.mediaMetadata ?: return false
         val nextIndex = player.nextMediaItemIndex
@@ -4778,10 +4812,11 @@ class MusicService :
 
 
 
-        // Preserve player state before creating the secondary player
-        // Use runBlocking to ensure we get the correct state from DataStore
-        val savedRepeatMode = runBlocking { dataStore.get(RepeatModeKey, REPEAT_MODE_OFF) }
-        val savedShuffleEnabled = runBlocking { dataStore.get(ShuffleModeKey, false) }
+        // Preserve the player's effective state before creating the secondary player.
+        // Reading the player directly avoids a stale DataStore value during a
+        // repeat/shuffle change made immediately before the mix point.
+        val savedRepeatMode = player.repeatMode
+        val savedShuffleEnabled = player.shuffleModeEnabled
 
         // For repeat-one, crossfade back into the same track
         val targetIndex =
@@ -4807,8 +4842,12 @@ class MusicService :
             } else {
                 null
             }
-        activeMixStyle = transition?.style ?: MixStyle.FADE
-        activeMixDurationMs = transition?.durationMs ?: crossfadeDuration.toLong()
+        val explicitTransition = transition?.takeUnless { isDefaultAutoTransition(it) }
+        activeMixStyle = explicitTransition?.style?.displayStyle() ?: MixStyle.AUTO
+        activeMixDurationMs = explicitTransition?.durationMs ?: crossfadeDuration.toLong()
+        activeMixVolumeCurve = explicitTransition?.volumeCurve ?: MixVolumeCurve.LINEAR
+        activeMixEqMode = explicitTransition?.eqMode ?: MixEqMode.NONE
+        activeMixEffect = explicitTransition?.effect ?: MixEffect.NONE
 
         secondaryPlayer = createExoPlayer()
         val secPlayer = secondaryPlayer!!
@@ -4827,6 +4866,21 @@ class MusicService :
         secPlayer.seekTo(targetIndex, 0)
         secPlayer.volume = 0f
 
+        // Configure both renderers before the incoming player starts filling
+        // its AudioTrack. The processor is pass-through outside this window.
+        playerTransitionProcessors[player]?.setTransition(
+            eqMode = activeMixEqMode,
+            effect = activeMixEffect,
+            progress = 0f,
+            outgoing = true,
+        )
+        playerTransitionProcessors[secPlayer]?.setTransition(
+            eqMode = activeMixEqMode,
+            effect = activeMixEffect,
+            progress = 0f,
+            outgoing = false,
+        )
+
         secPlayer.setPlaybackParameters(player.playbackParameters)
 
         secPlayer.repeatMode = savedRepeatMode
@@ -4839,6 +4893,7 @@ class MusicService :
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Failed to prepare secondary player for crossfade")
             playerNormalizationProcessors.remove(secPlayer)
+            playerTransitionProcessors.remove(secPlayer)
             secPlayer.release()
             secondaryPlayer = null
             return
@@ -4931,8 +4986,20 @@ class MusicService :
                     }
 
                     val progress = i / steps.toFloat()
-                    val fadeIn = activeMixStyle.fadeIn(progress)
-                    val fadeOut = activeMixStyle.fadeOut(progress)
+                    val fadeIn = activeMixStyle.fadeIn(progress, activeMixVolumeCurve)
+                    val fadeOut = activeMixStyle.fadeOut(progress, activeMixVolumeCurve)
+                    playerTransitionProcessors[player]?.setTransition(
+                        eqMode = activeMixEqMode,
+                        effect = activeMixEffect,
+                        progress = progress,
+                        outgoing = false,
+                    )
+                    playerTransitionProcessors[fadingPlayer]?.setTransition(
+                        eqMode = activeMixEqMode,
+                        effect = activeMixEffect,
+                        progress = progress,
+                        outgoing = true,
+                    )
 
                     try {
                         player.volume = startVolume * fadeIn
@@ -4955,6 +5022,8 @@ class MusicService :
     }
 
     private fun cleanupCrossfade(fadingPlayerSessionId: Int = C.AUDIO_SESSION_ID_UNSET) {
+        playerTransitionProcessors[player]?.clearTransition()
+        fadingPlayer?.let { playerTransitionProcessors.remove(it) }
         fadingPlayer?.let { playerNormalizationProcessors.remove(it) }
         fadingPlayer?.stop()
         fadingPlayer?.clearMediaItems()
