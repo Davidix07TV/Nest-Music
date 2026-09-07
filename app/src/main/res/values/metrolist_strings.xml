@@ -350,6 +350,33 @@
     <string name="crossfade_beta_title">Beta feature!</string>
     <string name="crossfade_beta_message">Crossfade is a new feature and may have bugs. If you experience any issues, please report them.\n\nNOTE: This feature disables audio offload due to technical limitations</string>
 
+    <string name="mix_with_next">Mix with next</string>
+    <string name="mix_with_next_desc">Create a DJ-style transition into the next track</string>
+    <string name="edit_transition">Edit transition</string>
+    <string name="transition_beta">Beta</string>
+    <string name="transition_outgoing">Now ending</string>
+    <string name="transition_incoming">Next up</string>
+    <string name="transition_change_next">Change next track</string>
+    <string name="transition_choose_next">Choose the next track</string>
+    <string name="transition_no_next">No next track available. Add this song to a queue first, or try again later.</string>
+    <string name="transition_length">Transition length</string>
+    <string name="transition_length_value">%1$d sec</string>
+    <string name="transition_style">Transition style</string>
+    <string name="transition_style_fade">Fade</string>
+    <string name="transition_style_fade_desc">Classic crossfade: both tracks blend gradually</string>
+    <string name="transition_style_rise">Rise</string>
+    <string name="transition_style_rise_desc">The next track swells in and takes over at the end</string>
+    <string name="transition_style_smooth">Smooth</string>
+    <string name="transition_style_smooth_desc">Equal-power blend with a constant overall level</string>
+    <string name="transition_preview">Save &amp; preview</string>
+    <string name="transition_preview_hint">The mix starts within a couple of seconds</string>
+    <string name="transition_remove">Remove transition</string>
+    <string name="transition_saved">Transition saved</string>
+    <string name="transition_removed">Transition removed</string>
+    <string name="transition_analyzing">Analyzing audio…</string>
+    <string name="transition_approach_note">Waveform is an approximation for this track</string>
+    <string name="save">Save</string>
+
     <!-- Romanization Settings -->
     <string name="lyrics_romanization_cyrillic">Cyrillic</string>
     <string name="lyrics_romanize_title">Romanization</string>

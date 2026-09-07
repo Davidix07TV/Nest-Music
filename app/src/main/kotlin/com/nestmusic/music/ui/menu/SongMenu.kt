@@ -595,6 +595,20 @@ fun SongMenu(
                         } else {
                             null
                         },
+                        Material3MenuItemData(
+                            title = { Text(text = stringResource(R.string.mix_with_next)) },
+                            description = { Text(text = stringResource(R.string.mix_with_next_desc)) },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.automix),
+                                    contentDescription = null,
+                                )
+                            },
+                            onClick = {
+                                onDismiss()
+                                navController.navigate("transition/${song.id}")
+                            },
+                        ),
                         if (!isGuest) {
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.start_radio)) },

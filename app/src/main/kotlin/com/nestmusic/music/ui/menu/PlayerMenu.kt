@@ -394,6 +394,24 @@ fun PlayerMenu(
             Material3MenuGroup(
                 items =
                     buildList {
+                        add(
+                            Material3MenuItemData(
+                                title = { Text(text = stringResource(R.string.mix_with_next)) },
+                                description = { Text(text = stringResource(R.string.mix_with_next_desc)) },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.automix),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                    )
+                                },
+                                onClick = {
+                                    playerBottomSheetState.collapseSoft()
+                                    onDismiss()
+                                    navController.navigate("transition/${mediaMetadata.id}")
+                                },
+                            ),
+                        )
                         // Don't show "View Artist" for podcasts - only show "View Podcast"
                         if (artists.isNotEmpty() && !isPodcast) {
                             add(

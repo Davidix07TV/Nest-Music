@@ -373,6 +373,21 @@ fun NavGraphBuilder.navigationBuilder(
         PlayerSettings(navController)
     }
 
+    composable(
+        route = "transition/{prevId}",
+        arguments =
+            listOf(
+                navArgument("prevId") {
+                    type = NavType.StringType
+                },
+            ),
+    ) { backStackEntry ->
+        TransitionEditorScreen(
+            navController = navController,
+            savedStateHandle = backStackEntry.savedStateHandle,
+        )
+    }
+
     composable("settings/stream_sources") {
         StreamSourcesSettings(navController)
     }
