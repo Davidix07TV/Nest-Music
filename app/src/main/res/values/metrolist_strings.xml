@@ -375,7 +375,6 @@
     <string name="transition_removed">Transition removed</string>
     <string name="transition_analyzing">Analyzing audio…</string>
     <string name="transition_approach_note">Waveform is an approximation for this track</string>
-    <string name="save">Save</string>
 
     <!-- Romanization Settings -->
     <string name="lyrics_romanization_cyrillic">Cyrillic</string>

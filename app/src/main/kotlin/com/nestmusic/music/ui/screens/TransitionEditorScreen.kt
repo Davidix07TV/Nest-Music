@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -62,12 +64,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.navigation.NavController
-import androidx.savedstate.SavedStateHandle
 import coil3.compose.AsyncImage
 import com.nestmusic.music.LocalDatabase
 import com.nestmusic.music.LocalPlayerAwareWindowInsets
@@ -149,7 +151,7 @@ fun TransitionEditorScreen(
     }
 
     val currentMediaId by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
-    val isPreviewable = currentMediaId == prevId
+    val isPreviewable = currentMediaId?.id == prevId
     val overlapMs = (durationSec * 1000f).toLong()
 
     val saveTransition =
@@ -759,7 +761,7 @@ private fun TransitionTrackCard(
 /** Selectable style tile in the transition style row. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun styleOption(
+private fun RowScope.styleOption(
     style: MixStyle,
     iconRes: Int,
     label: String,

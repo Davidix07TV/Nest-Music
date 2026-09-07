@@ -4914,7 +4914,7 @@ class MusicService :
         crossfadeJob =
             scope.launch {
                 val speed = fadingPlayer?.playbackParameters?.speed?.coerceAtLeast(0.01f) ?: 1f
-                val duration = (activeMixDurationMs / speed).coerceAtLeast(100L)
+                val duration = (activeMixDurationMs / speed).toLong().coerceAtLeast(100L)
                 val steps = 20
                 val stepTime = duration / steps
                 val startVolume =
