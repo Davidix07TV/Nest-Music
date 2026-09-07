@@ -24,6 +24,8 @@ import kotlinx.coroutines.withTimeout
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.io.File
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
@@ -171,31 +173,37 @@ object WaveformHelper {
      */
     private fun decodePeaks(file: File): Pair<ShortArray, Long> {
         val extractor = MediaExtractor()
-        val codec = MediaCodec()
+        var codec: MediaCodec? = null
         try {
             extractor.setDataSource(file.absolutePath)
             var trackIndex = -1
+            var trackMime: String? = null
             for (i in 0 until extractor.trackCount) {
-                val trackMime = extractor.getTrackFormat(i).getString(MediaFormat.KEY_MIME)
-                    ?: continue
-                if (trackMime.startsWith("audio/")) {
+                val mime =
+                    extractor.getTrackFormat(i).getString(MediaFormat.KEY_MIME)
+                        ?: continue
+                if (mime.startsWith("audio/")) {
                     trackIndex = i
+                    trackMime = mime
                     break
                 }
             }
-            if (trackIndex == -1) throw IllegalArgumentException("No audio track found")
+            if (trackIndex == -1 || trackMime == null) {
+                throw IllegalArgumentException("No audio track found")
+            }
 
             extractor.selectTrack(trackIndex)
             val format = extractor.getTrackFormat(trackIndex)
-            val sampleFormat = format.getInteger(MediaFormat.KEY_SAMPLE_FORMAT)
-            if (sampleFormat != AudioFormat.ENCODING_PCM_16BIT) {
-                throw IllegalArgumentException("Unsupported sample format: $sampleFormat")
-            }
+            // Ask the decoder for 16-bit PCM output so the peak walk below can
+            // read shorts directly (KEY_SAMPLE_FORMAT does not exist).
+            format.setInteger(MediaFormat.KEY_PCM_ENCODING, AudioFormat.ENCODING_PCM_16BIT)
             val sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
             val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
 
-            codec.configure(format, null, null, 0)
-            codec.start()
+            val decoder = MediaCodec.createDecoderByType(trackMime)
+            codec = decoder
+            decoder.configure(format, null, null, 0)
+            decoder.start()
 
             // Running min/max over fixed-size mono windows; resampled later.
             val windowPeaks = ArrayList<Short>()
@@ -210,24 +218,24 @@ object WaveformHelper {
 
             while (!outputEos) {
                 if (!inputEos) {
-                    val inIndex = codec.dequeueInputBuffer(10_000)
+                    val inIndex = decoder.dequeueInputBuffer(10_000)
                     if (inIndex >= 0) {
-                        val inBuffer = codec.getInputBuffer(inIndex)!!
+                        val inBuffer = decoder.getInputBuffer(inIndex)!!
                         inBuffer.clear()
                         val sampleSize = extractor.readSampleData(inBuffer, 0)
                         if (sampleSize >= 0) {
                             extractor.advance()
-                            codec.queueInputBuffer(inIndex, 0, sampleSize, extractor.sampleTime, 0)
+                            decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.sampleTime, 0)
                         } else {
-                            codec.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                            decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
                             inputEos = true
                         }
                     }
                 }
-                val outIndex = codec.dequeueOutputBuffer(outInfo, 10_000)
+                val outIndex = decoder.dequeueOutputBuffer(outInfo, 10_000)
                 if (outIndex >= 0) {
                     if (outInfo.size > 0) {
-                        val outBuffer = codec.getOutputBuffer(outIndex)!!
+                        val outBuffer = decoder.getOutputBuffer(outIndex)!!
                         val frameCount = outInfo.size / (2 * channelCount)
                         totalFrames += frameCount
                         // Take the first channel for a mono representative amplitude.
@@ -244,7 +252,7 @@ object WaveformHelper {
                             }
                         }
                     }
-                    codec.releaseOutputBuffer(outIndex, false)
+                    decoder.releaseOutputBuffer(outIndex, false)
                     if (outInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
                         outputEos = true
                     }
@@ -258,8 +266,10 @@ object WaveformHelper {
             val durationMs = totalFrames * 1000L / sampleRate
             return resamplePeaks(windowPeaks, durationMs)
         } finally {
-            runCatching { codec.stop() }
-            codec.release()
+            codec?.let {
+                runCatching { it.stop() }
+                it.release()
+            }
             extractor.release()
         }
     }
@@ -291,7 +301,7 @@ object WaveformHelper {
      * real analysis is not possible; still stable across calls.
      */
     private fun placeholder(mediaId: String): Waveform {
-        val random = Random(abs(mediaId.hashCode()).toLong() * 0x9E3779B97F4A7C15L)
+        val random = Random(abs(mediaId.hashCode()).toLong() * 0x9E3779B97F4A7C15uL.toLong())
         val peaks = ShortArray(BUCKET_COUNT)
         var level = 0.5f
         for (i in peaks.indices) {
@@ -305,8 +315,7 @@ object WaveformHelper {
     private fun readCache(context: Context, mediaId: String): Waveform? {
         val f = cacheFile(context, mediaId)
         if (!f.exists() || f.length() < 12L) return null
-        return f.inputStream().use { input ->
-            val data = input.buffered()
+        return DataInputStream(f.inputStream().buffered()).use { data ->
             val count = data.readInt()
             val durationMs = data.readLong()
             if (count != BUCKET_COUNT) return null
@@ -321,8 +330,7 @@ object WaveformHelper {
     private fun writeCache(context: Context, mediaId: String, waveform: Waveform) {
         if (waveform.isApproximate) return
         val f = cacheFile(context, mediaId)
-        f.outputStream().use { output ->
-            val data = output.buffered()
+        DataOutputStream(f.outputStream().buffered()).use { data ->
             data.writeInt(BUCKET_COUNT)
             data.writeLong(waveform.durationMs)
             waveform.peaks.forEach { data.writeShort(it.toInt()) }
