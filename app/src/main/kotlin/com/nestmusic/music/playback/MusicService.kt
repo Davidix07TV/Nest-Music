@@ -307,6 +307,11 @@ class MusicService :
     private var crossfadeGapless = true
     private var crossfadeMessage: PlayerMessage? = null
 
+    // Resolved per-pair transition for the swap currently in progress (may
+    // come from a user-defined override in TransitionStore).
+    private var activeMixStyle = MixStyle.FADE
+    private var activeMixDurationMs = 5000L
+
     private val secondaryPlayerListener =
         object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
@@ -472,8 +477,8 @@ class MusicService :
     private var initialBufferRecoveryJob: Job? = null
     private var initialBufferRecoveryAttemptedMediaId: String? = null
     // True only when stopOnError() paused playback purely because of a network outage
-    // (waitOnNetworkError exhausting its attempts). Lets triggerRetry() know it's safe —
-    // and necessary — to explicitly resume playback once connectivity returns, rather than
+    // (waitOnNetworkError exhausting its attempts). Lets triggerRetry() know it's safe ï¿½
+    // and necessary ï¿½ to explicitly resume playback once connectivity returns, rather than
     // leaving the player "prepared but paused" forever.
     private var pausedDueToNetworkError = false
     private var silenceSkipJob: Job? = null
@@ -506,7 +511,7 @@ class MusicService :
     // spans), so a single playback can re-resolve dozens or hundreds of times in a
     // very short window. Without this guard, every single resolve would launch its
     // own coroutine doing a Room read + a hop to Dispatchers.Main + a Room
-    // transaction — all redundant, since they all converge on the same mediaId and
+    // transaction ï¿½ all redundant, since they all converge on the same mediaId and
     // mostly no-op. If those launches outpace how fast they can drain (e.g. the
     // Main thread is busy with playback/UI work), dozens of them pile up in memory
     // at once, which is enough to blow past this app's heap limit on low-RAM
@@ -619,6 +624,9 @@ class MusicService :
         // never calls dataStore.get() (which does runBlocking internally).
         // This consolidates ~15 main-thread-blocking DataStore reads into 1.
         startupPrefs = runBlocking(Dispatchers.IO) { dataStore.data.first() }
+
+        // Load saved per-pair DJ transitions (Mix feature).
+        TransitionStore.init(this)
 
         // 3. Connect the processor to the service
         // handled in createExoPlayer
@@ -1300,7 +1308,7 @@ class MusicService :
 
         val silenceProcessor = SilenceDetectorAudioProcessor { handleLongSilenceDetected() }
 
-        // Set initial state — use pre-read prefs when available, otherwise fall back to DataStore
+        // Set initial state ï¿½ use pre-read prefs when available, otherwise fall back to DataStore
         val useAudioTrackPlaybackParams = if (prefs != null) {
             val skipSilence = prefs[SkipSilenceKey] ?: false
             val instantSkip = prefs[SkipSilenceInstantKey] ?: false
@@ -1485,7 +1493,7 @@ class MusicService :
         // before anything else can return early. Previously, hitting MAX_RETRY_COUNT while
         // still offline called stopOnError() and returned WITHOUT setting
         // waitingForNetworkConnection = true. That meant the "isConnected && waitingFor...
-        // -> triggerRetry()" listener never fired once the network actually came back —
+        // -> triggerRetry()" listener never fired once the network actually came back ï¿½
         // the player was left paused in a post-error state, and since ExoPlayer requires an
         // explicit prepare() after a fatal error before play() does anything, no song would
         // play again until the app was killed and relaunched (which recreates the player).
@@ -1497,7 +1505,7 @@ class MusicService :
             pausedDueToNetworkError = true
             stopOnError()
             retryCount = 0
-            // Don't schedule another backoff job — we're out of attempts for now — but stay
+            // Don't schedule another backoff job ï¿½ we're out of attempts for now ï¿½ but stay
             // "waiting" so the connectivity listener can still auto-resume on reconnect.
             retryJob?.cancel()
             return
@@ -1515,7 +1523,7 @@ class MusicService :
                     retryCount++
                     triggerRetry()
                 }
-                // If still offline when the timer fires, just let the job end — we stay
+                // If still offline when the timer fires, just let the job end ï¿½ we stay
                 // "waiting" and the connectivityObserver listener (not this job) is what
                 // will catch the eventual reconnection and call triggerRetry().
             }
@@ -1538,13 +1546,13 @@ class MusicService :
             player.prepare()
             if (shouldResumePlayback) {
                 // We explicitly paused this ourselves (stopOnError) purely because of the
-                // network outage — playWhenReady is now false, so prepare() alone would just
+                // network outage ï¿½ playWhenReady is now false, so prepare() alone would just
                 // sit there "ready but paused" until the user manually pressed play again on
                 // this exact item. Resume explicitly so reconnecting actually resumes audio.
                 player.playWhenReady = true
             }
             // Otherwise (we never force-paused), leave playWhenReady as-is and let the
-            // player auto-resume on its own — this avoids stealing audio focus on ordinary
+            // player auto-resume on its own ï¿½ this avoids stealing audio focus on ordinary
             // mid-stream retries where the user never lost the "should be playing" intent.
         }
     }
@@ -1639,7 +1647,7 @@ class MusicService :
 
     /**
      * Registers / refreshes song metadata (title, duration, isVideo, related songs)
-     * for [mediaId]. Pure metadata bookkeeping only — does NOT touch [dateDownload].
+     * for [mediaId]. Pure metadata bookkeeping only ï¿½ does NOT touch [dateDownload].
      *
      * Looks across player, secondaryPlayer and fadingPlayer so metadata is still
      * found correctly while a crossfade swap is in progress.
@@ -1715,8 +1723,8 @@ class MusicService :
      * recoverSong() is called from resolveDataSpec() on every dataSpec/chunk
      * resolution rather than once per song, so without this guard a heavily
      * fragmented (e.g. long-cached) file can fan out dozens of redundant,
-     * concurrent recoverSong() coroutines — each doing a Room read, a hop to
-     * Dispatchers.Main, and a Room transaction — for work that's already done
+     * concurrent recoverSong() coroutines ï¿½ each doing a Room read, a hop to
+     * Dispatchers.Main, and a Room transaction ï¿½ for work that's already done
      * after the first one completes. Always call this instead of launching
      * recoverSong() directly.
      */
@@ -1738,7 +1746,7 @@ class MusicService :
      * Marks [mediaId] as belonging to the Cache Playlist by setting [dateDownload],
      * but ONLY if the full file (byte 0 through contentLength) is actually present
      * in playerCache. This must only be called from a genuine "track finished
-     * naturally" signal (see onMediaItemTransition's AUTO-reason handling) —
+     * naturally" signal (see onMediaItemTransition's AUTO-reason handling) ï¿½
      * never from raw dataSpec/chunk resolution, since the player's background
      * prefetch can finish downloading a short file in seconds, long before the
      * user has actually listened to it (or even if they skipped away early).
@@ -3294,7 +3302,7 @@ class MusicService :
             // rate-limited refresh corrects the table, allow WEB_REMIX again on the next resolution.
             scope.launch {
                 if (CipherDeobfuscator.onStreamRejected()) {
-                    Timber.tag(TAG).d("Player config changed after stream rejection — restoring WEB_REMIX")
+                    Timber.tag(TAG).d("Player config changed after stream rejection ï¿½ restoring WEB_REMIX")
                     YTPlayerUtils.clearWebRemixFailures()
                 }
             }
@@ -3548,11 +3556,11 @@ class MusicService :
 
     private suspend fun updateDiscordRPC(song: Song, isPlaying: Boolean) {
         if (!DiscordRpcManager.isReady()) {
-            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping — not ready")
+            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping ï¿½ not ready")
             return
         }
         if (!discordRpcEnabled) {
-            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping — RPC disabled")
+            Timber.tag("DiscordSvc").w("updateDiscordRPC: skipping ï¿½ RPC disabled")
             return
         }
 
@@ -3592,7 +3600,7 @@ class MusicService :
         val btn2Url = dataStore.get(DiscordButton2UrlKey, DiscordDefaults.BUTTON2_URL)
 
         Timber.tag("DiscordSvc").d(
-            "updateDiscordRPC: prefs — advancedMode=%s, activityType=%d, activityName=%s, stateTemplate=%s, detailsTemplate=%s",
+            "updateDiscordRPC: prefs ï¿½ advancedMode=%s, activityType=%d, activityName=%s, stateTemplate=%s, detailsTemplate=%s",
             advancedMode, activityType, activityName, stateTemplate, detailsTemplate,
         )
 
@@ -3750,7 +3758,7 @@ class MusicService :
                     when {
                         dataSpec.length >= 0 -> dataSpec.length
                         contentLength != null -> (contentLength - dataSpec.position).coerceAtLeast(1)
-                        else -> CHUNK_LENGTH // contentLength unknown yet — fall back to old probe size
+                        else -> CHUNK_LENGTH // contentLength unknown yet ï¿½ fall back to old probe size
                     }
 
                 if (downloadCache.isCached(mediaId, dataSpec.position, requiredLength)) {
@@ -4693,12 +4701,41 @@ class MusicService :
     private fun scheduleCrossfade() {
         crossfadeMessage?.cancel()
         crossfadeMessage = null
-        
-        val mediaCrossfadeDuration = crossfadeDuration.toLong()
 
-        if (!crossfadeEnabled || crossfadeDuration <= 0f || player.duration == C.TIME_UNSET || player.duration <= mediaCrossfadeDuration) return
-        if (crossfadeGapless && isNextItemGapless()) return
-        if (!player.hasNextMediaItem() && player.repeatMode != REPEAT_MODE_ONE) return
+        // Never auto-mix inside a Listen Together room: playback must stay in
+        // sync with the host, so both global and per-pair transitions are off.
+        if (listenTogetherManager.roomState.value != null) return
+
+        val currentId = player.currentMediaItem?.mediaId
+        val repeatOne = player.repeatMode == REPEAT_MODE_ONE
+        val nextIndex =
+            if (repeatOne) {
+                player.currentMediaItemIndex
+            } else {
+                player.nextMediaItemIndex
+            }
+        val nextId =
+            if (nextIndex != C.INDEX_UNSET && nextIndex < player.mediaItemCount) {
+                player.getMediaItemAt(nextIndex).mediaId
+            } else {
+                null
+            }
+        // A user-defined transition for this exact pair wins over the global setting.
+        val transition =
+            if (currentId != null && nextId != null) {
+                TransitionStore.get(currentId, nextId)
+            } else {
+                null
+            }
+
+        val mediaCrossfadeDuration = transition?.durationMs ?: crossfadeDuration.toLong()
+
+        if (!crossfadeEnabled && transition == null) return
+        if (mediaCrossfadeDuration <= 0 || player.duration == C.TIME_UNSET || player.duration <= mediaCrossfadeDuration) return
+        // Gapless albums are only skipped for the generic crossfade; an explicit
+        // per-pair transition is an intentional user choice and always applies.
+        if (transition == null && crossfadeGapless && isNextItemGapless()) return
+        if (!player.hasNextMediaItem() && !repeatOne) return
 
         val triggerTime = player.duration - mediaCrossfadeDuration
         val mediaTimeRemaining = triggerTime - player.currentPosition
@@ -4716,6 +4753,16 @@ class MusicService :
             setPosition(triggerTime)
             send()
         }
+    }
+
+    /**
+     * Re-arms the pending transition for the current track. Called after the
+     * user saves or removes a per-pair transition so the change takes effect
+     * on the very next mix point without waiting for a playback state change.
+     */
+    fun rearmCrossfade() {
+        if (!::player.isInitialized) return
+        scheduleCrossfade()
     }
 
     private fun isNextItemGapless(): Boolean {
@@ -4745,9 +4792,30 @@ class MusicService :
             }
         if (targetIndex == C.INDEX_UNSET) return
 
+        // Resolve the per-pair transition (if the user defined one for this
+        // exact outgoing -> incoming handover) before creating the player.
+        val currentId = player.currentMediaItem?.mediaId
+        val targetItem =
+            if (targetIndex < player.mediaItemCount) {
+                player.getMediaItemAt(targetIndex)
+            } else {
+                null
+            }
+        val transition =
+            if (currentId != null && targetItem != null) {
+                TransitionStore.get(currentId, targetItem.mediaId)
+            } else {
+                null
+            }
+        activeMixStyle = transition?.style ?: MixStyle.FADE
+        activeMixDurationMs = transition?.durationMs ?: crossfadeDuration.toLong()
+
         secondaryPlayer = createExoPlayer()
         val secPlayer = secondaryPlayer!!
         secPlayer.addListener(secondaryPlayerListener)
+        // Volume ramping requires software rendering; the offload preference
+        // only reflects the global crossfade setting, so force it off here.
+        secPlayer.setOffloadEnabled(false)
 
         val itemCount = player.mediaItemCount
         val items = mutableListOf<MediaItem>()
@@ -4846,7 +4914,7 @@ class MusicService :
         crossfadeJob =
             scope.launch {
                 val speed = fadingPlayer?.playbackParameters?.speed?.coerceAtLeast(0.01f) ?: 1f
-                val duration = (crossfadeDuration / speed).toLong()
+                val duration = (activeMixDurationMs / speed).coerceAtLeast(100L)
                 val steps = 20
                 val stepTime = duration / steps
                 val startVolume =
@@ -4863,8 +4931,8 @@ class MusicService :
                     }
 
                     val progress = i / steps.toFloat()
-                    val fadeIn = 1.0f - (1.0f - progress) * (1.0f - progress)
-                    val fadeOut = (1.0f - progress) * (1.0f - progress)
+                    val fadeIn = activeMixStyle.fadeIn(progress)
+                    val fadeOut = activeMixStyle.fadeOut(progress)
 
                     try {
                         player.volume = startVolume * fadeIn
