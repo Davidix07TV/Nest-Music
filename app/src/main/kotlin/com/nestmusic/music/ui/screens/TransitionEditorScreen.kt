@@ -151,7 +151,7 @@ fun TransitionEditorScreen(
     }
 
     val currentMediaId by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
-    val isPreviewable = currentMediaId == prevId
+    val isPreviewable = currentMediaId?.id == prevId
     val overlapMs = (durationSec * 1000f).toLong()
 
     val saveTransition =
