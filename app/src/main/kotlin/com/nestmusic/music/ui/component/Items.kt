@@ -525,6 +525,7 @@ fun SongListItem(
     showInLibraryIcon: Boolean = false,
     showDownloadIcon: Boolean = true,
     subtitleOverride: String? = null,
+    bpm: Int? = null,
     badges: @Composable RowScope.() -> Unit = {
         if (showLikedIcon && song.song.liked) {
             Icon.Favorite()
@@ -558,7 +559,8 @@ fun SongListItem(
                       Text(
                           text = joinByBullet(
                               song.orderedArtists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
-                              makeTimeString(song.song.duration * 1000L)
+                              makeTimeString(song.song.duration * 1000L),
+                              bpm?.takeIf { it > 0 }?.let { stringResource(R.string.bpm_format, it) },
                           ),
                           style = MaterialTheme.typography.bodySmall,
                           color = MaterialTheme.colorScheme.secondary,
@@ -1105,15 +1107,18 @@ fun MediaMetadataListItem(
         title = mediaMetadata.title,
         subtitle = {
             if (mediaMetadata.explicit) Icon.Explicit()
+            val bpmLabel = mediaMetadata.bpm?.takeIf { it > 0 }
+                ?.let { stringResource(R.string.bpm_format, it) }
             Text(
                 text = buildAnnotatedString {
                     val base = joinByBullet(
                         mediaMetadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
-                        makeTimeString(mediaMetadata.duration * 1000L)
+                        makeTimeString(mediaMetadata.duration * 1000L),
+                        bpmLabel,
                     )
                     append(base)
                     if (mediaMetadata.suggestedBy != null && base.isNotEmpty()) {
-                        append(" • ")
+                        append(" ï¿½ ")
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(mediaMetadata.suggestedBy)
                         }
@@ -1182,7 +1187,11 @@ fun YouTubeListItem(
         ListItem(
             title = item.title,
             subtitle = when (item) {
-                is SongItem -> joinByBullet(item.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name }, makeTimeString(item.duration?.times(1000L)))
+                is SongItem -> joinByBullet(
+                    item.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
+                    makeTimeString(item.duration?.times(1000L)),
+                    item.bpm?.takeIf { it > 0 }?.let { stringResource(R.string.bpm_format, it) },
+                )
                 is AlbumItem -> joinByBullet(item.artists?.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name }, item.year?.toString())
                 is ArtistItem -> null
                 is PlaylistItem -> joinByBullet(item.author?.name, item.songCountText)

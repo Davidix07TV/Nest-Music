@@ -37,7 +37,9 @@ data class SongItem(
     val libraryRemoveToken: String? = null,
     val historyRemoveToken: String? = null,
     val isEpisode: Boolean = false,
-    val uploadEntityId: String? = null
+    val uploadEntityId: String? = null,
+    /** Optional source metadata; no beat/key detection is performed by the app. */
+    val bpm: Int? = null,
 ) : YTItem() {
     val isVideoSong: Boolean
         get() = musicVideoType != null && musicVideoType != MUSIC_VIDEO_TYPE_ATV

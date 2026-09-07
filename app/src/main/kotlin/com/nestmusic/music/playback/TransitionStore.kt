@@ -6,33 +6,31 @@
 package com.nestmusic.music.playback
 
 import android.content.Context
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 import java.io.File
 
 /**
- * Persists per-pair transition overrides: custom DJ-style transitions defined
- * between two specific consecutive tracks (outgoing [Transition.prevId] ->
- * incoming [Transition.nextId]).
- *
- * Overrides are independent from the global "crossfade" setting: once a
- * transition is saved for a pair, the service will mix that pair even if the
- * global crossfade is off, and the user-chosen duration/style always win over
- * the global defaults for that pair.
- *
- * Storage is a plain text file (one transition per line, fields separated by
- * "|||" which cannot occur in YouTube video ids) so no database schema
- * change is required.
+ * Persists per-pair transition overrides. The store intentionally lives outside
+ * Room: transitions are playback preferences and do not change the app's
+ * database schema.
  */
 object TransitionStore {
     data class Transition(
         val prevId: String,
         val nextId: String,
         val durationMs: Long,
-        val style: MixStyle,
+        val style: MixStyle = MixStyle.AUTO,
+        val volumeCurve: MixVolumeCurve = MixVolumeCurve.LINEAR,
+        val eqMode: MixEqMode = MixEqMode.NONE,
+        val effect: MixEffect = MixEffect.NONE,
+        /** Signed shift of the overlap centre, relative to the default centre. */
+        val mixPointOffsetMs: Long = 0L,
     )
 
-    const val MIN_DURATION_MS = 2_000L
-    const val MAX_DURATION_MS = 15_000L
+    const val MIN_DURATION_MS = 500L
+    const val MAX_DURATION_MS = 12_000L
 
     private const val FILE_NAME = "transition_overrides.txt"
     private const val SEPARATOR = "|||"
@@ -44,6 +42,10 @@ object TransitionStore {
     private val lock = Any()
     private val transitions = LinkedHashMap<String, Transition>()
     private var loaded = false
+
+    private val _revision = MutableStateFlow(0L)
+    /** Changes whenever an editor saves/removes a pair, so queue pills refresh. */
+    val revision = _revision.asStateFlow()
 
     private fun key(prevId: String, nextId: String) = prevId + SEPARATOR + nextId
 
@@ -62,13 +64,48 @@ object TransitionStore {
         val f = file ?: return
         if (!f.exists()) return
         try {
-            f.readLines().forEach { line ->
-                val parts = line.split(SEPARATOR)
-                if (parts.size != 4) return@forEach
-                val style = runCatching { MixStyle.valueOf(parts[3]) }.getOrNull() ?: return@forEach
-                val durationMs = parts[2].toLongOrNull() ?: return@forEach
-                transitions[key(parts[0], parts[1])] =
-                    Transition(parts[0], parts[1], durationMs, style)
+            f.useLines { lines ->
+                lines.forEach { line ->
+                    val parts = line.split(SEPARATOR)
+                    // Version 1: prev, next, duration, style.
+                    if (parts.size == 4) {
+                        val style = parseStyle(parts[3]) ?: return@forEach
+                        val durationMs = parts[2].toLongOrNull() ?: return@forEach
+                        transitions[key(parts[0], parts[1])] =
+                            Transition(
+                                prevId = parts[0],
+                                nextId = parts[1],
+                                durationMs = durationMs.coerceIn(MIN_DURATION_MS, MAX_DURATION_MS),
+                                style = style,
+                            )
+                        return@forEach
+                    }
+
+                    // Version 2: prev, next, duration, style, volume, eq,
+                    // effect, mix-point offset.
+                    if (parts.size != 8) return@forEach
+                    val style = parseStyle(parts[3]) ?: return@forEach
+                    val volume = runCatching { MixVolumeCurve.valueOf(parts[4]) }.getOrNull()
+                        ?: MixVolumeCurve.LINEAR
+                    val eq = runCatching { MixEqMode.valueOf(parts[5]) }.getOrNull()
+                        ?: MixEqMode.NONE
+                    val effect = runCatching { MixEffect.valueOf(parts[6]) }.getOrNull()
+                        ?: MixEffect.NONE
+                    val durationMs = parts[2].toLongOrNull() ?: return@forEach
+                    val offsetMs = parts[7].toLongOrNull() ?: 0L
+                    transitions[key(parts[0], parts[1])] = normalized(
+                        Transition(
+                            prevId = parts[0],
+                            nextId = parts[1],
+                            durationMs = durationMs,
+                            style = style,
+                            volumeCurve = volume,
+                            eqMode = eq,
+                            effect = effect,
+                            mixPointOffsetMs = offsetMs,
+                        ),
+                    )
+                }
             }
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Failed to load transition overrides")
@@ -76,16 +113,44 @@ object TransitionStore {
         }
     }
 
+    private fun parseStyle(value: String): MixStyle? =
+        when (value) {
+            // The first beta called equal-power "SMOOTH". Migrate it while
+            // reading instead of making users lose their saved transitions.
+            "SMOOTH" -> MixStyle.BLEND
+            else -> runCatching { MixStyle.valueOf(value) }.getOrNull()
+        }
+
+    private fun normalized(transition: Transition): Transition {
+        val durationMs = transition.durationMs.coerceIn(MIN_DURATION_MS, MAX_DURATION_MS)
+        return transition.copy(
+            durationMs = durationMs,
+            mixPointOffsetMs = transition.mixPointOffsetMs.coerceIn(
+                -durationMs / 2,
+                durationMs / 2,
+            ),
+        )
+    }
+
     private fun persistLocked() {
         val f = file ?: return
         try {
             f.bufferedWriter().use { writer ->
-                transitions.values.forEach { t ->
+                transitions.values.forEach { transition ->
+                    val t = normalized(transition)
                     writer.write(key(t.prevId, t.nextId))
                     writer.write(SEPARATOR)
                     writer.write(t.durationMs.toString())
                     writer.write(SEPARATOR)
-                    writer.write(t.style.name)
+                    writer.write(t.style.displayStyle().name)
+                    writer.write(SEPARATOR)
+                    writer.write(t.volumeCurve.name)
+                    writer.write(SEPARATOR)
+                    writer.write(t.eqMode.name)
+                    writer.write(SEPARATOR)
+                    writer.write(t.effect.name)
+                    writer.write(SEPARATOR)
+                    writer.write(t.mixPointOffsetMs.toString())
                     writer.newLine()
                 }
             }
@@ -100,21 +165,23 @@ object TransitionStore {
 
     /** Creates or updates the transition for the pair. */
     fun save(transition: Transition) {
-        val clamped = transition.copy(
-            durationMs = transition.durationMs.coerceIn(MIN_DURATION_MS, MAX_DURATION_MS),
-        )
+        val clamped = normalized(transition)
         synchronized(lock) {
             transitions[key(clamped.prevId, clamped.nextId)] = clamped
             persistLocked()
+            _revision.value++
         }
     }
 
     /** Removes the transition for the pair, if any. */
     fun remove(prevId: String, nextId: String): Boolean {
         val removed = synchronized(lock) {
-            val removed = transitions.remove(key(prevId, nextId)) != null
-            if (removed) persistLocked()
-            removed
+            val didRemove = transitions.remove(key(prevId, nextId)) != null
+            if (didRemove) {
+                persistLocked()
+                _revision.value++
+            }
+            didRemove
         }
         if (removed) {
             Timber.tag(TAG).d("Removed transition $prevId -> $nextId")
