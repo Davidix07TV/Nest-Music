@@ -182,17 +182,56 @@ jobs:
           ls -la out
 
       # Cheap structural check: the sidecar and the node runtime must sit next to the main
-      # binary inside the bundle, or the app opens with no backend and no stream URLs.
+      # binary inside the bundle, or the app opens with no backend and no stream URLs. The
+      # key findings are also emitted as annotations, which stay readable from the API even
+      # when the (much larger) job log is not.
       - name: Inspect bundles
         run: |
           set -e
+          notice() { echo "::notice title=$1::$2"; }
+
           echo "── deb control ──"
           dpkg-deb -I out/*.deb
+          dpkg-deb -f out/*.deb Package Version Architecture Depends \
+            | while IFS= read -r line; do notice "deb control" "$line"; done
+
           echo "── deb contents (key files) ──"
-          dpkg-deb -c out/*.deb | grep -E 'nest-music|/node$|\.desktop$' || true
+          dpkg-deb -c out/*.deb | awk '{print $6}' \
+            | grep -E '/(nest-music|nest-music-server|node)$|potgen/server/build/main\.js$|\.desktop$' \
+            | sort -u | tee /tmp/deb-layout.txt
+          while IFS= read -r line; do notice "deb layout" "$line"; done < /tmp/deb-layout.txt
+
           echo "── AppImage contents ──"
           APPIMAGE_EXTRACT_AND_RUN=1 sh -c './out/*.AppImage --appimage-extract' >/dev/null
-          find squashfs-root -maxdepth 5 \( -name 'nest-music-server*' -o -name 'node' -o -name '*.desktop' \) -printf '%p\n'
+          find squashfs-root \( -name 'nest-music-server*' -o -name 'node' -o -name '*.desktop' \
+                               -o -path '*potgen/server/build/main.js' \) -printf '%p\n' \
+            | sort -u | tee /tmp/appimage-layout.txt
+          while IFS= read -r line; do notice "appimage layout" "$line"; done < /tmp/appimage-layout.txt
+
+          # server.rs resolves node/potgen relative to the directory holding the sidecar, so
+          # both being siblings is the invariant worth reporting.
+          SIDE_HIT=$(grep -m1 -E '/nest-music-server(-x86_64-unknown-linux-gnu)?$' /tmp/deb-layout.txt || true)
+          if [ -n "$SIDE_HIT" ]; then
+            SIDE_DIR=$(dirname "$SIDE_HIT")
+            notice "deb sidecar dir" "$SIDE_DIR"
+            if grep -q "^${SIDE_DIR}/node$" /tmp/deb-layout.txt; then
+              notice "deb node" "sits next to the sidecar in ${SIDE_DIR}"
+            else
+              echo "::warning title=deb node::not in ${SIDE_DIR} — server.rs falls back to Tauri's resource_dir()"
+            fi
+          else
+            echo "::warning title=deb sidecar::nest-music-server not matched in the deb listing"
+          fi
+
+          # The deep-link scheme has to be registered for nest-music:// URLs to reach the app.
+          DESKTOP=$(find squashfs-root -name '*.desktop' | head -1)
+          if [ -n "$DESKTOP" ]; then
+            grep -E '^(Name|Exec|Icon|Categories|MimeType)=' "$DESKTOP" \
+              | while IFS= read -r line; do notice "desktop entry" "$line"; done
+          else
+            echo "::warning title=desktop entry::no .desktop file found in the AppImage"
+          fi
+
           test -n "$(find squashfs-root -name 'nest-music-server-x86_64-unknown-linux-gnu' -o -name 'nest-music-server')" \
             || { echo "::error::sidecar missing from the AppImage"; exit 1; }
           test -n "$(find squashfs-root -type f -name 'node')" \
