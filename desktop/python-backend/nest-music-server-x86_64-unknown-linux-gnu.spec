@@ -6,13 +6,20 @@ _ytm_locales = os.path.join(os.path.dirname(_ytm.origin), 'locales')
 
 # Vendored Boidu Composer — built static site (repo ./composer/dist) bundled as data,
 # extracted to sys._MEIPASS/composer_dist at runtime (served by _composer_dist_dir in
-# server.py). Must be built (pnpm build) before this runs.
+# server.py). Built by build_server.sh --with-composer / by CI before this runs; a local
+# build without it still produces a working server (the Composer routes just 404).
 _composer_dist = os.path.abspath(os.path.join(SPECPATH, '..', 'composer', 'dist'))
+_composer_datas = [(_composer_dist, 'composer_dist')] if os.path.isdir(_composer_dist) else []
 
 # Discord feedback webhook config (gitignored). CI writes it from a secret before building;
 # bundled to _MEIPASS root so _load_feedback_webhook() finds it at runtime. Absent → no feedback.
 _feedback_cfg = os.path.join(SPECPATH, 'feedback_config.json')
 _extra_datas = [(_feedback_cfg, '.')] if os.path.exists(_feedback_cfg) else []
+
+# Last.fm API key + secret (gitignored, same pattern as feedback). CI writes it from secrets.
+_lastfm_cfg = os.path.join(SPECPATH, 'lastfm_config.json')
+if os.path.exists(_lastfm_cfg):
+    _extra_datas.append((_lastfm_cfg, '.'))
 
 # PO-token stack: bundle the bgutil yt-dlp plugin + the yt-dlp-ejs solver scripts so the
 # frozen server can discover them (plugins via the yt_dlp_plugins namespace, EJS via its
@@ -40,7 +47,7 @@ a = Analysis(
     ['server.py'],
     pathex=[],
     binaries=_kakasi_binaries,
-    datas=[(_ytm_locales, 'ytmusicapi/locales'), (_composer_dist, 'composer_dist')] + _extra_datas + _pot_datas + _kakasi_datas,
+    datas=[(_ytm_locales, 'ytmusicapi/locales')] + _composer_datas + _extra_datas + _pot_datas + _kakasi_datas,
     hiddenimports=["jaconv"] + _pot_hidden + _kakasi_hidden,
     hookspath=[],
     hooksconfig={},
@@ -61,7 +68,8 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,  # UPX-compressing a ~100 MB onefile bundle is slow and has broken the
+                # bootloader's self-extraction before; the size win is not worth the risk.
     upx_exclude=[],
     runtime_tmpdir=None,
     console=True,

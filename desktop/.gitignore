@@ -26,9 +26,9 @@ python-backend/build_tmp/
 python-backend/dist/
 python-backend/*.spec
 # Ausnahme: Build-Specs die GitHub Actions braucht
-!python-backend/kodama-server-x86_64-pc-windows-msvc.spec
-!python-backend/kodama-server-x86_64-unknown-linux-gnu.spec
-!python-backend/kodama-server-aarch64-apple-darwin.spec
+!python-backend/nest-music-server-x86_64-pc-windows-msvc.spec
+!python-backend/nest-music-server-x86_64-unknown-linux-gnu.spec
+!python-backend/nest-music-server-aarch64-apple-darwin.spec
 
 # Lokale Caches (werden zur Laufzeit befüllt)
 python-backend/album_cache/
@@ -46,6 +46,9 @@ browser.json
 
 # Node.js Binary (wird beim Build heruntergeladen)
 src-tauri/resources/node.exe
+# Linux/macOS: the bundled runtime node is ~110 MB and is fetched by build_server.sh / CI
+src-tauri/resources/node
+src-tauri/resources/node-*
 
 # FFmpeg Binaries (müssen separat heruntergeladen werden)
 python-backend/ffmpeg.exe

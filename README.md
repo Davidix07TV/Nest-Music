@@ -4,7 +4,7 @@
 
 # Nest Music
 
-### YouTube Music client for Android and Windows!
+### YouTube Music client for Android, Windows and Linux!
 
 [![Latest release](https://img.shields.io/github/v/release/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/releases)
 [![License](https://img.shields.io/github/license/Davidix07TV/Nest-Music?style=for-the-badge&labelColor=0d1117)](https://github.com/Davidix07TV/Nest-Music/blob/master/LICENSE)
@@ -299,15 +299,19 @@ This project is not affiliated with YouTube, YouTube Music, or Google. All trade
 
 </div>
 
-## Desktop (Windows)
+## Desktop (Windows & Linux)
 
-Nest Music includes a full desktop app for Windows, built with **Tauri 2** (React + Vite frontend, Rust shell, Python sidecar). It supports synced lyrics, offline downloads, Discord Rich Presence, Last.fm scrobbling, an OBS overlay and more.
+Nest Music includes a full desktop app for Windows and Linux, built with **Tauri 2** (React + Vite frontend, Rust shell, Python sidecar). It supports synced lyrics, offline downloads, Discord Rich Presence, Last.fm scrobbling, an OBS overlay and more. On Linux it additionally integrates with the desktop's media controls (MPRIS: media keys, playerctl, GNOME/KDE now-playing) and the system tray.
 
 > The desktop app was formerly known as **Kodama** (by [KiyoshiTheDevil](https://github.com/KiyoshiTheDevil/Kodama)); Nest Music continues it as its own desktop client under the **AGPL-3.0** license, keeping the original attribution.
 
 ### Install
 
-Download the latest installer from GitHub Actions (workflow **Desktop Windows Installer** → artifact `nest-music-windows-installer`) or build it yourself:
+Download the latest build from GitHub Actions (workflow **Desktop Windows Installer** →
+artifact `nest-music-windows-installer`, workflow **Desktop Linux Bundles** → artifact
+`nest-music-linux-bundles`) or build it yourself.
+
+**Windows**
 
 ```bat
 cd desktop
@@ -322,6 +326,23 @@ npm run tauri build
 
 The NSIS installer is written to `desktop/src-tauri/target/release/bundle/nsis/`.
 
+**Linux (x86_64)** — needs the webview/ALSA/dbus/tray development packages first
+(see `desktop/README.md` for the full `apt install` list):
+
+```bash
+cd desktop
+npm ci
+cd python-backend
+./build_server.sh          # sidecar + bundled Node 22 (--with-composer --with-potgen = release parity)
+cd ..
+APPIMAGE_EXTRACT_AND_RUN=1 npm run tauri build -- --bundles appimage,deb
+```
+
+The AppImage is written to `desktop/src-tauri/target/release/bundle/appimage/`, the `.deb`
+to `desktop/src-tauri/target/release/bundle/deb/`. Install the package with
+`sudo apt install ./nest-music_*_amd64.deb`, or just `chmod +x` and run the AppImage
+(add `--appimage-extract-and-run` if the distro has no FUSE 2).
+
 ### Development
 
 ```bat
@@ -329,5 +350,8 @@ cd desktop
 npm ci
 npm run tauri dev
 ```
+
+The same commands work on Linux (`npm run tauri dev`) once the system packages above are
+installed.
 
 See `desktop/README.md` for the full desktop documentation.

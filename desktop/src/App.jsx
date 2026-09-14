@@ -23,6 +23,10 @@ import { ExplicitBadge, ArtistLinks } from "./ui/rows.jsx";
 import { Tooltip } from "./ui/tooltip.jsx";
 import { usePersistedState } from "./hooks/use-persisted-state.js";
 import { APP_VERSION } from "./version.js";
+// macOS and Linux run in a natively titled window (traffic lights / WM decorations), so the
+// custom titlebar + drag region is Windows-only: borderless windows swallow clicks on macOS,
+// and on Linux an undecorated window cannot be resized by its edges at all.
+import { IS_MAC, IS_WINDOWS } from "./platform.js";
 // Side-effect import: installs the console interceptor whose ring buffer the Debug tab reads.
 import "./debug/console-log.js";
 import { DebugFloatingWindow } from "./settings/debug-tab.jsx";
@@ -119,10 +123,6 @@ function cmpVersion(a, b) {
   }
   return 0;
 }
-
-// macOS uses a native titled window (traffic lights + native drag), so the custom
-// titlebar/drag-region is Windows-only. (Borderless windows swallow clicks on macOS.)
-const IS_MAC = /Mac OS X|Macintosh/.test(navigator.userAgent || "");
 
 const APP_TAG = "v1.0.0";
 const GITHUB_RELEASES_API = "https://api.github.com/repos/KiyoshiTheDevil/Kodama/releases?per_page=1";
@@ -5431,7 +5431,10 @@ export default function App() {
             backdrop for the WHOLE app (z-index:-1 → paints over bg-base but under all content,
             so it shows through the transparent sidebar/canvas while cards keep their own bg). */}
         <AmbientBackdrop thumbnail={ambientBackground ? currentTrack?.thumbnail : null} />
-        {!fullscreen && !IS_MAC && <TitleBar />}
+        {/* Windows only: the main window is borderless there, so the app draws its own
+            minimize/maximize/close row. macOS and Linux get native window decorations
+            (see tauri.macos.conf.json / tauri.linux.conf.json) and provide their own. */}
+        {!fullscreen && IS_WINDOWS && <TitleBar />}
         <div style={{
           width: fullscreen ? 0 : (sidebarCollapsed ? SIDEBAR_COLLAPSED : sidebarWidth),
           minWidth: fullscreen ? 0 : (sidebarCollapsed ? SIDEBAR_COLLAPSED : sidebarWidth),

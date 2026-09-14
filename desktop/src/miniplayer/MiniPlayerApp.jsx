@@ -13,6 +13,7 @@ import { translate } from "../i18n.js";
 import { thumbHi } from "../context.jsx";
 import { EV_NOW_PLAYING, MINI_SIZE_KEY, sayHello, sendToMain, requestShowMain } from "./bridge.js";
 import { applyFontScale, readFontScale } from "../settings/scale.js";
+import { WindowResizeEdges } from "../ui/window-resize-edges.jsx";
 
 const fmt = (s) => {
   if (!isFinite(s) || s < 0) s = 0;
@@ -238,6 +239,10 @@ export default function MiniPlayerApp() {
           </div>
         </div>
       </div>
+
+      {/* Linux only: this window is borderless, and an undecorated Linux window has no
+          frame edges to grab — these strips provide them. No-op on Windows/macOS. */}
+      <WindowResizeEdges />
     </div>
   );
 }
