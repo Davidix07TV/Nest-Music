@@ -31,6 +31,13 @@ on:
   push:
     tags:
       - 'v*'
+  # Validate the Linux bundles on PRs that touch the desktop app. Restricted by path so the
+  # Android-only PRs (the majority here) never pay for a ~40 min Rust + AppImage build, and
+  # gated by the RELEASE_TAG check below so a PR can never publish anything.
+  pull_request:
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/desktop-linux.yml'
 
 permissions:
   contents: write
