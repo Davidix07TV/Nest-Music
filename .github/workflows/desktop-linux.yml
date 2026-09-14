@@ -1,0 +1,341 @@
+name: Desktop Linux Bundles
+
+# Builds the Linux desktop app (Tauri 2: React + Vite frontend, Rust shell, Python sidecar)
+# and uploads an AppImage + a .deb. Linux counterpart of "Desktop Windows Installer".
+#
+# Pipeline (all inside desktop/):
+#   1. apt: webkit2gtk 4.1 / gtk / appindicator / ALSA / dbus / autotools (libopus is
+#      compiled from source by audiopus_sys, exactly like the macOS build)
+#   2. python-backend/build_server.sh --with-composer --with-potgen
+#        → composer/dist                      (vendored Lyrics Composer, packed into the sidecar)
+#        → src-tauri/binaries/nest-music-server-x86_64-unknown-linux-gnu
+#                                              (the exact name Tauri's externalBin requires)
+#        → src-tauri/resources/node           (>= 22, yt-dlp EJS signature / n-sig solving)
+#        → src-tauri/resources/potgen/server  (bgutil PO-token generator, registered as a
+#                                              Tauri resource for this build only)
+#   3. npm ci + npm run tauri build -- --bundles appimage,deb
+#
+# On a tag push (or with an explicit tag input) the bundles are attached to that release and
+# the updater manifest gains a linux-x86_64 entry — the manifest step needs the Tauri signing
+# key, without it the job still produces both bundles as downloadable artifacts.
+#
+# Output artifacts: desktop/src-tauri/target/release/bundle/{appimage,deb}/*
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Optional existing release tag to publish to (e.g. v1.0.4). Empty = artifact only.'
+        required: false
+        type: string
+  push:
+    tags:
+      - 'v*'
+  # Validate the Linux bundles on PRs that touch the desktop app. Restricted by path so the
+  # Android-only PRs (the majority here) never pay for a ~40 min Rust + AppImage build, and
+  # gated by the RELEASE_TAG check below so a PR can never publish anything.
+  pull_request:
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/desktop-linux.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-linux:
+    name: Build Linux AppImage + deb
+    # Pinned: ubuntu-22.04 is being retired (brownouts from 2026-09-17, removal 2027-04-17)
+    # and ubuntu-latest drifts. Consequence to document for users: the bundles need
+    # glibc >= 2.39 (Ubuntu 24.04+, Debian 13+, Fedora 40+, Arch, openSUSE Leap 15.6+).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: desktop
+    env:
+      # Only a real tag publishes — a workflow_dispatch on a branch must never touch releases.
+      RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag || '' }}
+      SIGNING_KEY_PRESENT: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY != '' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      # Tauri's own Linux prerequisites plus what this app's crates link against:
+      #   libasound2-dev  → cpal/rodio (native audio engine)
+      #   libdbus-1-dev   → souvlaki (MPRIS media controls / media keys)
+      #   autoconf/automake/libtool → audiopus_sys builds libopus from source
+      #   libayatana-appindicator3-dev → the tray icon
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential curl wget file pkg-config \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libasound2-dev \
+            libdbus-1-dev \
+            autoconf automake libtool
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+          key: linux-x86_64
+
+      - name: Write feedback webhook config
+        working-directory: desktop/python-backend
+        env:
+          WEBHOOK: ${{ secrets.KODAMA_FEEDBACK_WEBHOOK }}
+        run: |
+          if [ -n "$WEBHOOK" ]; then
+            printf '{"webhook":"%s"}' "$WEBHOOK" > feedback_config.json
+          else
+            echo "::warning::KODAMA_FEEDBACK_WEBHOOK not set — in-app feedback reports are disabled"
+          fi
+
+      - name: Write Last.fm config
+        working-directory: desktop/python-backend
+        env:
+          LFM_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LFM_SECRET: ${{ secrets.LASTFM_API_SECRET }}
+        run: |
+          if [ -n "$LFM_KEY" ] && [ -n "$LFM_SECRET" ]; then
+            printf '{"api_key":"%s","api_secret":"%s"}' "$LFM_KEY" "$LFM_SECRET" > lastfm_config.json
+          else
+            echo "::warning::LASTFM_API_KEY/SECRET not set — scrobbling will run without an API key"
+          fi
+
+      - name: Build Python sidecar, Composer, node runtime and PO-token generator
+        working-directory: desktop/python-backend
+        # Invoked through bash so the executable bit never matters (e.g. after a checkout on
+        # a filesystem that dropped it).
+        run: bash ./build_server.sh --with-composer --with-potgen
+
+      - name: Verify sidecar and bundled node exist
+        run: |
+          set -e
+          test -x src-tauri/binaries/nest-music-server-x86_64-unknown-linux-gnu \
+            || { echo "::error::sidecar missing"; ls -la src-tauri/binaries || true; exit 1; }
+          test -x src-tauri/resources/node \
+            || { echo "::error::bundled node missing"; ls -la src-tauri/resources || true; exit 1; }
+          test -f src-tauri/resources/potgen/server/build/generate_once.js \
+            || echo "::warning::bgutil PO-token generator not bundled — Premium-only tracks may fail to stream"
+          ls -la src-tauri/binaries src-tauri/resources
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # The GitHub runners have no libfuse2 and appimagetool is itself an AppImage, so the
+      # AppImage tooling is told to extract instead of mount. Without this the appimage step
+      # dies with "dlopen(): error loading libfuse.so.2".
+      - name: Build Tauri bundles (AppImage + deb)
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          set -e
+          if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            # Signed build: also emit the .AppImage.sig the in-app updater verifies. Kept out
+            # of tauri.linux.conf.json so a local `tauri build` never demands a signing key.
+            npm run tauri build -- --bundles appimage,deb \
+              --config '{"bundle":{"createUpdaterArtifacts":true}}'
+          else
+            echo "::warning::TAURI_SIGNING_PRIVATE_KEY not set — building without updater artifacts"
+            npm run tauri build -- --bundles appimage,deb
+          fi
+
+      - name: Collect bundles
+        run: |
+          set -e
+          BASE=src-tauri/target/release/bundle
+          mkdir -p out
+          cp "$BASE"/appimage/*.AppImage out/
+          cp "$BASE"/deb/*.deb out/
+          cp "$BASE"/appimage/*.AppImage.sig out/ 2>/dev/null || true
+          ls -la out
+
+      # Cheap structural check: the sidecar and the node runtime must sit next to the main
+      # binary inside the bundle, or the app opens with no backend and no stream URLs. The
+      # key findings are also emitted as annotations, which stay readable from the API even
+      # when the (much larger) job log is not.
+      - name: Inspect bundles
+        run: |
+          set -e
+          notice() { echo "::notice title=$1::$2"; }
+
+          echo "── deb control ──"
+          dpkg-deb -I out/*.deb
+          dpkg-deb -f out/*.deb Package Version Architecture Depends \
+            | while IFS= read -r line; do notice "deb control" "$line"; done
+
+          echo "── deb contents (key files) ──"
+          dpkg-deb -c out/*.deb | awk '{print $6}' \
+            | grep -E '/(nest-music|nest-music-server|node)$|potgen/server/build/main\.js$|\.desktop$' \
+            | sort -u | tee /tmp/deb-layout.txt
+          while IFS= read -r line; do notice "deb layout" "$line"; done < /tmp/deb-layout.txt
+
+          echo "── AppImage contents ──"
+          APPIMAGE_EXTRACT_AND_RUN=1 sh -c './out/*.AppImage --appimage-extract' >/dev/null
+          find squashfs-root \( -name 'nest-music-server*' -o -name 'node' -o -name '*.desktop' \
+                               -o -path '*potgen/server/build/main.js' \) -printf '%p\n' \
+            | sort -u | tee /tmp/appimage-layout.txt
+          while IFS= read -r line; do notice "appimage layout" "$line"; done < /tmp/appimage-layout.txt
+
+          # server.rs resolves node/potgen relative to the directory holding the sidecar, so
+          # both being siblings is the invariant worth reporting.
+          SIDE_HIT=$(grep -m1 -E '/nest-music-server(-x86_64-unknown-linux-gnu)?$' /tmp/deb-layout.txt || true)
+          if [ -n "$SIDE_HIT" ]; then
+            SIDE_DIR=$(dirname "$SIDE_HIT")
+            notice "deb sidecar dir" "$SIDE_DIR"
+            if grep -q "^${SIDE_DIR}/node$" /tmp/deb-layout.txt; then
+              notice "deb node" "sits next to the sidecar in ${SIDE_DIR}"
+            else
+              echo "::warning title=deb node::not in ${SIDE_DIR} — server.rs falls back to Tauri's resource_dir()"
+            fi
+          else
+            echo "::warning title=deb sidecar::nest-music-server not matched in the deb listing"
+          fi
+
+          # The deep-link scheme has to be registered for nest-music:// URLs to reach the app.
+          DESKTOP=$(find squashfs-root -name '*.desktop' | head -1)
+          if [ -n "$DESKTOP" ]; then
+            grep -E '^(Name|Exec|Icon|Categories|MimeType)=' "$DESKTOP" \
+              | while IFS= read -r line; do notice "desktop entry" "$line"; done
+          else
+            echo "::warning title=desktop entry::no .desktop file found in the AppImage"
+          fi
+
+          test -n "$(find squashfs-root -name 'nest-music-server-x86_64-unknown-linux-gnu' -o -name 'nest-music-server')" \
+            || { echo "::error::sidecar missing from the AppImage"; exit 1; }
+          test -n "$(find squashfs-root -type f -name 'node')" \
+            || { echo "::error::bundled node missing from the AppImage"; exit 1; }
+          rm -rf squashfs-root
+
+      - name: Upload bundles artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nest-music-linux-bundles
+          path: desktop/out/*
+          if-no-files-found: error
+
+      # ── Publishing (tag push, or workflow_dispatch with a tag) ──────────────
+      - name: Attach bundles to the release
+        if: env.RELEASE_TAG != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          TAG="$RELEASE_TAG"
+          # The Android release job creates the tag *and* the release (gh release create), so
+          # the release normally exists already; wait out a slow race instead of failing.
+          FOUND=0
+          for _ in $(seq 1 15); do
+            if gh release view "$TAG" >/dev/null 2>&1; then FOUND=1; break; fi
+            sleep 20
+          done
+          if [ "$FOUND" != "1" ]; then
+            echo "::warning::release $TAG does not exist — bundles stay in the workflow artifacts."
+            echo "::warning::Re-run this workflow with tag=$TAG once the release is published."
+            exit 0
+          fi
+          gh release upload "$TAG" out/*.AppImage out/*.deb --clobber
+          if ls out/*.AppImage.sig >/dev/null 2>&1; then
+            gh release upload "$TAG" out/*.AppImage.sig --clobber
+          fi
+          echo "Published $TAG (linux-x86_64) to ${{ github.repository }}."
+
+      # Adds/refreshes the linux-x86_64 entry in desktop/updates/latest.json, the manifest the
+      # in-app updater polls. Other platforms in the manifest are left untouched.
+      - name: Update the updater manifest (linux-x86_64)
+        if: env.RELEASE_TAG != '' && env.SIGNING_KEY_PRESENT == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          TAG="$RELEASE_TAG"
+          VERSION="${TAG#v}"
+          APPIMAGE=$(ls out/*.AppImage | head -1)
+          SIG="$APPIMAGE.sig"
+          test -f "$SIG" || { echo "::error::missing $SIG — cannot write the updater manifest"; exit 1; }
+          # No release, no manifest: an entry pointing at a missing asset would break every
+          # client's update check. The publish step already warned about this.
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::warning::release $TAG does not exist — skipping the updater manifest"
+            exit 0
+          fi
+          # The release must hold the asset, otherwise the manifest would point at a 404.
+          gh release view "$TAG" --json assets --jq '.assets[].name' | grep -qx "$(basename "$APPIMAGE")" \
+            || { echo "::error::$(basename "$APPIMAGE") is not attached to $TAG"; exit 1; }
+
+          BASE_URL="https://github.com/${{ github.repository }}/releases/download/$TAG"
+          NOTES="Nest Music $TAG — Linux bundles."
+
+          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" ../manifest-repo
+          MANIFEST="../manifest-repo/desktop/updates/latest.json"
+          jq --arg version "v$VERSION" \
+             --arg pub_date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             --arg notes "$NOTES" \
+             --arg lurl "$BASE_URL/$(basename "$APPIMAGE")" \
+             --arg lsig "$(cat "$SIG")" \
+             '.version = $version | .pub_date = $pub_date | .notes = $notes
+              | .platforms["linux-x86_64"] = {url: $lurl, signature: $lsig}' \
+             "$MANIFEST" > "$MANIFEST.tmp" && mv "$MANIFEST.tmp" "$MANIFEST"
+          echo "latest.json:"; cat "$MANIFEST"
+
+          cd ../manifest-repo
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add desktop/updates/latest.json
+          if git diff --cached --quiet; then
+            echo "manifest unchanged — nothing to publish"
+          else
+            git commit -m "release: linux-x86_64 updater entry for $TAG [skip ci]"
+            git push
+          fi
+
+      - name: Build summary
+        if: always()
+        run: |
+          {
+            echo "## Nest Music — Linux bundles"
+            echo ""
+            echo "| File | Size |"
+            echo "| --- | --- |"
+            for f in out/*; do
+              [ -f "$f" ] || continue
+              echo "| \`$(basename "$f")\` | $(du -h "$f" | cut -f1) |"
+            done
+            echo ""
+            if [ -n "$RELEASE_TAG" ]; then
+              echo "Release tag: \`$RELEASE_TAG\`"
+            else
+              echo "No tag given — bundles are attached to this run as artifacts only."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

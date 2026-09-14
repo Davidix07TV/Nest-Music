@@ -8,6 +8,7 @@ import { IconContext } from "./icons.jsx";
 import { translate } from "./i18n.js";
 import OverlayEditor from "./overlay/OverlayEditor.jsx";
 import { applyFontScale, readFontScale } from "./settings/scale.js";
+import { WindowResizeEdges } from "./ui/window-resize-edges.jsx";
 
 const API = "http://localhost:9847";
 
@@ -52,6 +53,9 @@ export default function OverlayEditorApp() {
           apiBase={API}
           standalone
         />
+        {/* Linux only: the editor window is borderless, and an undecorated Linux window has
+            no frame edges to grab — these strips provide them. No-op on Windows/macOS. */}
+        <WindowResizeEdges />
       </div>
     </IconContext.Provider>
   );
