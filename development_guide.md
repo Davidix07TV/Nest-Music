@@ -88,5 +88,6 @@ directly if you have a Mac.
 
 ## Contributing
 
-Read [`AGENTS.md`](AGENTS.md) — the working rules there (branches, commit format, strings,
+Start from [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full workflow (issues, PRs, verification),
+then read [`AGENTS.md`](AGENTS.md) — the working rules there (branches, commit format, strings,
 migrations, versioning) apply to humans and agents alike.
