@@ -39,9 +39,11 @@ function parseSrt(content: string, _fallbackDuration?: number): ParseResult {
     const end = parseSrtTimestamp(endStr.trim());
 
     const textLines = blockLines.slice(timestampIdx + 1);
+    // SRT marks inline styling with tags (<i>, <font color=…>). Removing matched tags only can
+    // leave a new one behind (`<<i>script>` → `<script>`), so drop the delimiters themselves.
     const text = textLines
       .join(" ")
-      .replace(/<[^>]+>/g, "")
+      .replace(/[<>]/g, "")
       .trim();
 
     if (text) {

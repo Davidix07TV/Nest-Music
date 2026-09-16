@@ -7,7 +7,8 @@ Starte mit: python server.py
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from ytmusicapi import YTMusic
-import sys, os, json, glob, threading, time, requests, sqlite3, uuid, collections
+import sys, os, json, glob, threading, time, requests, sqlite3, uuid, collections, re
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 CORS(app, origins=[
@@ -188,8 +189,9 @@ def submit_feedback():
         if resp.status_code >= 300:
             return jsonify({"error": f"webhook_{resp.status_code}"}), 502
         return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 502
+    except Exception:
+        _logging.warning("[feedback] webhook post failed", exc_info=True)
+        return jsonify({"error": "feedback_failed"}), 502
 
 @app.route("/diag")
 def diag():
@@ -273,7 +275,10 @@ def _lastfm_enabled():
     return bool(LASTFM_API_KEY and LASTFM_API_SECRET)
 
 def _lastfm_sign(params):
-    """api_sig = md5 of sorted 'key+value' pairs (excl. format/callback) + secret."""
+    """api_sig = md5 of sorted 'key+value' pairs (excl. format/callback) + secret.
+
+    The MD5 is not a storage hash: Last.fm's API specification requires MD5 for `api_sig`,
+    so switching algorithms would break signed calls (scrobbling, love/ban)."""
     import hashlib
     raw = "".join(f"{k}{params[k]}" for k in sorted(params) if k not in ("format", "callback"))
     return hashlib.md5((raw + LASTFM_API_SECRET).encode("utf-8")).hexdigest()
@@ -297,8 +302,9 @@ def _lastfm_call(method, params=None, http="GET", signed=False):
         if isinstance(data, dict) and data.get("error"):
             return False, data
         return True, data
-    except Exception as e:
-        return False, {"error": str(e)}
+    except Exception:
+        _logging.warning("[lastfm] request failed", exc_info=True)
+        return False, {"error": "lastfm_unreachable"}
 
 def _active_meta_path():
     return os.path.join(PROFILES_DIR, f"{_current_profile or 'default'}.meta.json")
@@ -333,6 +339,36 @@ os.makedirs(CUSTOM_LYRICS_DIR, exist_ok=True)
 
 VIDEO_SYNC_CACHE_DIR = os.path.join(_base_dir, "video_sync_cache")
 os.makedirs(VIDEO_SYNC_CACHE_DIR, exist_ok=True)
+
+# ── Untrusted input helpers ───────────────────────────────────────────────────
+# Ids and URLs arriving over HTTP end up as cache file names and as fetch targets, so they
+# are validated in one place instead of at every call site.
+_ID_RE = re.compile(r"[A-Za-z0-9_-]{1,64}$")
+
+# Hosts /imgproxy (and cover-art downloads) may fetch from. YouTube Music serves artwork from
+# these CDNs only; anything else is rejected so the endpoint can't be used as an open proxy.
+_IMAGE_URL_PATTERN = (
+    r"https?://(?:[A-Za-z0-9-]+\.)*(?:ytimg\.com|ggpht\.com|googleusercontent\.com|youtube\.com)"
+    r"(?::\d+)?(?:[/?#]\S*)?"
+)
+
+def _safe_cache_path(base_dir, item_id, suffix):
+    """Path for `item_id` + `suffix` inside `base_dir`, or None when the id is not a plain
+    media id or the resolved path would leave that directory."""
+    if not isinstance(item_id, str) or not _ID_RE.match(item_id):
+        return None
+    root = os.path.realpath(base_dir)
+    path = os.path.normpath(os.path.join(root, item_id + suffix))
+    if not path.startswith(root + os.sep):
+        return None
+    return path
+
+def _url_host(url):
+    """Hostname of `url` (empty string when it can't be parsed)."""
+    try:
+        return (urlparse(url).hostname or "").lower()
+    except ValueError:
+        return ""
 
 # yt-dlp self-update: YouTube changes constantly and the bundled yt-dlp goes stale between
 # app releases. A newer yt-dlp wheel dropped in here is prepended to sys.path so `import
@@ -842,15 +878,20 @@ def _refresh_ytm_psidts(force=False):
         # the *DCC tokens that a plain youtube.com homepage hit often leaves stale.
         authed = None
         statuses = []
-        for url in ("https://music.youtube.com/", "https://www.youtube.com/", "https://accounts.google.com/"):
+        # (url, carries_login_flag) — only the YouTube pages expose the LOGGED_IN flag.
+        for url, has_login_flag in (
+            ("https://music.youtube.com/", True),
+            ("https://www.youtube.com/", True),
+            ("https://accounts.google.com/", False),
+        ):
             try:
                 r = sess.get(url, headers={
                     "Cookie": cookie_header, "User-Agent": ua,
                     "Accept-Language": "en-US,en;q=0.9",
                 }, timeout=8, allow_redirects=True)
-                statuses.append(f"{url.split('//', 1)[1].split('/', 1)[0]}={r.status_code}")
+                statuses.append(f"{_url_host(url)}={r.status_code}")
                 # Diagnose login state from YouTube's own page flag.
-                if authed is None and "youtube.com" in url:
+                if authed is None and has_login_flag:
                     txt = r.text or ""
                     if '"LOGGED_IN":true' in txt:
                         authed = True
@@ -1427,9 +1468,10 @@ def setup_auth():
         _playlist_cache.clear()
         threading.Thread(target=fetch_account_info, args=(profile_name,), daemon=True).start()
         return jsonify({"ok": True, "profile": profile_name})
-    except Exception as e:
+    except Exception:
+        _logging.warning("[profiles] could not create profile", exc_info=True)
         if os.path.exists(path): os.remove(path)
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "profile_create_failed"}), 500
 
 
 @app.route("/auth/cookie-login", methods=["POST"])
@@ -1533,7 +1575,7 @@ def cookie_login():
         _logging.error(f"[login] cookie-login profile={profile_name} FAILED: {e}")
         if os.path.exists(path):
             os.remove(path)
-        return jsonify({"error": f"Login fehlgeschlagen: {str(e)}"}), 500
+        return jsonify({"error": "Login fehlgeschlagen"}), 500
 
 @app.route("/auth/logout", methods=["POST"])
 def logout():
@@ -2029,17 +2071,29 @@ def _unison_forward(method, path):
     try:
         url = f"https://unison.boidu.dev{path}"
         r = req.request(method, url, json=body, timeout=12)
-        ct = r.headers.get("Content-Type", "application/json")
-        return (r.content, r.status_code, {"Content-Type": ct})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 502
+        # Re-serialize the upstream JSON rather than piping the raw body and the upstream
+        # Content-Type through: the response is then always JSON of our own making.
+        try:
+            payload = r.json()
+        except ValueError:
+            payload = None
+        if not isinstance(payload, (dict, list)):
+            return jsonify({"success": False, "error": "unison_invalid_response"}), 502
+        return jsonify(payload), r.status_code
+    except Exception:
+        _logging.warning("[unison] upstream request failed", exc_info=True)
+        return jsonify({"success": False, "error": "unison_unreachable"}), 502
 
 @app.route("/unison/lyrics/<lyrics_id>/vote", methods=["POST", "DELETE"])
 def unison_vote(lyrics_id):
+    if not _ID_RE.match(lyrics_id):
+        return jsonify({"success": False, "error": "invalid lyrics id"}), 400
     return _unison_forward(request.method, f"/lyrics/{lyrics_id}/vote")
 
 @app.route("/unison/lyrics/<lyrics_id>/report", methods=["POST"])
 def unison_report(lyrics_id):
+    if not _ID_RE.match(lyrics_id):
+        return jsonify({"success": False, "error": "invalid lyrics id"}), 400
     return _unison_forward("POST", f"/lyrics/{lyrics_id}/report")
 
 @app.route("/unison/auth/nickname", methods=["PUT", "DELETE"])
@@ -2114,15 +2168,15 @@ def composer_bridge_audio(video_id):
         sr = req.get(f"http://127.0.0.1:9847/stream/{video_id}", timeout=60)
         data = sr.json()
         url = data.get("url")
-    except Exception as e:
-        return _bridge_headers(jsonify({"error": str(e)})), 502
+    except Exception:
+        return _bridge_headers(jsonify({"error": "bridge_stream_failed"})), 502
     if not url:
         return _bridge_headers(jsonify({"error": (data or {}).get("error", "no_url")})), 502
 
     try:
         upstream = req.get(url, stream=True, timeout=120)
-    except Exception as e:
-        return _bridge_headers(jsonify({"error": str(e)})), 502
+    except Exception:
+        return _bridge_headers(jsonify({"error": "bridge_stream_failed"})), 502
 
     content_type = upstream.headers.get("Content-Type", "audio/mp4")
     # Tee the bytes into the song cache (if enabled) so reopening this song is instant.
@@ -2396,7 +2450,7 @@ def translate_lyrics():
         return jsonify({"translations": result})
     except Exception as e:
         print(f"[Translation] Error: {e}")
-        return jsonify({"error": str(e), "translations": list(lines)}), 500
+        return jsonify({"error": "translation_failed", "translations": list(lines)}), 500
 
 @app.route("/cache/stats")
 def cache_stats():
@@ -2496,7 +2550,8 @@ def liked_songs():
     except Exception as e:
         if _is_signed_out_ytm_error(e):
             return jsonify({"error": "YouTube session expired", "code": "auth_expired"}), 401
-        return jsonify({"error": str(e)}), 500
+        _logging.warning("[liked-songs] fetch failed", exc_info=True)
+        return jsonify({"error": "request_failed"}), 500
 
 def _ydl_extract_url(video_id, fmt, skip_download=True, extra_opts=None, skip_auth=False, use_ytm=True):
     """Run yt-dlp extraction with the given format string. Returns info dict.
@@ -2634,6 +2689,15 @@ def _is_hard_error(err_str):
 
 def _is_unavailable(err_str):
     return any(k in err_str for k in ("Video unavailable", "This video is not available"))
+
+def _stream_error_code(err_str, premium=False):
+    """Coarse outcome for the frontend. The raw yt-dlp message stays in the backend log —
+    exception text must not travel back over HTTP."""
+    if premium or "Music Premium" in err_str:
+        return "premium_only"
+    if _is_unavailable(err_str):
+        return "unavailable"
+    return "stream_failed"
 
 _MIN_NODE_MAJOR = 22
 
@@ -2812,9 +2876,10 @@ def stream_url(video_id):
     err_str = str(last_err) if last_err else "No URL found"
     premium = "Music Premium" in err_str
     unavailable = _is_unavailable(err_str)
-    _LAST_STREAM_ERROR = {"videoId": video_id, "error": err_str[:400], "at": int(time.time())}
+    error_code = _stream_error_code(err_str, premium)
+    _LAST_STREAM_ERROR = {"videoId": video_id, "error": error_code, "at": int(time.time())}
     _logging.error(f"[stream] {video_id}: {type(last_err).__name__}: {err_str}")
-    return jsonify({"error": err_str, "premium_only": premium, "unavailable": unavailable}), 500
+    return jsonify({"error": error_code, "premium_only": premium, "unavailable": unavailable}), 500
 
 
 @app.route("/stream-prepare/<video_id>")
@@ -2878,7 +2943,8 @@ def stream_prepare(video_id):
     premium = "Music Premium" in err_str
     unavailable = _is_unavailable(err_str)
     _logging.error(f"[stream-prepare] {video_id}: {type(last_err).__name__}: {err_str}")
-    return jsonify({"error": err_str, "premium_only": premium, "unavailable": unavailable}), 500
+    return jsonify({"error": _stream_error_code(err_str, premium), "premium_only": premium,
+                    "unavailable": unavailable}), 500
 
 
 # ── Progressive streaming proxy ─────────────────────────────────────────────
@@ -2923,11 +2989,12 @@ def audio_stream(video_id):
             return jsonify({"error": "no_url"}), 502
         try:
             upstream = req.get(url, headers=up_headers, stream=True, timeout=60)
-        except Exception as e:
+        except Exception:
+            _logging.warning("[audio-stream] upstream fetch failed", exc_info=True)
             _audio_stream_url_cache.pop(video_id, None)
             if attempt == 0:
                 continue
-            return jsonify({"error": str(e)}), 502
+            return jsonify({"error": "stream_unavailable"}), 502
         # Expired/blocked signed URL → drop cache and re-resolve once.
         if upstream.status_code in (403, 410) and attempt == 0:
             _audio_stream_url_cache.pop(video_id, None)
@@ -2980,8 +3047,8 @@ def library_playlists():
                 "thumbnail": thumbnail,
             })
         return jsonify({"playlists": result})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/playlist/create", methods=["POST"])
 def create_playlist():
@@ -3005,8 +3072,8 @@ def create_playlist():
         video_ids = data.get("videoIds")
         result = get_ytmusic().create_playlist(title, description, privacy_status=privacy, video_ids=video_ids)
         return jsonify({"ok": True, "playlistId": result})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/playlist/<playlist_id>/add", methods=["POST"])
 def playlist_add_tracks(playlist_id):
@@ -3035,8 +3102,8 @@ def playlist_add_tracks(playlist_id):
         get_ytmusic().add_playlist_items(playlist_id, video_ids)
         _purge_playlist_cache(playlist_id)
         return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/playlist/<playlist_id>/remove", methods=["POST"])
 def playlist_remove_tracks(playlist_id):
@@ -3059,8 +3126,8 @@ def playlist_remove_tracks(playlist_id):
         get_ytmusic().remove_playlist_items(playlist_id, videos)
         _purge_playlist_cache(playlist_id)
         return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/playlist/<playlist_id>/edit", methods=["POST"])
 def playlist_edit(playlist_id):
@@ -3082,8 +3149,8 @@ def playlist_edit(playlist_id):
         get_ytmusic().edit_playlist(playlist_id, title=title, description=description, privacyStatus=privacy)
         _purge_playlist_cache(playlist_id)
         return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/playlist/<playlist_id>", methods=["DELETE"])
 def delete_playlist(playlist_id):
@@ -3097,8 +3164,8 @@ def delete_playlist(playlist_id):
         get_ytmusic().delete_playlist(playlist_id)
         _purge_playlist_cache(playlist_id)
         return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/library/albums")
 def library_albums():
@@ -3119,8 +3186,8 @@ def library_albums():
                 "thumbnail": thumbnail,
             })
         return jsonify({"albums": result})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/library/artists")
 def library_artists():
@@ -3139,8 +3206,8 @@ def library_artists():
                 "thumbnail": thumbnail,
             })
         return jsonify({"artists": result})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/playlist/<playlist_id>/stream")
 def stream_playlist(playlist_id):
@@ -3283,7 +3350,7 @@ def stream_playlist(playlist_id):
             import traceback
             traceback.print_exc()
             print(f"[playlist] {playlist_id} failed: {e}", flush=True)
-            yield send({"type": "error", "message": str(e)})
+            yield send({"type": "error", "message": "playlist_failed"})
 
     return Response(
         stream_with_context(generate()),
@@ -3326,8 +3393,8 @@ def get_radio(playlist_id):
                 "isExplicit": bool(t.get("isExplicit", False)),
             })
         return jsonify({"tracks": tracks})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/playlist/<playlist_id>")
 def get_playlist(playlist_id):
@@ -3408,8 +3475,8 @@ def get_playlist(playlist_id):
             "thumbnail": (playlist.get("thumbnails") or [{}])[-1].get("url", ""),
             "tracks": tracks,
         })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/album/<browse_id>")
 def get_album(browse_id):
@@ -3456,8 +3523,8 @@ def get_album(browse_id):
         if _cache_enabled["albums"]:
             _save_album_disk(browse_id, result)
         return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 def _extract_artist_desc_url(browse_id):
     """ytmusicapi keeps only the first description run, dropping the trailing
@@ -3583,8 +3650,8 @@ def get_artist(browse_id):
             "videos":  videos,
             "related": related,
         })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/artist/<browse_id>/subscribe", methods=["POST"])
 def artist_subscribe(browse_id):
@@ -3593,8 +3660,8 @@ def artist_subscribe(browse_id):
         channel_id = data.get("channelId") or browse_id
         get_ytmusic().subscribe_artists([channel_id])
         return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/artist/<browse_id>/unsubscribe", methods=["POST"])
 def artist_unsubscribe(browse_id):
@@ -3603,8 +3670,8 @@ def artist_unsubscribe(browse_id):
         channel_id = data.get("channelId") or browse_id
         get_ytmusic().unsubscribe_artists([channel_id])
         return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/song/meta/<video_id>")
 def song_meta(video_id):
@@ -3624,8 +3691,8 @@ def song_meta(video_id):
             "thumbnail": thumb,
             "duration": dur,
         })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 502
+    except Exception:
+        return jsonify({"error": "upstream_error"}), 502
 
 
 @app.route("/ytmusic/history", methods=["POST"])
@@ -3647,8 +3714,8 @@ def ytmusic_add_history():
         resp = ytm.add_history_item(song)
         status = getattr(resp, "status_code", None)
         return jsonify({"ok": status == 204, "status": status})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 502
+    except Exception:
+        return jsonify({"error": "upstream_error"}), 502
 
 
 @app.route("/song/credits/<video_id>")
@@ -3738,7 +3805,9 @@ def get_song_credits(video_id):
 
     result = {"description": description}
     if not description and last_error:
-        result["error"] = last_error
+        # The raw yt-dlp/HTTP message stays in the backend log; the frontend only needs to know
+        # that the credits could not be resolved.
+        result["error"] = "credits_unavailable"
     _credits_cache[video_id] = result
     return jsonify(result)
 
@@ -3761,8 +3830,8 @@ def get_artist_albums_route():
                 "type":      a.get("type", ""),
             })
         return jsonify({"albums": result})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 def _map_search_song(t):
     artist_list = t.get("artists", []) or []
@@ -3862,10 +3931,10 @@ def search():
                     items.append(it)
 
         return jsonify({"results": items})
-    except Exception as e:
+    except Exception:
         import traceback
         traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/search/suggestions")
 def search_suggestions():
@@ -3994,11 +4063,11 @@ def get_home():
                 sections.append({"title": title, "items": items})
         return jsonify({"sections": sections})
     except Exception as e:
-        # With only str(e) the frontend showed "no suggestions" and the traceback was gone,
-        # so a parsing bug here was indistinguishable from an empty feed. The ring buffer
-        # feeds the Debug tab, so the next one is diagnosable from a user's report.
+        # The traceback goes to the ring buffer (Debug tab) instead of the response: with only
+        # a generic error the frontend just shows "no suggestions", so without this log a
+        # parsing bug here is indistinguishable from an empty feed.
         _logging.exception(f"[home] failed to build the feed: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "internal_error"}), 500
 
 
 @app.route("/podcast/<playlist_id>")
@@ -4030,8 +4099,8 @@ def get_podcast(playlist_id):
             "thumbnail": _pick_thumb(thumbs) if thumbs else None,
             "episodes": episodes,
         })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 
 @app.route("/mood/categories")
@@ -4055,8 +4124,8 @@ def get_mood_categories():
             if chips:
                 groups[section_title] = chips
         return jsonify(groups)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 
 def _parse_two_row_item(renderer):
@@ -4135,8 +4204,8 @@ def get_mood_playlists():
                 seen.add(key)
                 result.append(parsed)
         return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 
 @app.route("/imgproxy")
@@ -4152,6 +4221,11 @@ def img_proxy():
     # High-quality mode: try to upscale the YouTube/Google thumbnail URL.
     if request.args.get("hq", "0") == "1":
         url = _upscale_thumbnail_url(url)
+
+    # Only artwork CDNs are proxied — the endpoint exists to dodge CORS for cover art, not to
+    # be an open proxy. Keep the check in this direct `re.fullmatch` form.
+    if not re.fullmatch(_IMAGE_URL_PATTERN, url, re.IGNORECASE):
+        return jsonify({"error": "unsupported image host"}), 400
 
     # Derive a stable filename from the URL
     url_hash = hashlib.sha1(url.encode()).hexdigest()
@@ -4180,7 +4254,10 @@ def img_proxy():
     # has no system CA certs, so urllib HTTPS fails with CERTIFICATE_VERIFY_FAILED.
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
-        if "ytimg.com" in url or "yt3.ggpht.com" in url or "youtube.com" in url:
+        host = _url_host(url)
+        if (host == "ytimg.com" or host.endswith(".ytimg.com")
+                or host == "ggpht.com" or host.endswith(".ggpht.com")
+                or host == "youtube.com" or host.endswith(".youtube.com")):
             headers["Referer"] = "https://music.youtube.com/"
         r = requests.get(url, headers=headers, timeout=10)
         r.raise_for_status()
@@ -4194,8 +4271,9 @@ def img_proxy():
         resp.headers["Cache-Control"] = "public, max-age=604800"
         resp.headers["X-Cache"] = "MISS"
         return resp
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        _logging.warning("[imgproxy] fetch failed", exc_info=True)
+        return jsonify({"error": "image_fetch_failed"}), 500
 
 @app.route("/like/<video_id>", methods=["POST"])
 def like_song(video_id):
@@ -4217,8 +4295,8 @@ def like_song(video_id):
             return jsonify({"ok": True, "rating": rating})
         get_ytmusic().rate_song(video_id, rating)
         return jsonify({"ok": True, "rating": rating})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/liked/ids")
 def liked_ids():
@@ -4230,8 +4308,8 @@ def liked_ids():
         songs = get_ytmusic().get_liked_songs(limit=None)
         ids = [t.get("videoId") for t in songs.get("tracks", []) if t.get("videoId")]
         return jsonify({"ids": ids})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 @app.route("/song/info/<video_id>")
 def song_info(video_id):
@@ -4262,8 +4340,8 @@ def song_info(video_id):
             "artistBrowseId": artist_id,
             "albumBrowseId": album_id,
         })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 
 @app.route("/song/stats/<video_id>")
@@ -4291,15 +4369,14 @@ def song_stats(video_id):
                 "dislikesRaw": d.get("dislikes"),
             })
         return jsonify({"error": "stats unavailable"}), 502
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "internal_error"}), 500
 
 def _song_audio_path(video_id):
     """Return the path to the cached audio file (.opus or .m4a)."""
-    safe = video_id.replace("/", "_").replace("\\", "_")
     for ext in (".opus", ".m4a", ".webm", ".mp3"):
-        p = os.path.join(SONG_CACHE_DIR, safe + ext)
-        if os.path.exists(p):
+        p = _safe_cache_path(SONG_CACHE_DIR, video_id, ext)
+        if p and os.path.exists(p):
             return p
     return None
 
@@ -4308,9 +4385,10 @@ def _player_audio_path(video_id):
     Lets the Composer reuse the file the player just played instead of re-extracting it
     from YouTube — the slow part the user noticed."""
     import tempfile, glob as _glob
+    if not isinstance(video_id, str) or not _ID_RE.match(video_id):
+        return None
     cache_dir = os.path.join(tempfile.gettempdir(), "kiyoshi-audio")
-    safe = video_id.replace("/", "_").replace("\\", "_")
-    for p in _glob.glob(os.path.join(cache_dir, f"{safe}.*")):
+    for p in _glob.glob(os.path.join(cache_dir, f"{video_id}.*")):
         ext = os.path.splitext(p)[1].lower()
         if ext in (".m4a", ".mp4", ".mp3", ".ogg", ".flac", ".wav", ".webm", ".opus"):
             try:
@@ -4321,16 +4399,16 @@ def _player_audio_path(video_id):
     return None
 
 def _song_meta_path(video_id):
-    safe = video_id.replace("/", "_").replace("\\", "_")
-    return os.path.join(SONG_CACHE_DIR, safe + ".json")
+    return _safe_cache_path(SONG_CACHE_DIR, video_id, ".json")
 
 def _download_song_bg(video_id, meta):
     """Background download via yt-dlp."""
     global _download_status, _download_queue
     try:
         import yt_dlp
-        safe = video_id.replace("/", "_").replace("\\", "_")
-        output_tpl = os.path.join(SONG_CACHE_DIR, safe + ".%(ext)s")
+        output_tpl = _safe_cache_path(SONG_CACHE_DIR, video_id, ".%(ext)s")
+        if not output_tpl:
+            raise ValueError("invalid video id")
 
         def progress_hook(d):
             if d.get("status") == "downloading":
@@ -4366,6 +4444,8 @@ def _download_song_bg(video_id, meta):
             raise last_dl_err
         # Save metadata
         meta_path = _song_meta_path(video_id)
+        if not meta_path:
+            raise ValueError("invalid video id")
         with open(meta_path, "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False)
         _download_status[video_id] = "done"
@@ -4387,6 +4467,8 @@ def _download_song_bg(video_id, meta):
 
 @app.route("/song/download/<video_id>", methods=["POST"])
 def download_song(video_id):
+    if not _ID_RE.match(video_id):
+        return jsonify({"error": "invalid video id"}), 400
     if _song_audio_path(video_id):
         _download_status[video_id] = "done"
         return jsonify({"ok": True, "status": "done"})
@@ -4643,7 +4725,7 @@ def _embed_metadata(file_path, meta, fmt="opus"):
             try:
                 # Request high-res version (YouTube Music thumbnails support size params)
                 thumb_url = thumbnail
-                if "lh3.googleusercontent.com" in thumb_url:
+                if _url_host(thumb_url) == "lh3.googleusercontent.com":
                     # Replace size suffix to get 500x500 cover
                     import re
                     thumb_url = re.sub(r'=w\d+-h\d+.*$', '=w500-h500-l90-rj', thumb_url)
@@ -5147,7 +5229,7 @@ def _compute_video_sync_offset(video_id):
                     shutil.rmtree(tmp_dir, ignore_errors=True)
     except Exception as e:
         _logging.warning(f"[video-sync] offset computation failed for {video_id}: {e}")
-        result = {"available": False, "error": str(e)}
+        result = {"available": False, "error": "sync_offset_failed"}
 
     # Only cache durable facts (has/hasn't a counterpart, or a computed offset) — never an
     # "error" result, since those are almost always transient/environmental (ffmpeg missing,
@@ -5257,7 +5339,7 @@ def video_sync_stream(video_id):
 
     err_str = str(last_err) if last_err else "No playable video URL found"
     _logging.error(f"[video-sync-stream] {video_id}: {type(last_err).__name__ if last_err else ''}: {err_str}")
-    return jsonify({"error": err_str}), 500
+    return jsonify({"error": _stream_error_code(err_str)}), 500
 
 
 def _active_ytdlp_version():
@@ -5318,8 +5400,9 @@ def ytdlp_update():
         for m in [m for m in sys.modules if m == "yt_dlp" or m.startswith("yt_dlp.")]:
             del sys.modules[m]
         return jsonify({"ok": True, "version": _active_ytdlp_version()})
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e)}), 502
+    except Exception:
+        _logging.warning("[ytdlp] update failed", exc_info=True)
+        return jsonify({"ok": False, "error": "update_failed"}), 502
 
 
 @app.route("/ffmpeg/download")
@@ -5387,10 +5470,11 @@ def ffmpeg_download():
                 os.chmod(tmp_exe, 0o755)
                 os.replace(tmp_exe, dest_exe)
                 yield "data: {\"status\": \"done\"}\n\n"
-            except Exception as e:
+            except Exception:
+                _logging.warning("[ffmpeg] install failed", exc_info=True)
                 try: os.remove(tmp_exe)
                 except OSError: pass
-                yield "data: " + json.dumps({"status": "error", "message": str(e)}) + "\n\n"
+                yield "data: " + json.dumps({"status": "error", "message": "download_failed"}) + "\n\n"
             return
         # Only runs when frozen (installed); in dev just report done.
         if not getattr(sys, 'frozen', False):
@@ -5457,8 +5541,9 @@ def ffmpeg_download():
 
                 yield "data: {\"status\": \"done\"}\n\n"
 
-        except Exception as e:
-            payload = json.dumps({"status": "error", "message": str(e)})
+        except Exception:
+            _logging.warning("[ytdlp] install stream failed", exc_info=True)
+            payload = json.dumps({"status": "error", "message": "install_failed"})
             yield f"data: {payload}\n\n"
 
     return Response(
@@ -5475,8 +5560,8 @@ def ffmpeg_download():
 def get_custom_lyrics(video_id):
     """Gibt manuell importierte Lyrics für eine videoId zurück."""
     for ext in ("lrc", "ttml"):
-        path = os.path.join(CUSTOM_LYRICS_DIR, f"{video_id}.{ext}")
-        if os.path.isfile(path):
+        path = _safe_cache_path(CUSTOM_LYRICS_DIR, video_id, f".{ext}")
+        if path and os.path.isfile(path):
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
             return jsonify({"content": content, "format": ext})
@@ -5490,14 +5575,16 @@ def save_custom_lyrics():
     video_id = data.get("videoId", "").strip()
     content = data.get("content", "")
     fmt = data.get("format", "lrc").lower()
-    if not video_id or not content or fmt not in ("lrc", "ttml"):
+    if not _ID_RE.match(video_id) or not content or fmt not in ("lrc", "ttml"):
         return jsonify({"error": "invalid request"}), 400
     # Eventuelle andere Datei desselben Songs entfernen
     for ext in ("lrc", "ttml"):
-        old = os.path.join(CUSTOM_LYRICS_DIR, f"{video_id}.{ext}")
-        if os.path.isfile(old):
+        old = _safe_cache_path(CUSTOM_LYRICS_DIR, video_id, f".{ext}")
+        if old and os.path.isfile(old):
             os.remove(old)
-    path = os.path.join(CUSTOM_LYRICS_DIR, f"{video_id}.{fmt}")
+    path = _safe_cache_path(CUSTOM_LYRICS_DIR, video_id, f".{fmt}")
+    if not path:
+        return jsonify({"error": "invalid request"}), 400
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     return jsonify({"ok": True})
@@ -5508,8 +5595,8 @@ def delete_custom_lyrics(video_id):
     """Löscht manuell importierte Lyrics für eine videoId."""
     deleted = False
     for ext in ("lrc", "ttml"):
-        path = os.path.join(CUSTOM_LYRICS_DIR, f"{video_id}.{ext}")
-        if os.path.isfile(path):
+        path = _safe_cache_path(CUSTOM_LYRICS_DIR, video_id, f".{ext}")
+        if path and os.path.isfile(path):
             os.remove(path)
             deleted = True
     if deleted:
@@ -6278,6 +6365,42 @@ _remote_state = {
 }
 _remote_cmds = []                 # pending command strings, drained by the app frontend
 _remote_devices = {}              # deviceId -> {name, status: pending|approved, last_seen}
+_remote_pinned = {}               # deviceId -> name, remembered across restarts ("pin")
+
+# The pairing token and the pinned devices are persisted here rather than in the renderer's
+# localStorage, which any script running in the window can read.
+REMOTE_STATE_PATH = os.path.join(_base_dir, "remote_state.json")
+
+def _remote_pinned_list():
+    return [{"id": did, "name": name} for did, name in _remote_pinned.items()]
+
+def _remote_state_save():
+    try:
+        with open(REMOTE_STATE_PATH, "w", encoding="utf-8") as f:
+            json.dump({"token": _remote_token, "pinned": _remote_pinned_list()}, f)
+    except OSError:
+        _logging.warning("[remote] could not persist remote state", exc_info=True)
+
+def _remote_state_load():
+    global _remote_token
+    try:
+        with open(REMOTE_STATE_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return
+    if not isinstance(data, dict):
+        return
+    token = data.get("token")
+    if isinstance(token, str) and token:
+        _remote_token = token[:64]
+    pinned = data.get("pinned")
+    if isinstance(pinned, list):
+        for entry in pinned:
+            did = (entry or {}).get("id")
+            if did:
+                _remote_pinned[did] = (entry.get("name") or "Device")[:48]
+
+_remote_state_load()
 
 _REMOTE_HTML = """<!DOCTYPE html>
 <html lang="en"><head>
@@ -6549,27 +6672,20 @@ def remote_enable():
     enabled = bool(data.get("enabled"))
     _remote_enabled = enabled
     if enabled:
-        # The desktop persists the token + trusted devices across restarts (backend state is
-        # in-memory) and re-supplies them here, so old QR codes and remembered phones keep
-        # working after a restart. A supplied token is reused; otherwise a fresh one is minted.
-        supplied = (data.get("token") or "").strip()
-        if supplied:
-            _remote_token = supplied[:64]
-        elif not _remote_token:
+        # Token and pinned devices come from remote_state.json, so old QR codes and remembered
+        # phones keep working after a restart.
+        if not _remote_token:
             _remote_token = _secrets.token_urlsafe(12)
-        trusted = data.get("trusted")
-        if isinstance(trusted, list):
-            for tdev in trusted:
-                did = (tdev or {}).get("id")
-                if did and did not in _remote_devices:
-                    _remote_devices[did] = {"name": (tdev.get("name") or "Device")[:48],
-                                            "status": "approved", "last_seen": 0}
+            _remote_state_save()
+        for did, name in _remote_pinned.items():
+            if did not in _remote_devices:
+                _remote_devices[did] = {"name": name, "status": "approved", "last_seen": 0}
     else:
         _remote_token = None
         _remote_devices = {}
         _remote_cmds = []
-    return jsonify({"enabled": _remote_enabled, "token": _remote_token,
-                    "port": 9847, "ips": _remote_local_ips()})
+    return jsonify({"enabled": _remote_enabled, "token": _remote_token, "port": 9847,
+                    "ips": _remote_local_ips(), "pinned": _remote_pinned_list()})
 
 @app.route("/remote/_status")
 def remote_status():
@@ -6579,8 +6695,9 @@ def remote_status():
     devices = [{"id": did, "name": d["name"], "status": d["status"],
                 "online": (now - d.get("last_seen", 0)) < 12}
                for did, d in _remote_devices.items()]
-    return jsonify({"enabled": _remote_enabled, "token": _remote_token,
-                    "port": 9847, "ips": _remote_local_ips(), "devices": devices})
+    return jsonify({"enabled": _remote_enabled, "token": _remote_token, "port": 9847,
+                    "ips": _remote_local_ips(), "devices": devices,
+                    "pinned": _remote_pinned_list()})
 
 @app.route("/remote/_device", methods=["POST"])
 def remote_device():
@@ -6595,7 +6712,25 @@ def remote_device():
         d["status"] = "approved"
     elif action in ("deny", "remove"):
         _remote_devices.pop(did, None)
+        if _remote_pinned.pop(did, None) is not None:
+            _remote_state_save()
     return jsonify({"ok": True})
+
+@app.route("/remote/_remember", methods=["POST"])
+def remote_remember():
+    """Pin/unpin a paired device so it is remembered across restarts."""
+    if not _remote_is_local():
+        return jsonify({"error": "forbidden"}), 403
+    data = request.json or {}
+    did = data.get("id")
+    if not did:
+        return jsonify({"error": "invalid"}), 400
+    if data.get("on"):
+        _remote_pinned[did] = (data.get("name") or "Device")[:48]
+    else:
+        _remote_pinned.pop(did, None)
+    _remote_state_save()
+    return jsonify({"ok": True, "pinned": _remote_pinned_list()})
 
 @app.route("/remote/_push", methods=["POST"])
 def remote_push():

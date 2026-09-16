@@ -220,6 +220,21 @@
       // maxresdefault is 16:9 and clean. hqdefault — what oEmbed hands out — is a 4:3 canvas
       // with the 16:9 frame letterboxed inside it, so its black bars end up baked into the
       // square crop. Not every video has a maxres, hence the fallback.
+      // Old links carry the cover URL in "c". Only artwork-CDN URLs are accepted: the value ends
+      // up as <img src> and as the page background, and a plain "starts with https://" check
+      // would let any host through. The literal prefixes are what keeps the check airtight.
+      function safeCoverUrl(raw) {
+        if (typeof raw !== "string") return null;
+        if (raw.startsWith("https://i.ytimg.com/") ||
+            raw.startsWith("https://i9.ytimg.com/") ||
+            raw.startsWith("https://yt3.ggpht.com/") ||
+            raw.startsWith("https://yt3.googleusercontent.com/") ||
+            raw.startsWith("https://lh3.googleusercontent.com/")) {
+          return raw.slice(0, 512);
+        }
+        return null;
+      }
+
       function loadCover(id, fallbackUrl) {
         var img = document.getElementById("cover");
         img.crossOrigin = "anonymous";
@@ -296,7 +311,7 @@
       var t = params.get("t"), a = params.get("a"), cParam = params.get("c");
       if (t || a) {
         setText(t, a);
-        loadCover(v, (cParam && /^https?:\/\//i.test(cParam)) ? cParam : null);
+        loadCover(v, safeCoverUrl(cParam));
       } else {
         loadCover(v, null);
         // YouTube's oEmbed answers with CORS, so no key and no backend are needed — which is

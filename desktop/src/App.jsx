@@ -10,7 +10,7 @@ import { startAudioLevels } from "./audioLevels.js";
 import { I18nProvider } from "@react-aria/i18n";
 import { IconContext, Minus, X, Play, Pause, House, Books, Heart, CaretLineLeft, CaretLineRight, MagnifyingGlass, Gear, Microphone, VinylRecord, MusicNote, Playlist, Shuffle, SkipBack, SkipForward, Repeat, RepeatOnce, SpeakerX, SpeakerLow, SpeakerHigh, Queue, ChatText, CaretUp, CaretDown, ArrowsIn, ArrowsOut, ArrowLeft, ArrowClockwise, Check, DotsThreeVertical, PushPin, ClockCounterClockwise, CheckCircle, Plus, DownloadSimple, Trash, PencilSimple, ArrowCircleUp, Copy, Moon, Translate, UploadSimple, WifiX, Bug, Radio, ShareNodes, ScreencastSimple, ClapperboardPlay, HeadphonesSimple, UserCircle, Users, SignOut, Power, Bell, Megaphone, MiniPlayerEnter } from "./icons.jsx";
 
-import { API, thumb, hiResThumb, LangContext, useLang, AnimationContext, useAnimations, ZoomContext, useZoom, FontScaleContext, TrackNumberContext } from "./context.jsx";
+import { API, thumb, hiResThumb, isGoogleArtUrl, LangContext, useLang, AnimationContext, useAnimations, ZoomContext, useZoom, FontScaleContext, TrackNumberContext } from "./context.jsx";
 import { CreatePlaylistModal, RenamePlaylistModal, DeletePlaylistModal } from "./modals/playlist-modals.jsx";
 import { NewsModal } from "./modals/news-modal.jsx";
 import { BugReportModal } from "./modals/bug-report-modal.jsx";
@@ -2092,7 +2092,7 @@ function Player({ track, setTrack, queue, setQueue, audioRef, isPlaying, setIsPl
     // the one big cover but wasteful for up to 100 tiny list icons pushed every second.
     const queueThumb = (url) => {
       if (!url) return "";
-      if (url.includes("googleusercontent.com") || url.includes("ggpht.com")) {
+      if (isGoogleArtUrl(url)) {
         return /=[ws]\d+/.test(url) ? url.replace(/=[ws]\d+[^/]*$/, "=w120-h120-l90-rj") : url + "=w120-h120-l90-rj";
       }
       return url;
@@ -4629,25 +4629,20 @@ export default function App() {
   const [remoteEnabled, setRemoteEnabled] = useState(false);
   const [remoteInfo, setRemoteInfo] = useState(null);     // { token, ips, port }
   const [remoteDevices, setRemoteDevices] = useState([]);
-  // Remembered devices persist across app restarts. The backend state is in-memory, so the
-  // desktop keeps the stable token + trusted device list in localStorage and re-supplies both
-  // on enable — remembered phones then auto-approve without re-pairing after a restart.
-  const [remoteTrusted, setRemoteTrusted] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("kodama-remote-trusted") || "[]"); } catch { return []; }
-  });
+  // Remembered ("pinned") devices survive app restarts: the sidecar keeps them in
+  // remote_state.json and hands them back through /remote/_enable and /remote/_status, so the
+  // renderer only mirrors the list in memory instead of keeping pairing data in localStorage.
+  const [remoteTrusted, setRemoteTrusted] = useState([]);
   const remoteTrustedIds = useMemo(() => new Set(remoteTrusted.map(x => x.id)), [remoteTrusted]);
   const toggleRemote = useCallback(async (on) => {
     try {
-      let trusted = [];
-      try { trusted = JSON.parse(localStorage.getItem("kodama-remote-trusted") || "[]"); } catch {}
-      const savedToken = localStorage.getItem("kodama-remote-token") || "";
       const d = await fetch(`${API}/remote/_enable`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: on, token: on ? savedToken : "", trusted: on ? trusted : [] }),
+        body: JSON.stringify({ enabled: on }),
       }).then(r => r.json());
       setRemoteEnabled(!!d.enabled);
       setRemoteInfo(d.enabled ? { token: d.token, ips: d.ips || [], port: d.port } : null);
-      if (d.enabled && d.token) { try { localStorage.setItem("kodama-remote-token", d.token); } catch {} }
+      setRemoteTrusted(Array.isArray(d.pinned) ? d.pinned : []);
       if (!d.enabled) setRemoteDevices([]);
     } catch (e) { console.error("[Remote] toggle failed:", e); }
   }, []);
@@ -4657,20 +4652,18 @@ export default function App() {
       body: JSON.stringify({ id, action }),
     }).catch(() => {});
     // Forget a removed/denied device so it doesn't get re-seeded as approved next restart.
+    // The sidecar unpins it as well — it owns the remembered list.
     if (action === "remove" || action === "deny") {
-      setRemoteTrusted(prev => {
-        const next = prev.filter(x => x.id !== id);
-        try { localStorage.setItem("kodama-remote-trusted", JSON.stringify(next)); } catch {}
-        return next;
-      });
+      setRemoteTrusted(prev => prev.filter(x => x.id !== id));
     }
   }, []);
   const remoteRememberDevice = useCallback((id, name, on) => {
-    setRemoteTrusted(prev => {
-      const next = on ? [...prev.filter(x => x.id !== id), { id, name }] : prev.filter(x => x.id !== id);
-      try { localStorage.setItem("kodama-remote-trusted", JSON.stringify(next)); } catch {}
-      return next;
-    });
+    fetch(`${API}/remote/_remember`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, name, on }),
+    }).catch(() => {});
+    setRemoteTrusted(prev =>
+      on ? [...prev.filter(x => x.id !== id), { id, name }] : prev.filter(x => x.id !== id));
   }, []);
   // Pairing modal open state — declared before the device poll so the poll can speed up
   // while it's open (for snappy scan detection) and stay slow otherwise (for performance).
@@ -4683,10 +4676,15 @@ export default function App() {
     // Only update state when the device list actually changed — a fresh array reference
     // every poll would re-render the whole app even when nothing changed.
     const sig = (arr) => (arr || []).map(x => `${x.id}:${x.status}:${x.online}`).join("|");
+    const pinnedSig = (arr) => (arr || []).map(x => `${x.id}:${x.name}`).join("|");
     const tick = () => fetch(`${API}/remote/_status`).then(r => r.json())
       .then(d => {
         if (stop || !d || !d.devices) return;
         setRemoteDevices(prev => (sig(prev) === sig(d.devices) ? prev : d.devices));
+        // Pins are remembered by the sidecar, so this also restores them on a fresh launch.
+        if (Array.isArray(d.pinned)) {
+          setRemoteTrusted(prev => (pinnedSig(prev) === pinnedSig(d.pinned) ? prev : d.pinned));
+        }
       }).catch(() => {});
     tick();
     const iv = setInterval(tick, pairModalOpen ? 2000 : 5000);

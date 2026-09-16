@@ -16,15 +16,13 @@ describe("platform mod-key constants", () => {
 
 const SRC_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
-const HARDCODE_WHITELIST = new Set(
-  [
-    "utils/platform.ts",
-    "utils/platform.test.ts",
-    "ui/help-modal.tsx",
-    "ui/shortcut-rebind-row.tsx",
-    "stores/shortcut-bindings.ts",
-  ].map((p) => p.replace(/\//g, "/")),
-);
+const HARDCODE_WHITELIST = new Set([
+  "utils/platform.ts",
+  "utils/platform.test.ts",
+  "ui/help-modal.tsx",
+  "ui/shortcut-rebind-row.tsx",
+  "stores/shortcut-bindings.ts",
+]);
 
 function* walk(dir: string): Generator<string> {
   for (const entry of readdirSync(dir)) {
