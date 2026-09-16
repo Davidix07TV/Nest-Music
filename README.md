@@ -227,7 +227,8 @@ If you find Nest Music useful, please star this repository on GitHub!
 Found a bug or have a feature request? [Open an issue](https://github.com/Davidix07TV/Nest-Music/issues)!
 
 #### Contribute Code 💻
-Pull requests are welcome! Please ensure your changes align with the project goals.
+Pull requests are welcome! Read [CONTRIBUTING.md](CONTRIBUTING.md) first — the project is on a
+feature freeze, so fixes, cleanup and docs are what we're looking for.
 
 </div>
 
