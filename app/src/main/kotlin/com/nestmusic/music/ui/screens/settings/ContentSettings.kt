@@ -931,6 +931,12 @@ fun ContentSettings(
             title = "Wrapped",
             items = listOf(
                 Material3SettingsItem(
+                    icon = painterResource(R.drawable.automix),
+                    title = { Text(stringResource(R.string.view_wrapped)) },
+                    description = { Text(stringResource(R.string.view_wrapped_desc)) },
+                    onClick = { navController.navigate("wrapped") }
+                ),
+                Material3SettingsItem(
                     icon = painterResource(R.drawable.stats),
                     title = { Text(stringResource(R.string.show_most_stats_playlists)) },
                     description = { Text(stringResource(R.string.show_most_stats_playlists_desc)) },

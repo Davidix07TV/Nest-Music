@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -96,7 +97,7 @@ fun WrappedMinutesScreen(
             verticalArrangement = Arrangement.Center
         ) {
             FormattedText(
-                text = messagePair?.tease ?: "", modifier = Modifier.padding(horizontal = 24.dp),
+                text = messagePair?.let { stringResource(it.teaseRes) } ?: "", modifier = Modifier.padding(horizontal = 24.dp),
                 style = MaterialTheme.typography.headlineSmall.copy(color = Color.White, textAlign = TextAlign.Center)
             )
             Spacer(Modifier.height(32.dp))
@@ -126,7 +127,7 @@ fun WrappedMinutesScreen(
             }
             Spacer(Modifier.height(16.dp))
             FormattedText(
-                text = messagePair?.reveal ?: "", modifier = Modifier.padding(horizontal = 24.dp),
+                text = messagePair?.let { stringResource(it.revealRes, totalMinutes) } ?: "", modifier = Modifier.padding(horizontal = 24.dp),
                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.White.copy(alpha = 0.8f), textAlign = TextAlign.Center)
             )
         }

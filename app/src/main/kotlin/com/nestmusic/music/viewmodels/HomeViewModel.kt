@@ -32,6 +32,7 @@ import com.nestmusic.music.constants.QuickPicks
 import com.nestmusic.music.constants.QuickPicksKey
 import com.nestmusic.music.constants.ShowWrappedCardKey
 import com.nestmusic.music.constants.WrappedSeenKey
+import com.nestmusic.music.constants.WrappedSeenYearKey
 import com.nestmusic.music.db.MusicDatabase
 import com.nestmusic.music.db.entities.Album
 import com.nestmusic.music.db.entities.LocalItem
@@ -41,6 +42,7 @@ import com.nestmusic.music.extensions.filterVideoSongs
 import com.nestmusic.music.extensions.toEnum
 import com.nestmusic.music.models.SimilarRecommendation
 import com.nestmusic.music.ui.screens.wrapped.WrappedAudioService
+import com.nestmusic.music.ui.screens.wrapped.WrappedConstants
 import com.nestmusic.music.ui.screens.wrapped.WrappedManager
 import com.nestmusic.music.utils.SyncUtils
 import com.nestmusic.music.utils.dataStore
@@ -60,7 +62,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.random.Random
@@ -255,10 +256,17 @@ class HomeViewModel @Inject constructor(
 
 	val showWrappedCard: StateFlow<Boolean> = context.dataStore.data.map { prefs ->
         val showWrappedPref = prefs[ShowWrappedCardKey] ?: false
-        val seen = prefs[WrappedSeenKey] ?: false
-        val isBeforeDate = LocalDate.now().isBefore(LocalDate.of(2026, 2, 1))
-
-        isBeforeDate && (!seen || showWrappedPref)
+        // The "Show Wrapped card" toggle forces the card at any time (useful
+        // to preview the Wrapped outside the year-end window). Otherwise the
+        // card is only offered during the year-end window and only once per
+        // Wrapped year.
+        if (showWrappedPref) {
+            true
+        } else {
+            val seenYear = prefs[WrappedSeenYearKey] ?: ""
+            val seenThisYear = seenYear == WrappedConstants.YEAR.toString()
+            WrappedConstants.IS_IN_YEAR_END_WINDOW && !seenThisYear
+        }
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val wrappedSeen: StateFlow<Boolean> = context.dataStore.data.map { prefs ->
@@ -281,6 +289,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             context.safeDataStoreEdit {
                 it[WrappedSeenKey] = true
+                it[WrappedSeenYearKey] = WrappedConstants.YEAR.toString()
             }
         }
     }
