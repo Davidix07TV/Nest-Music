@@ -159,6 +159,8 @@
     <string name="prevent_duplicate_tracks_in_queue">Prevent duplicate tracks in queue</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">When adding a track that\'s already in the queue, it will be moved from its previous position rather than added again</string>
     <string name="show_wrapped_card">Show Wrapped card</string>
+    <string name="view_wrapped">View Wrapped</string>
+    <string name="view_wrapped_desc">Replay your Wrapped at any time</string>
     <string name="skip_silence_desc">Fast-forward through silent parts of songs</string>
     <string name="skip_silence_instant">Instantly skip silence</string>
     <string name="skip_silence_instant_desc">Jump ahead during silent moments instead of speeding up playback</string>
@@ -773,6 +775,29 @@
     <string name="ai_system_prompt_placeholder">Use {lineCount} as a placeholder for the number of lines to translate</string>
     <string name="ai_system_prompt_default">Default</string>
     <string name="ai_system_prompt_reset">Reset to default</string>
+
+    <!-- AI Playlist -->
+    <string name="ai_playlist_title">AI playlist</string>
+    <string name="ai_playlist_entry_title">AI playlist</string>
+    <string name="ai_playlist_entry_desc">Describe a mood and let AI build a playlist for you</string>
+    <string name="ai_playlist_prompt_placeholder">Describe what you want to listen to…</string>
+    <string name="ai_playlist_hint">Tip: the more specific your description, the better the result.</string>
+    <string name="ai_playlist_suggestions">Suggestions</string>
+    <string name="ai_playlist_songs_count">Number of songs</string>
+    <string name="ai_playlist_generate">Generate</string>
+    <string name="ai_playlist_thinking">Asking AI for song suggestions…</string>
+    <string name="ai_playlist_building">Adding songs… %1$d/%2$d</string>
+    <string name="ai_playlist_suggestion_1">chill lo-fi to study to</string>
+    <string name="ai_playlist_suggestion_2">high-energy workout</string>
+    <string name="ai_playlist_suggestion_3">rainy day jazz</string>
+    <string name="ai_playlist_suggestion_4">indie pop from the 2010s</string>
+    <string name="ai_playlist_not_configured_title">AI is not configured</string>
+    <string name="ai_playlist_not_configured_desc">Add your provider and API key in AI settings to generate playlists with AI.</string>
+    <string name="ai_playlist_open_settings">Open AI settings</string>
+    <string name="ai_playlist_error_not_configured">AI is not configured. Add your API key in AI settings first.</string>
+    <string name="ai_playlist_error_deepl">DeepL cannot generate playlists. Pick a chat model provider in AI settings.</string>
+    <string name="ai_playlist_error_ai">The AI request failed. Check your settings and try again.</string>
+    <string name="ai_playlist_error_no_songs">No songs were found for this request. Try a different description.</string>
 
     <!-- Crash Handler -->
     <string name="crash_title">App crashed</string>

@@ -268,4 +268,112 @@ Output MUST be a JSON array with EXACTLY $lineCount strings."""
             }
             return@withContext Result.failure(Exception("Max retries exceeded"))
         }
+
+    /**
+     * Generic OpenAI-compatible chat completion. Returns the raw message content.
+     * Used by features that are not translations (e.g. AI playlist generation).
+     */
+    suspend fun complete(
+        systemPrompt: String,
+        userPrompt: String,
+        apiKey: String,
+        baseUrl: String,
+        model: String,
+        maxTokens: Int = 4096,
+        temperature: Double = 0.8,
+        maxRetries: Int = 3,
+    ): Result<String> =
+        withContext(Dispatchers.IO) {
+            var currentAttempt = 0
+
+            if (userPrompt.isBlank()) {
+                return@withContext Result.failure(Exception("Input prompt is empty"))
+            }
+
+            val messages =
+                JSONArray().apply {
+                    put(
+                        JSONObject().apply {
+                            put("role", "system")
+                            put("content", systemPrompt)
+                        },
+                    )
+                    put(
+                        JSONObject().apply {
+                            put("role", "user")
+                            put("content", userPrompt)
+                        },
+                    )
+                }
+
+            val jsonBody =
+                JSONObject().apply {
+                    if (model.isNotBlank()) {
+                        put("model", model)
+                    }
+                    put("messages", messages)
+                    put("temperature", temperature)
+                    put("max_tokens", maxTokens)
+                }
+
+            val request =
+                Request
+                    .Builder()
+                    .url(baseUrl.ifBlank { "https://openrouter.ai/api/v1/chat/completions" })
+                    .apply {
+                        if (apiKey.isNotBlank()) {
+                            addHeader("Authorization", "Bearer ${apiKey.trim()}")
+                        }
+                    }.addHeader("Content-Type", "application/json")
+                    .addHeader("HTTP-Referer", "https://github.com/Davidix07TV/Nest-Music")
+                    .addHeader("X-Title", "Nest Music")
+                    .post(jsonBody.toString().toRequestBody(JSON))
+                    .build()
+
+            while (currentAttempt < maxRetries) {
+                try {
+                    val response = client.newCall(request).execute()
+                    val responseBody = response.body?.string()
+
+                    if (!response.isSuccessful) {
+                        if (response.code >= 500) {
+                            currentAttempt++
+                            kotlinx.coroutines.delay(1000L * currentAttempt)
+                            continue
+                        }
+
+                        val errorMsg =
+                            try {
+                                JSONObject(responseBody ?: "").optJSONObject("error")?.optString("message")
+                                    ?: "HTTP ${response.code}: ${response.message}"
+                            } catch (e: Exception) {
+                                "HTTP ${response.code}: ${response.message}"
+                            }
+                        return@withContext Result.failure(Exception("AI request failed: $errorMsg"))
+                    }
+
+                    if (responseBody == null) {
+                        currentAttempt++
+                        continue
+                    }
+
+                    val jsonResponse = JSONObject(responseBody)
+                    val choices = jsonResponse.optJSONArray("choices")
+                    val content = choices?.optJSONObject(0)?.optJSONObject("message")?.optString("content")?.trim()
+
+                    if (!content.isNullOrBlank()) {
+                        return@withContext Result.success(content)
+                    }
+
+                    currentAttempt++
+                } catch (e: Exception) {
+                    if (currentAttempt == maxRetries - 1) {
+                        return@withContext Result.failure(e)
+                    }
+                }
+                currentAttempt++
+                kotlinx.coroutines.delay(1000L * currentAttempt)
+            }
+            return@withContext Result.failure(Exception("Max retries exceeded"))
+        }
 }

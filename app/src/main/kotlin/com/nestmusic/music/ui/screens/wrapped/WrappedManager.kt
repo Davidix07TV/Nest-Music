@@ -49,7 +49,7 @@ class WrappedManager(
     private val _state = MutableStateFlow(WrappedState())
     val state = _state.asStateFlow()
 
-    fun createPlaylist(imageResName: String) {
+    fun createPlaylist(imageRes: Int?) {
         if (_state.value.playlistCreationState != PlaylistCreationState.Idle) return
 
         _state.update { it.copy(playlistCreationState = PlaylistCreationState.Creating) }
@@ -62,17 +62,21 @@ class WrappedManager(
 
                     val playlistId = UUID.randomUUID().toString()
 
-                    val drawableId = context.resources.getIdentifier(imageResName, "drawable", context.packageName)
-                    val bitmap = BitmapFactory.decodeResource(context.resources, drawableId)
-                    val file = File(context.cacheDir, "$playlistId.png")
-                    FileOutputStream(file).use {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                    // A Wrapped with no artwork for its year gets no thumbnail
+                    // instead of a cover showing the wrong year.
+                    val thumbnailUrl = imageRes?.let { res ->
+                        val bitmap = BitmapFactory.decodeResource(context.resources, res)
+                        val file = File(context.cacheDir, "$playlistId.png")
+                        FileOutputStream(file).use {
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                        }
+                        file.toURI().toString()
                     }
 
                     val newPlaylist = PlaylistEntity(
                         id = playlistId,
                         name = WrappedConstants.PLAYLIST_NAME,
-                        thumbnailUrl = file.toURI().toString(),
+                        thumbnailUrl = thumbnailUrl,
                         bookmarkedAt = LocalDateTime.now(),
                         isEditable = true
                     )

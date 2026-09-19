@@ -41,6 +41,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.nestmusic.music.LocalNavController
 import com.nestmusic.music.R
+import com.nestmusic.music.ui.screens.Screens
 import com.nestmusic.music.ui.screens.wrapped.pages.ConclusionPage
 import com.nestmusic.music.ui.screens.wrapped.pages.PlaylistPage
 import com.nestmusic.music.ui.screens.wrapped.pages.WrappedIntro
@@ -105,6 +106,13 @@ fun WrappedScreenContent() {
     val navController = LocalNavController.current
     val onClose: () -> Unit = {
         navController.previousBackStackEntry?.savedStateHandle?.set("wrapped_seen", true)
+        // When opened from outside Home (e.g. Settings), also mark the Home
+        // entry so the home card is dismissed consistently.
+        try {
+            navController.getBackStackEntry(Screens.Home.route).savedStateHandle["wrapped_seen"] = true
+        } catch (_: Exception) {
+            // Home entry is not on the back stack
+        }
         navController.popBackStack()
     }
     BackHandler(onBack = onClose)

@@ -53,11 +53,11 @@ fun PlaylistPage() {
     val state by manager.state.collectAsStateWithLifecycle()
     val playlistCreationState = state.playlistCreationState
 
-    val (playlistImageRes, playlistImageName) = remember {
-        if (Random.nextBoolean()) {
-            Pair(R.drawable.wrapped_playlistv1, "wrapped_playlistv1")
-        } else {
-            Pair(R.drawable.wrapped_playlistv2, "wrapped_playlistv2")
+    // Each Wrapped year has its own playlist covers; when we run out of
+    // prepared artworks the playlist is created without a thumbnail.
+    val playlistImageRes = remember {
+        WrappedConstants.playlistCovers(WrappedConstants.YEAR)?.let { covers ->
+            if (Random.nextBoolean()) covers.first else covers.second
         }
     }
 
@@ -93,14 +93,16 @@ fun PlaylistPage() {
                 )
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Image(
-                painter = painterResource(id = playlistImageRes),
-                contentDescription = stringResource(R.string.album_cover_desc),
-                modifier = Modifier
-                    .size(256.dp)
-                    .clip(RoundedCornerShape(3.dp))
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+            if (playlistImageRes != null) {
+                Image(
+                    painter = painterResource(id = playlistImageRes),
+                    contentDescription = stringResource(R.string.album_cover_desc),
+                    modifier = Modifier
+                        .size(256.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
             Text(
                 text = stringResource(R.string.wrapped_playlist_title, WrappedConstants.YEAR),
                 style = TextStyle(
@@ -113,7 +115,7 @@ fun PlaylistPage() {
             Button(
                 onClick = {
                     if (playlistCreationState == PlaylistCreationState.Idle) {
-                        manager.createPlaylist(playlistImageName)
+                        manager.createPlaylist(playlistImageRes)
                     }
                 },
                 shape = CircleShape,
