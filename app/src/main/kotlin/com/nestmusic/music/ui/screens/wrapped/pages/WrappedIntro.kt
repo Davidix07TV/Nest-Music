@@ -135,11 +135,15 @@ fun WrappedIntro(onNext: () -> Unit) {
         // the container instead made the year drift to the middle of the page
         // and overlap the logo and the title.
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            // Read from BoxWithConstraintsScope before entering the inner Box:
+            // the layout DSL markers hide an outer scope inside a layout lambda.
+            val watermarkWidth = maxWidth * 0.26f
+            val availableHeight = maxHeight
             Box(
                 modifier =
                     Modifier
                         .align(Alignment.CenterStart)
-                        .width(maxWidth * 0.26f)
+                        .width(watermarkWidth)
                         .fillMaxHeight(),
                 contentAlignment = Alignment.Center
             ) {
@@ -147,16 +151,16 @@ fun WrappedIntro(onNext: () -> Unit) {
                     text = WrappedConstants.YEAR.toString(),
                     style = TextStyle.Default.copy(
                         fontFamily = bbhBartle,
-                        // Four digits at roughly maxHeight/5 wide each fill the
-                        // screen height; AutoResizingText still shrinks it if
-                        // a year ever needs more room.
-                        fontSize = with(LocalDensity.current) { (maxHeight / 5).toSp() },
+                        // Four digits at roughly availableHeight/5 wide each fill
+                        // the screen height; AutoResizingText still shrinks it
+                        // if a year ever needs more room.
+                        fontSize = with(LocalDensity.current) { (availableHeight / 5).toSp() },
                         color = Color.White,
                         drawStyle = Stroke(width = 2f)
                     ),
                     modifier =
                         Modifier
-                            .width(maxHeight)
+                            .width(availableHeight)
                             .graphicsLayer {
                                 scaleX = scale
                                 scaleY = scale
