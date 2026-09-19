@@ -159,6 +159,8 @@
     <string name="prevent_duplicate_tracks_in_queue">Prevent duplicate tracks in queue</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">When adding a track that\'s already in the queue, it will be moved from its previous position rather than added again</string>
     <string name="show_wrapped_card">Show Wrapped card</string>
+    <string name="view_wrapped">View Wrapped</string>
+    <string name="view_wrapped_desc">Replay your Wrapped at any time</string>
     <string name="skip_silence_desc">Fast-forward through silent parts of songs</string>
     <string name="skip_silence_instant">Instantly skip silence</string>
     <string name="skip_silence_instant_desc">Jump ahead during silent moments instead of speeding up playback</string>
