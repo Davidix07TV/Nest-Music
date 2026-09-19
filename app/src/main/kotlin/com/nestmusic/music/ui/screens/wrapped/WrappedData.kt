@@ -5,46 +5,52 @@
 
 package com.nestmusic.music.ui.screens.wrapped
 
-data class MessagePair(val range: LongRange, val tease: String, val reveal: String)
+import com.nestmusic.music.R
+
+/**
+ * A tease/reveal pair for the minutes page, held as string resources so the
+ * messages can be translated. The reveal carries the minutes placeholder.
+ */
+data class MessagePair(val range: LongRange, val teaseRes: Int, val revealRes: Int)
 
 object WrappedRepository {
     private val messages = listOf(
-        MessagePair(0L..999L, "I really hope you are not dissapointed...", "That's **%d minutes**. Just warming up?"),
-        MessagePair(0L..999L, "Testing the waters, are we?", "**%d minutes** is a quick dip in the musical ocean."),
-        MessagePair(0L..999L, "Busy schedule this year?", "**%d minutes** is short, sweet, and to the point."),
-        MessagePair(0L..999L, "Silence is golden, they say...", "But you preferred **%d minutes** of noise."),
+        MessagePair(0L..999L, R.string.wrapped_message_tease_1, R.string.wrapped_message_reveal_1),
+        MessagePair(0L..999L, R.string.wrapped_message_tease_2, R.string.wrapped_message_reveal_2),
+        MessagePair(0L..999L, R.string.wrapped_message_tease_3, R.string.wrapped_message_reveal_3),
+        MessagePair(0L..999L, R.string.wrapped_message_tease_4, R.string.wrapped_message_reveal_4),
 
-        MessagePair(1000L..4999L, "It seems like you found Metrolist recently...", "And you dedicated **%d minutes** to the tunes."),
-        MessagePair(1000L..4999L, "You have a life outside of music.", "**%d minutes** is a healthy balance. We respect that."),
-        MessagePair(1000L..4999L, "Not too quiet, not too loud.", "Just the right amount of vibes for **%d minutes**."),
-        MessagePair(1000L..4999L, "A casual stop on your journey.", "Thanks for dropping by for **%d minutes**."),
+        MessagePair(1000L..4999L, R.string.wrapped_message_tease_5, R.string.wrapped_message_reveal_5),
+        MessagePair(1000L..4999L, R.string.wrapped_message_tease_6, R.string.wrapped_message_reveal_6),
+        MessagePair(1000L..4999L, R.string.wrapped_message_tease_7, R.string.wrapped_message_reveal_7),
+        MessagePair(1000L..4999L, R.string.wrapped_message_tease_8, R.string.wrapped_message_reveal_8),
 
-        MessagePair(5000L..14999L, "Music is definitely your thing.", "**%d minutes** is a solid soundtrack for your year."),
-        MessagePair(5000L..14999L, "We saw you here quite a bit.", "Always setting the mood for **%d minutes**."),
-        MessagePair(5000L..14999L, "Your commute must be fun.", "**%d minutes** of melodies."),
-        MessagePair(5000L..14999L, "Consistent. Reliable. Rhythmic.", "You know what you like, for **%d minutes**."),
+        MessagePair(5000L..14999L, R.string.wrapped_message_tease_9, R.string.wrapped_message_reveal_9),
+        MessagePair(5000L..14999L, R.string.wrapped_message_tease_10, R.string.wrapped_message_reveal_10),
+        MessagePair(5000L..14999L, R.string.wrapped_message_tease_11, R.string.wrapped_message_reveal_11),
+        MessagePair(5000L..14999L, R.string.wrapped_message_tease_12, R.string.wrapped_message_reveal_12),
 
-        MessagePair(15000L..39999L, "Do you ever take your headphones off?", "**%d minutes** suggests music is your oxygen."),
-        MessagePair(15000L..39999L, "Your battery is begging for mercy.", "But your ears absolutely love those **%d minutes**."),
-        MessagePair(15000L..39999L, "Main Character Energy detected.", "Your life was a movie for **%d minutes**."),
-        MessagePair(15000L..39999L, "Walking, working, sleeping...", "There was always a song playing during those **%d minutes**."),
+        MessagePair(15000L..39999L, R.string.wrapped_message_tease_13, R.string.wrapped_message_reveal_13),
+        MessagePair(15000L..39999L, R.string.wrapped_message_tease_14, R.string.wrapped_message_reveal_14),
+        MessagePair(15000L..39999L, R.string.wrapped_message_tease_15, R.string.wrapped_message_reveal_15),
+        MessagePair(15000L..39999L, R.string.wrapped_message_tease_16, R.string.wrapped_message_reveal_16),
 
-        MessagePair(40000L..Long.MAX_VALUE, "Are you... okay?", "You literally lived here for **%d minutes**."),
-        MessagePair(40000L..Long.MAX_VALUE, "We are worried about your eardrums.", "Top 1% behavior. **%d minutes** is legendary."),
-        MessagePair(40000L..Long.MAX_VALUE, "Silence scares you, doesn't it?", "A wall of sound, all year long, for **%d minutes**."),
-        MessagePair(40000L..Long.MAX_VALUE, "Certified Stress Tester.", "You made those extractors work overtime for **%d minutes**.")
+        MessagePair(40000L..Long.MAX_VALUE, R.string.wrapped_message_tease_17, R.string.wrapped_message_reveal_17),
+        MessagePair(40000L..Long.MAX_VALUE, R.string.wrapped_message_tease_18, R.string.wrapped_message_reveal_18),
+        MessagePair(40000L..Long.MAX_VALUE, R.string.wrapped_message_tease_19, R.string.wrapped_message_reveal_19),
+        MessagePair(40000L..Long.MAX_VALUE, R.string.wrapped_message_tease_20, R.string.wrapped_message_reveal_20),
     )
+
+    private val fallback =
+        MessagePair(
+            0L..Long.MAX_VALUE,
+            R.string.wrapped_message_tease_fallback,
+            R.string.wrapped_message_reveal_fallback,
+        )
 
     fun getMessage(minutes: Long): MessagePair {
         val possibleMessages = messages.filter { minutes in it.range }
-        val chosenMessage = if (possibleMessages.isNotEmpty()) {
-            possibleMessages.random()
-        } else {
-            // Fallback for safety
-            MessagePair(0L..Long.MAX_VALUE, "Looks like we lost count!", "But you definitely listened to **%d minutes** of music.")
-        }
-        return chosenMessage.copy(
-            reveal = chosenMessage.reveal.format(minutes)
-        )
+        // Fallback for safety
+        return possibleMessages.randomOrNull() ?: fallback
     }
 }

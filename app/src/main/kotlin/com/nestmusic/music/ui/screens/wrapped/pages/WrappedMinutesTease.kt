@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -44,7 +45,7 @@ fun WrappedMinutesTease(
             enter = fadeIn(tween(1000)) + scaleIn(initialScale = 0.9f, animationSpec = tween(1000))
         ) {
             Text(
-                text = messagePair?.tease ?: "", modifier = Modifier.padding(horizontal = 24.dp),
+                text = messagePair?.let { stringResource(it.teaseRes) } ?: "", modifier = Modifier.padding(horizontal = 24.dp),
                 color = Color.White, fontSize = 30.sp, lineHeight = 34.sp, textAlign = TextAlign.Center,
                 fontFamily = try { bbh_bartle } catch (e: Exception) { FontFamily.Default }
             )

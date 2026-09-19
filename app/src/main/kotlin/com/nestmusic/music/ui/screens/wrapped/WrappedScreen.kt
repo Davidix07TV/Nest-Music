@@ -119,12 +119,12 @@ fun WrappedScreenContent() {
 
     val messagePairSaver =
         Saver<MessagePair, List<Any>>(
-            save = { listOf(it.range.first, it.range.last, it.tease, it.reveal) },
+            save = { listOf(it.range.first, it.range.last, it.teaseRes, it.revealRes) },
             restore = {
                 MessagePair(
                     range = (it[0] as Long)..(it[1] as Long),
-                    tease = it[2] as String,
-                    reveal = it[3] as String,
+                    teaseRes = it[2] as Int,
+                    revealRes = it[3] as Int,
                 )
             },
         )

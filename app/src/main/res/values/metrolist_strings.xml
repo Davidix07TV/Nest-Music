@@ -535,6 +535,59 @@
     <string name="wrapped_intro_button">let\'s go!</string>
     <string name="wrapped_logo_content_description">Nest Music Logo</string>
     <string name="wrapped_year">2025</string>
+
+    <!--
+      Wrapped minutes messages: collected by listening time.
+      The **...** markers make the enclosed text bold in FormattedText.
+    -->
+    <string name="wrapped_message_tease_1">I really hope you are not dissapointed...</string>
+    <string name="wrapped_message_reveal_1">That\'s **%d minutes**. Just warming up?</string>
+    <string name="wrapped_message_tease_2">Testing the waters, are we?</string>
+    <string name="wrapped_message_reveal_2">**%d minutes** is a quick dip in the musical ocean.</string>
+    <string name="wrapped_message_tease_3">Busy schedule this year?</string>
+    <string name="wrapped_message_reveal_3">**%d minutes** is short, sweet, and to the point.</string>
+    <string name="wrapped_message_tease_4">Silence is golden, they say...</string>
+    <string name="wrapped_message_reveal_4">But you preferred **%d minutes** of noise.</string>
+    <string name="wrapped_message_tease_5">It seems like you found Nest Music recently...</string>
+    <string name="wrapped_message_reveal_5">And you dedicated **%d minutes** to the tunes.</string>
+    <string name="wrapped_message_tease_6">You have a life outside of music.</string>
+    <string name="wrapped_message_reveal_6">**%d minutes** is a healthy balance. We respect that.</string>
+    <string name="wrapped_message_tease_7">Not too quiet, not too loud.</string>
+    <string name="wrapped_message_reveal_7">Just the right amount of vibes for **%d minutes**.</string>
+    <string name="wrapped_message_tease_8">A casual stop on your journey.</string>
+    <string name="wrapped_message_reveal_8">Thanks for dropping by for **%d minutes**.</string>
+    <string name="wrapped_message_tease_9">Music is definitely your thing.</string>
+    <string name="wrapped_message_reveal_9">**%d minutes** is a solid soundtrack for your year.</string>
+    <string name="wrapped_message_tease_10">We saw you here quite a bit.</string>
+    <string name="wrapped_message_reveal_10">Always setting the mood for **%d minutes**.</string>
+    <string name="wrapped_message_tease_11">Your commute must be fun.</string>
+    <string name="wrapped_message_reveal_11">**%d minutes** of melodies.</string>
+    <string name="wrapped_message_tease_12">Consistent. Reliable. Rhythmic.</string>
+    <string name="wrapped_message_reveal_12">You know what you like, for **%d minutes**.</string>
+    <string name="wrapped_message_tease_13">Do you ever take your headphones off?</string>
+    <string name="wrapped_message_reveal_13">**%d minutes** suggests music is your oxygen.</string>
+    <string name="wrapped_message_tease_14">Your battery is begging for mercy.</string>
+    <string name="wrapped_message_reveal_14">But your ears absolutely love those **%d minutes**.</string>
+    <string name="wrapped_message_tease_15">Main Character Energy detected.</string>
+    <string name="wrapped_message_reveal_15">Your life was a movie for **%d minutes**.</string>
+    <string name="wrapped_message_tease_16">Walking, working, sleeping...</string>
+    <string name="wrapped_message_reveal_16">There was always a song playing during those **%d minutes**.</string>
+    <string name="wrapped_message_tease_17">Are you... okay?</string>
+    <string name="wrapped_message_reveal_17">You literally lived here for **%d minutes**.</string>
+    <string name="wrapped_message_tease_18">We are worried about your eardrums.</string>
+    <string name="wrapped_message_reveal_18">Top 1% behavior. **%d minutes** is legendary.</string>
+    <string name="wrapped_message_tease_19">Silence scares you, doesn\'t it?</string>
+    <string name="wrapped_message_reveal_19">A wall of sound, all year long, for **%d minutes**.</string>
+    <string name="wrapped_message_tease_20">Certified Stress Tester.</string>
+    <string name="wrapped_message_reveal_20">You made those extractors work overtime for **%d minutes**.</string>
+    <string name="wrapped_message_tease_fallback">Looks like we lost count!</string>
+    <string name="wrapped_message_reveal_fallback">But you definitely listened to **%d minutes** of music.</string>
+
+    <!--
+      App name shown on the Wrapped intro. Deliberately not translatable:
+      translations of wrapped_intro_title still carry the old Metrolist name.
+    -->
+    <string name="wrapped_intro_brand" translatable="false">NEST MUSIC</string>
     <string name="wrapped_ready_title">YOUR WRAPPED IS READY!</string>
     <string name="wrapped_ready_subtitle">Time to see what you loved all this year…</string>
     <string name="wrapped_thank_you">Thank you for listening!</string>
