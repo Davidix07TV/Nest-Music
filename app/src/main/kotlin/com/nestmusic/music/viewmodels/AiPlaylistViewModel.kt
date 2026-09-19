@@ -31,7 +31,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDateTime
 import java.util.Collections
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 

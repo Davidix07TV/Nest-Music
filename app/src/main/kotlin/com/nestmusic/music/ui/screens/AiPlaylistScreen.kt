@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -94,7 +95,7 @@ fun AiPlaylistScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(LocalPlayerAwareWindowInsets.current),
+                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current),
     ) {
         if (!configured) {
             AiNotConfiguredCard(onOpenSettings = { navController.navigate("settings/ai") })
@@ -173,7 +174,7 @@ fun AiPlaylistScreen(
                 Text(stringResource(R.string.ai_playlist_generate))
             }
 
-            when (state = uiState) {
+            when (val state = uiState) {
                 is AiPlaylistUiState.Thinking ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
