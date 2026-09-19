@@ -9,6 +9,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -27,6 +29,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -804,6 +808,16 @@ fun LibraryMixScreen(
                         headerContent()
                     }
 
+                    if (searchQuery.isBlank()) {
+                        item(
+                            key = "aiPlaylistEntry",
+                            span = { GridItemSpan(maxLineSpan) },
+                            contentType = CONTENT_TYPE_HEADER,
+                        ) {
+                            AiPlaylistEntryCard(onClick = { navController.navigate("ai_playlist") })
+                        }
+                    }
+
                     if (showLikedPlaylist) {
                         item(
                             key = "likedPlaylist",
@@ -1086,5 +1100,51 @@ fun LibraryMixScreen(
                     .align(Alignment.TopCenter)
                     .padding(LocalPlayerAwareWindowInsets.current.asPaddingValues()),
         )
+    }
+}
+
+@Composable
+private fun AiPlaylistEntryCard(onClick: () -> Unit) {
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+                .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.automix),
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.ai_playlist_entry_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = stringResource(R.string.ai_playlist_entry_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.arrow_forward),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
     }
 }

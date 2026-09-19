@@ -59,6 +59,7 @@
 #### Lyrics & Discovery
 - Live synced lyrics with word-by-word highlighting
 - AI-powered lyrics translation
+- AI playlist generation from a text prompt
 - Music recognition (Shazam integration)
 - Personalized quick picks
 - Search songs, albums, artists, videos, and playlists
