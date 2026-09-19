@@ -64,9 +64,7 @@ jobs:
           fi
 
       - name: Build FOSS Release APK
-        run: |
-          set -o pipefail
-          ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease 2>&1 | tee build.log
+        run: ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           NESTMUSIC_APPLICATION_ID: com.nestmusic.music
@@ -78,29 +76,6 @@ jobs:
           PULL_REQUEST: "false"
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
-
-      # TEMPORARY DIAGNOSTICS (remove before merge): make the Gradle failure
-      # readable from outside CI. Annotations show up in the check run, the
-      # pushed branch carries the full log when the token allows it.
-      - name: Report build failure
-        if: failure()
-        continue-on-error: true
-        run: |
-          ERR=$(grep -E "^e: |^w: |error:|FAILED|Execution failed for task|What went wrong|Caused by:|Unresolved reference|Type mismatch|Cannot access" build.log | head -60 || true)
-          echo "$ERR"
-          echo "::error::GRADLE ERRORS%0A$(printf '%s' "$ERR" | sed ':a;N;$!ba;s/\n/%0A/g')"
-          echo "::error::GRADLE TAIL%0A$(tail -25 build.log | sed ':a;N;$!ba;s/\n/%0A/g')"
-
-      - name: Publish build log
-        if: failure()
-        continue-on-error: true
-        run: |
-          git config user.name "arena-agent"
-          git config user.email "arena-agent@users.noreply.github.com"
-          git checkout -B ci/build-log
-          git add -f build.log
-          git commit -m "ci: gradle log for ${{ github.sha }}"
-          git push -f origin ci/build-log
 
       - name: Upload APK
         uses: actions/upload-artifact@v6
