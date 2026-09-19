@@ -106,7 +106,7 @@ constructor(
                         apiKey = apiKey,
                         baseUrl = baseUrl,
                         model = model,
-                    ).mapCatching { AiPlaylistGenerator.parsePlan(it) }
+                    ).mapCatching { AiPlaylistGenerator.parsePlan(it).getOrThrow() }
 
             if (planResult.isFailure) {
                 reportException(planResult.exceptionOrNull() ?: Exception("AI plan failed"))

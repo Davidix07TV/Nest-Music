@@ -136,12 +136,11 @@ fun AiPlaylistScreen(
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(suggestions) { suggestionRes ->
+                    val suggestionText = stringResource(suggestionRes)
                     FilterChip(
                         selected = false,
-                        onClick = {
-                            if (isIdle) prompt = stringResource(suggestionRes)
-                        },
-                        label = { Text(stringResource(suggestionRes)) },
+                        onClick = { if (isIdle) prompt = suggestionText },
+                        label = { Text(suggestionText) },
                     )
                 }
             }
