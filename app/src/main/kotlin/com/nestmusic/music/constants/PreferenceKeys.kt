@@ -271,6 +271,7 @@ val SimpMusicMigrationDoneKey = booleanPreferencesKey("simpMusicMigrationDone")
 val QueueEditLockKey = booleanPreferencesKey("queueEditLock")
 val ShowWrappedCardKey = booleanPreferencesKey("show_wrapped_card")
 val WrappedSeenKey = booleanPreferencesKey("wrapped_seen")
+val WrappedSeenYearKey = stringPreferencesKey("wrapped_seen_year")
 val LastSeenVersionKey = stringPreferencesKey("lastSeenVersion")
 val RandomizeHomeOrderKey = booleanPreferencesKey("randomizeHomeOrder")
 
