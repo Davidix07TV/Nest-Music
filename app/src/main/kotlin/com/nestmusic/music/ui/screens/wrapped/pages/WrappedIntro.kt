@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -43,6 +44,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -127,26 +129,39 @@ fun WrappedIntro(onNext: () -> Unit) {
             label = "intro rotation"
         )
 
-        // Background year text
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                    rotationZ = rotation
-                }
-        ) {
-            BoxWithConstraints {
+        // Background year: a vertical outlined watermark on the left edge.
+        // The text is laid out horizontally (as wide as the screen is tall) and
+        // then rotated around its own centre: laying it out first and rotating
+        // the container instead made the year drift to the middle of the page
+        // and overlap the logo and the title.
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterStart)
+                        .width(maxWidth * 0.26f)
+                        .fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
                 AutoResizingText(
                     text = WrappedConstants.YEAR.toString(),
                     style = TextStyle.Default.copy(
                         fontFamily = bbhBartle,
-                        fontSize = 800.sp, // Increased size
+                        // Four digits at roughly maxHeight/5 wide each fill the
+                        // screen height; AutoResizingText still shrinks it if
+                        // a year ever needs more room.
+                        fontSize = with(LocalDensity.current) { (maxHeight / 5).toSp() },
                         color = Color.White,
                         drawStyle = Stroke(width = 2f)
                     ),
-                    modifier = Modifier.width(this.maxHeight) // Use height for width due to rotation
+                    modifier =
+                        Modifier
+                            .width(maxHeight)
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                                rotationZ = rotation
+                            }
                 )
             }
         }
@@ -159,7 +174,7 @@ fun WrappedIntro(onNext: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // App Icon
+            // App icon
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(FADE_IN_DURATION, delayMillis = ICON_DELAY)) + slideInVertically(animationSpec = tween(SLIDE_IN_DURATION, delayMillis = ICON_DELAY))
@@ -173,7 +188,7 @@ fun WrappedIntro(onNext: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Metrolist Title with Layered Effect
+            // Brand title with layered effect
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(FADE_IN_DURATION, delayMillis = TITLE_DELAY)) + slideInVertically(animationSpec = tween(SLIDE_IN_DURATION, delayMillis = TITLE_DELAY))
@@ -185,9 +200,9 @@ fun WrappedIntro(onNext: () -> Unit) {
                         letterSpacing = 2.sp,
                         fontSize = 50.sp
                     )
-                    AutoResizingText(text = stringResource(id = R.string.wrapped_intro_title), style = baseStyle.copy(color = Color.DarkGray), modifier = Modifier.offset(x = 2.dp, y = 2.dp))
-                    AutoResizingText(text = stringResource(id = R.string.wrapped_intro_title), style = baseStyle.copy(color = Color.Gray), modifier = Modifier.offset(x = 1.dp, y = 1.dp))
-                    AutoResizingText(text = stringResource(id = R.string.wrapped_intro_title), style = baseStyle.copy(color = Color.White))
+                    AutoResizingText(text = stringResource(id = R.string.wrapped_intro_brand), style = baseStyle.copy(color = Color.DarkGray), modifier = Modifier.offset(x = 2.dp, y = 2.dp))
+                    AutoResizingText(text = stringResource(id = R.string.wrapped_intro_brand), style = baseStyle.copy(color = Color.Gray), modifier = Modifier.offset(x = 1.dp, y = 1.dp))
+                    AutoResizingText(text = stringResource(id = R.string.wrapped_intro_brand), style = baseStyle.copy(color = Color.White))
                 }
             }
 
