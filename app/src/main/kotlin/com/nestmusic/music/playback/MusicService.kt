@@ -1183,9 +1183,9 @@ class MusicService :
 
         // A practice loop seeks locally, which would fight the room host's playback sync.
         scope.launch {
-            listenTogetherManager.roomState
-                .distinctUntilChanged()
-                .collect { roomState -> if (roomState != null) practiceLoop?.endSession() }
+            listenTogetherManager.roomState.collect { roomState ->
+                if (roomState != null) practiceLoop?.endSession()
+            }
         }
 
         // Observe and cache common preferences to avoid runBlocking reads in playback callbacks
