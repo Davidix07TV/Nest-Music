@@ -169,6 +169,7 @@ import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.Lyrics
 import com.nestmusic.music.ui.component.PlayerSliderTrack
+import com.nestmusic.music.ui.component.PracticeLoopBar
 import com.nestmusic.music.ui.component.ResizableIconButton
 import com.nestmusic.music.ui.component.SquigglySlider
 import com.nestmusic.music.ui.component.WavySlider
@@ -1508,6 +1509,15 @@ fun BottomSheetPlayer(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+
+            // A-B practice loop controls, only rendered while a practice session is running
+            PracticeLoopBar(
+                modifier =
+                    Modifier.padding(
+                        horizontal = PlayerHorizontalPadding,
+                        vertical = 4.dp,
+                    ),
+            )
 
             Spacer(Modifier.height(24.dp))
 

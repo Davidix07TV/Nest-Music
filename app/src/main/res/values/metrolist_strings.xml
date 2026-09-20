@@ -449,6 +449,29 @@
     <string name="varispeed">Enable varispeed</string>
     <string name="varispeed_description">Link pitch to playback speed, resulting in tape-style speedup and slowdown effects</string>
 
+    <!-- Practice loop (A-B repeat) -->
+    <string name="practice_loop">Practice loop</string>
+    <string name="practice_loop_desc">Repeat a section between two points</string>
+    <string name="practice_loop_idle">Set the loop points while the song plays</string>
+    <string name="practice_loop_active">A %1$s - B %2$s - repeat %3$d</string>
+    <string name="practice_loop_counting_in">Count-in…</string>
+    <string name="practice_loop_point_a">Point A</string>
+    <string name="practice_loop_point_b">Point B</string>
+    <string name="practice_loop_set_a">Set A</string>
+    <string name="practice_loop_set_b">Set B</string>
+    <string name="practice_loop_clear">Clear loop</string>
+    <string name="practice_loop_end">End practice</string>
+    <string name="practice_loop_hint">Playback repeats the part between A and B. Play the song, tap Set A where the section starts, then Set B where it ends. Tapping either button again moves that point to the current position.</string>
+    <string name="practice_loop_position">Current position</string>
+    <string name="practice_loop_point_unset">Not set</string>
+    <string name="practice_loop_length">Section length</string>
+    <string name="practice_loop_repeats_label">Repetitions</string>
+    <string name="practice_loop_repeats">%1$d repetitions</string>
+    <string name="practice_loop_count_in">Count-in</string>
+    <string name="practice_loop_count_in_desc">Pause and play three beeps before every repetition</string>
+    <string name="practice_loop_speed">Speed</string>
+    <string name="practice_loop_speed_desc">The same playback speed as the speed control in the player menu, handy to slow a difficult part down</string>
+
     <!-- AudioTrack Playback Parameters -->
     <string name="audio_track_playback_params">Use hardware audio processing</string>
     <string name="audio_track_playback_params_description">Use Android\'s AudioTrack for speed/pitch changes instead of software processing. More reliable for extreme pitch values</string>

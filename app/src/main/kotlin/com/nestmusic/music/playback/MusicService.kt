@@ -118,6 +118,7 @@ import com.nestmusic.music.constants.CrossfadeDurationKey
 import com.nestmusic.music.constants.CrossfadeEnabledKey
 import com.nestmusic.music.constants.CrossfadeGaplessKey
 import com.nestmusic.music.constants.DisableLoadMoreWhenRepeatAllKey
+import com.nestmusic.music.constants.PracticeLoopCountInKey
 import com.nestmusic.music.constants.DiscordActivityNameKey
 import com.nestmusic.music.constants.DiscordActivityTypeKey
 import com.nestmusic.music.constants.DiscordAdvancedModeKey
@@ -390,6 +391,9 @@ class MusicService :
     }
 
     var sleepTimer: SleepTimer? = null
+
+    /** A-B practice loop; null until [onCreate] finished initializing playback. */
+    var practiceLoop: PracticeLoop? = null
 
     @Inject
     @PlayerCache
@@ -692,6 +696,12 @@ class MusicService :
             }
         player.addListener(sleepTimer!!)
 
+        practiceLoop =
+            PracticeLoop(scope).also { loop ->
+                loop.player = player
+                player.addListener(loop)
+            }
+
         playerInitialized.value = true
         Timber.tag(TAG).d("Player successfully initialized")
 
@@ -845,6 +855,14 @@ class MusicService :
                 }
         }
 
+        // The practice loop itself runs here, while its count-in switch lives in the UI.
+        scope.launch {
+            dataStore.data
+                .map { it[PracticeLoopCountInKey] ?: false }
+                .distinctUntilChanged()
+                .collect { enabled -> practiceLoop?.countInEnabled = enabled }
+        }
+
         combine(
             playerVolume,
             isMuted,
@@ -972,6 +990,7 @@ class MusicService :
 
                 player.removeListener(this)
                 sleepTimer?.let { player.removeListener(it) }
+                practiceLoop?.let { player.removeListener(it) }
                 playerNormalizationProcessors.remove(player)
                 playerSilenceProcessors.remove(player)
                 playerTransitionProcessors.remove(player)
@@ -980,8 +999,10 @@ class MusicService :
                 val newPlayer = createExoPlayer()
                 newPlayer.addListener(this@MusicService)
                 sleepTimer?.let { newPlayer.addListener(it) }
+                practiceLoop?.let { newPlayer.addListener(it) }
 
                 sleepTimer?.player = newPlayer
+                practiceLoop?.player = newPlayer
 
                 try {
                     mediaSession?.let { (it as MediaSession).player = newPlayer }
@@ -1159,6 +1180,13 @@ class MusicService :
                 crossfadeDuration = duration * 1000f // Convert to ms
                 crossfadeGapless = gapless
             }
+
+        // A practice loop seeks locally, which would fight the room host's playback sync.
+        scope.launch {
+            listenTogetherManager.roomState
+                .distinctUntilChanged()
+                .collect { roomState -> if (roomState != null) practiceLoop?.endSession() }
+        }
 
         // Observe and cache common preferences to avoid runBlocking reads in playback callbacks
         scope.launch {
@@ -4241,6 +4269,10 @@ class MusicService :
         closeAudioEffectSession()
         mediaLibrarySessionCallback.release()
         mediaSession?.release()
+        practiceLoop?.let {
+            it.clear()
+            player.removeListener(it)
+        }
         player.removeListener(this)
         sleepTimer?.let { player.removeListener(it) }
         playerNormalizationProcessors.remove(player)

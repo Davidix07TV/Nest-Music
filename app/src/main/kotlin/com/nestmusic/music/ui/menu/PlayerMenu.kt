@@ -95,10 +95,12 @@ import com.nestmusic.music.db.entities.Song
 import com.nestmusic.music.db.entities.SpeedDialItem
 import com.nestmusic.music.ui.component.BottomSheetState
 import com.nestmusic.music.ui.component.ListDialog
+import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.Material3MenuGroup
 import com.nestmusic.music.ui.component.Material3MenuItemData
 import com.nestmusic.music.ui.component.NewAction
 import com.nestmusic.music.ui.component.NewActionGrid
+import com.nestmusic.music.ui.component.PracticeLoopSheet
 import com.nestmusic.music.ui.component.VolumeSlider
 import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
@@ -121,6 +123,7 @@ fun PlayerMenu(
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
     val playerVolume = playerConnection.service.playerVolume.collectAsStateWithLifecycle()
+    val bottomSheetPageState = LocalBottomSheetPageState.current
 
     // Cast state for volume control - safely access castConnectionHandler to prevent crashes
     val castHandler =
@@ -772,6 +775,28 @@ fun PlayerMenu(
                                     },
                                 ),
                             )
+                            if (!isListenTogetherGuest) {
+                                add(
+                                    Material3MenuItemData(
+                                        title = { Text(text = stringResource(R.string.practice_loop)) },
+                                        description = { Text(text = stringResource(R.string.practice_loop_desc)) },
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.repeat),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(24.dp),
+                                            )
+                                        },
+                                        onClick = {
+                                            playerConnection.service.practiceLoop?.startSession()
+                                            bottomSheetPageState.show {
+                                                PracticeLoopSheet()
+                                            }
+                                            onDismiss()
+                                        },
+                                    ),
+                                )
+                            }
                         }
                     },
             )
