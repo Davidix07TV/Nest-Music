@@ -121,9 +121,9 @@ body:
   - type: input
     id: app-version
     attributes:
-      label: Metrolist version
+      label: Nest Music version
       description: |
-        You can find your Metrolist version in **Settings**.
+        You can find your Nest Music version in **Settings**.
       placeholder: |
         Example: "13.1.1"
     validations:
