@@ -131,6 +131,10 @@ class PracticeLoop(
 ) : Player.Listener {
     private companion object {
         private const val TICK_MS = 60L
+
+        /** While playback is stopped the loop only watches for it to come back. */
+        private const val IDLE_TICK_MS = 500L
+
         private const val COUNT_IN_BEEPS = 3
         private const val COUNT_IN_BEEP_INTERVAL_MS = 600L
         private const val COUNT_IN_BEEP_DURATION_MS = 120
@@ -216,7 +220,7 @@ class PracticeLoop(
     }
 
     override fun onIsPlayingChanged(isPlaying: Boolean) {
-        // The ticker stops itself while playback is paused, so resume it here.
+        // The ticker idles while playback is stopped: restart it to loop on the spot.
         if (isPlaying && state.isActive) ensureTicker()
     }
 
@@ -235,13 +239,17 @@ class PracticeLoop(
         tickerJob =
             scope.launch {
                 while (state.isActive && isActive) {
-                    if (!tick()) break
-                    delay(TICK_MS)
+                    val playing = tick()
+                    delay(if (playing) TICK_MS else IDLE_TICK_MS)
                 }
             }
     }
 
-    /** Returns false when the loop has nothing to watch anymore. */
+    /**
+     * Returns true while playback is running and the loop is being watched. Playback can stop
+     * for reasons the loop never hears about - a pause, a stalled stream or the service
+     * recreating its player - so it keeps watching slowly instead of waiting for a callback.
+     */
     private suspend fun tick(): Boolean {
         val player = player ?: return false
         if (!player.isPlaying) return false
