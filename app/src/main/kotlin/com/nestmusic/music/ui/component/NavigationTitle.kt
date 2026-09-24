@@ -71,8 +71,8 @@ fun NavigationTitle(
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.primary,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -82,14 +82,14 @@ fun NavigationTitle(
         onPlayAllClick?.let { playAllClick ->
             OutlinedButton(
                 onClick = playAllClick,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(999.dp),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 ),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
+                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
                 modifier = Modifier
-                    .height(24.dp)
+                    .height(28.dp)
             ) {
                 Text(
                     text = stringResource(R.string.play_all),

@@ -26,7 +26,8 @@ import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicColorScheme
 import com.materialkolor.score.Score
 
-val DefaultThemeColor = Color(0xFFED5564)
+// Nest brand seed: the tangerine stop of the logo sunset
+val DefaultThemeColor = Color(0xFFF97316)
 
 @Composable
 fun MetrolistTheme(
@@ -66,6 +67,7 @@ fun MetrolistTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = AppTypography, // Use the defined AppTypography
+        shapes = NestShapes,
         content = content
     )
 }

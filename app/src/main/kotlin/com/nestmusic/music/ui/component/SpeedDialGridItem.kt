@@ -79,7 +79,7 @@ fun SpeedDialGridItem(
         ) {
             Text(
                 text = item.title,
-                style = MaterialTheme.typography.titleSmall, // Smaller, punchier font
+                style = MaterialTheme.typography.titleMedium, // Bolder hero tile title
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 maxLines = 1,

@@ -175,6 +175,7 @@ import com.nestmusic.music.ui.component.WavySlider
 import com.nestmusic.music.ui.component.rememberBottomSheetState
 import com.nestmusic.music.ui.menu.PlayerMenu
 import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.theme.NestSunsetColors
 import com.nestmusic.music.ui.theme.PlayerColorExtractor
 import com.nestmusic.music.ui.theme.PlayerSliderColors
 import com.nestmusic.music.ui.utils.ShowMediaInfo
@@ -904,6 +905,15 @@ fun BottomSheetPlayer(
                                         .fillMaxSize()
                                         .alpha(backgroundAlpha)
                                         .background(Brush.verticalGradient(colorStops = gradientColorStops))
+                                        .background(Color.Black.copy(alpha = 0.2f)),
+                                )
+                            } else {
+                                // No cover colors available: fall back to the brand sunset
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .alpha(backgroundAlpha)
+                                        .background(Brush.verticalGradient(NestSunsetColors))
                                         .background(Color.Black.copy(alpha = 0.2f)),
                                 )
                             }

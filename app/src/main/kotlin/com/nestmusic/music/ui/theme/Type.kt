@@ -11,73 +11,71 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// TODO: Define or import actual M3 Expressive font families if needed.
-// For now, using default FontFamily as a placeholder.
-
-// Define M3 Expressive Typography based on Material Design guidelines
-// https://m3.material.io/styles/typography/type-scale-tokens
-// Note: M3 Expressive might introduce subtle changes or new roles.
-// Referencing standard M3 roles for now, adjust if Expressive spec differs significantly.
+/**
+ * Nest 2026 expressive type scale:
+ * heavy, tight display and headline weights for a bold, modern music-app feel,
+ * with unchanged body sizes so existing layouts keep their rhythm.
+ */
 val AppTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.ExtraBold,
         fontSize = 57.sp,
         lineHeight = 64.sp,
-        letterSpacing = (-0.25).sp
+        letterSpacing = (-0.5).sp
     ),
     displayMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.ExtraBold,
         fontSize = 45.sp,
         lineHeight = 52.sp,
-        letterSpacing = 0.sp
+        letterSpacing = (-0.25).sp
     ),
     displaySmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Bold,
         fontSize = 36.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.sp
     ),
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
         lineHeight = 40.sp,
-        letterSpacing = 0.sp
+        letterSpacing = (-0.15).sp
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 36.sp,
-        letterSpacing = 0.sp
+        letterSpacing = (-0.1).sp
     ),
     headlineSmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal, // M3 uses Normal, M2 used Medium
+        fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp
     ),
     titleSmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
@@ -87,7 +85,7 @@ val AppTypography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp // M3 uses 0.5, M2 used 0.15
+        letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
@@ -105,7 +103,7 @@ val AppTypography = Typography(
     ),
     labelLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp

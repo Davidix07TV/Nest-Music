@@ -121,6 +121,7 @@ import coil3.request.allowHardware
 import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.nestmusic.music.ui.theme.NestSunsetColors
 import com.nestmusic.music.ui.theme.PlayerColorExtractor
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.menu.AddToPlaylistDialog
@@ -412,11 +413,8 @@ private fun NewMiniPlayer(
                     }
                 }
                 MiniPlayerBackgroundStyle.GRADIENT -> {
-                    val colors = if (gradientColors.isNotEmpty()) gradientColors
-                    else listOf(
-                        MaterialTheme.colorScheme.surfaceContainer,
-                        MaterialTheme.colorScheme.surfaceContainer,
-                    )
+                    // Fall back to the brand sunset when the cover yields no usable colors
+                    val colors = if (gradientColors.isNotEmpty()) gradientColors else NestSunsetColors
                     Box(
                         Modifier
                             .fillMaxSize()
