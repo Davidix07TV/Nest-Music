@@ -54,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nestmusic.music.R
 import com.nestmusic.music.ui.screens.OptionStats
+import com.nestmusic.music.ui.theme.useNestUi
 
 @Composable
 fun <E> ChipsRow(
@@ -72,12 +73,16 @@ fun <E> ChipsRow(
     ) {
         Spacer(Modifier.width(12.dp))
 
+        val nestUi = useNestUi()
+
         chips.forEach { (value, label) ->
+            val selected = currentValue == value
             FilterChip(
                 label = { Text(label) },
-                selected = currentValue == value,
+                selected = selected,
                 colors = FilterChipDefaults.filterChipColors(
-                    containerColor = containerColor,
+                    containerColor = if (nestUi && selected) MaterialTheme.colorScheme.primaryContainer else containerColor,
+                    labelColor = if (nestUi && selected) MaterialTheme.colorScheme.onPrimaryContainer else Color.Unspecified,
                 ),
                 onClick = { onValueUpdate(value) },
                 shape = RoundedCornerShape(16.dp),
@@ -188,20 +193,24 @@ fun <Int> ChoiceChipsRow(
                     .horizontalScroll(rememberScrollState())
                     .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
             ) {
-                chips.forEach { (value, label) ->
-                    Spacer(Modifier.width(8.dp))
+            val nestUi = useNestUi()
 
-                    FilterChip(
-                        label = { Text(label) },
-                        selected = currentValue == value,
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = containerColor,
-                        ),
-                        onClick = { onValueUpdate(value) },
-                        shape = RoundedCornerShape(16.dp),
-                        border = null
-                    )
-                }
+            chips.forEach { (value, label) ->
+                Spacer(Modifier.width(8.dp))
+
+                val selected = currentValue == value
+                FilterChip(
+                    label = { Text(label) },
+                    selected = selected,
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = if (nestUi && selected) MaterialTheme.colorScheme.primaryContainer else containerColor,
+                        labelColor = if (nestUi && selected) MaterialTheme.colorScheme.onPrimaryContainer else Color.Unspecified,
+                    ),
+                    onClick = { onValueUpdate(value) },
+                    shape = RoundedCornerShape(16.dp),
+                    border = null
+                )
+            }
             }
         }
     }

@@ -175,7 +175,9 @@ import com.nestmusic.music.ui.component.WavySlider
 import com.nestmusic.music.ui.component.rememberBottomSheetState
 import com.nestmusic.music.ui.menu.PlayerMenu
 import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.theme.NestSunsetColors
 import com.nestmusic.music.ui.theme.PlayerColorExtractor
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.theme.PlayerSliderColors
 import com.nestmusic.music.ui.utils.ShowMediaInfo
 import com.nestmusic.music.ui.utils.ShowOffsetDialog
@@ -904,6 +906,15 @@ fun BottomSheetPlayer(
                                         .fillMaxSize()
                                         .alpha(backgroundAlpha)
                                         .background(Brush.verticalGradient(colorStops = gradientColorStops))
+                                        .background(Color.Black.copy(alpha = 0.2f)),
+                                )
+                            } else if (useNestUi()) {
+                                // No cover colors available in the new UI: fall back to the brand sunset
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .alpha(backgroundAlpha)
+                                        .background(Brush.verticalGradient(NestSunsetColors))
                                         .background(Color.Black.copy(alpha = 0.2f)),
                                 )
                             }
@@ -1747,12 +1758,19 @@ fun BottomSheetPlayer(
 
                             Spacer(Modifier.width(8.dp))
 
+                            val nestUiPlayGradient = useNestUi() && playerBackground == PlayerBackgroundStyle.DEFAULT
                             Box(
                                 modifier =
                                     Modifier
                                         .size(72.dp)
                                         .clip(RoundedCornerShape(playPauseRoundness))
-                                        .background(textButtonColor)
+                                        .then(
+                                            if (nestUiPlayGradient) {
+                                                Modifier.background(Brush.verticalGradient(NestSunsetColors))
+                                            } else {
+                                                Modifier.background(textButtonColor)
+                                            },
+                                        )
                                         .clickable {
                                             if (isListenTogetherGuest) {
                                                 playerConnection.toggleMute()
@@ -1789,7 +1807,10 @@ fun BottomSheetPlayer(
                                             },
                                         ),
                                     contentDescription = null,
-                                    colorFilter = ColorFilter.tint(iconButtonColor),
+                                    // White icon reads best on the sunset gradient
+                                    colorFilter = ColorFilter.tint(
+                                        if (nestUiPlayGradient) Color.White else iconButtonColor,
+                                    ),
                                     modifier =
                                         Modifier
                                             .align(Alignment.Center)

@@ -6,6 +6,7 @@
 package com.nestmusic.music.ui.screens.playlist
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -111,6 +112,8 @@ import com.nestmusic.music.viewmodels.OnlinePlaylistViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.nestmusic.music.ui.theme.useNestUi
+import com.nestmusic.music.ui.theme.NestSunsetBrush
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -710,6 +713,7 @@ private fun OnlinePlaylistHeader(
             }
 
             // Play Button - Larger primary circular button
+            val nestUi = useNestUi()
             Surface(
                 onClick = {
                     if (!isListenTogetherGuest && songs.isNotEmpty()) {
@@ -723,9 +727,11 @@ private fun OnlinePlaylistHeader(
                         )
                     }
                 },
-                color = MaterialTheme.colorScheme.primary,
+                color = if (nestUi) Color.Transparent else MaterialTheme.colorScheme.primary,
                 shape = CircleShape,
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier
+                    .size(72.dp)
+                    .then(if (nestUi) Modifier.background(NestSunsetBrush) else Modifier),
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -734,7 +740,7 @@ private fun OnlinePlaylistHeader(
                     Icon(
                         painter = painterResource(R.drawable.play),
                         contentDescription = stringResource(R.string.play),
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = if (nestUi) Color.White else MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp),
                     )
                 }

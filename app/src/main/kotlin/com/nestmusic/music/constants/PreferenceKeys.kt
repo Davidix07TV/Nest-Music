@@ -23,6 +23,11 @@ val PureBlackMiniPlayerKey = booleanPreferencesKey("pureBlackMiniPlayer")
 val MiniPlayerOutlineKey = booleanPreferencesKey("miniPlayerOutline")
 val MiniPlayerBackgroundStyleKey = stringPreferencesKey("miniPlayerBackgroundStyle")
 
+// Nest 2026 interface: true = new "Nest Sunset" UI, false = classic UI
+val NestUiKey = booleanPreferencesKey("nest_ui_2026")
+// True once the user picked (or dismissed) the first-launch UI choice dialog
+val NestUiChoiceShownKey = booleanPreferencesKey("nest_ui_choice_shown")
+
 enum class MiniPlayerBackgroundStyle {
     DEFAULT,
     TRANSPARENT,
@@ -160,7 +165,7 @@ val PauseListenHistoryKey = booleanPreferencesKey("pauseListenHistory")
 val PauseSearchHistoryKey = booleanPreferencesKey("pauseSearchHistory")
 val DisableScreenshotKey = booleanPreferencesKey("disableScreenshot")
 
-// Stream sources — which innertube clients are used for stream resolution (Settings ? Stream sources).
+// Stream sources ï¿½ which innertube clients are used for stream resolution (Settings ? Stream sources).
 val StreamSourceWebRemixKey = booleanPreferencesKey("streamSourceWebRemix")
 val StreamSourceTVHTML5Key = booleanPreferencesKey("streamSourceTVHTML5")
 val StreamSourceAndroidVRKey = booleanPreferencesKey("streamSourceAndroidVR")
@@ -546,23 +551,23 @@ val LanguageCodeToName =
         "az" to "Az?rbaycan",
         "id" to "Bahasa Indonesia",
         "ms" to "Bahasa Malaysia",
-        "ca" to "Català",
-        "cs" to "Ceština",
+        "ca" to "Catalï¿½",
+        "cs" to "Ceï¿½tina",
         "da" to "Dansk",
         "de" to "Deutsch",
         "et" to "Eesti",
         "en-GB" to "English (UK)",
         "en" to "English (US)",
-        "es" to "Español (España)",
-        "es-419" to "Español (Latinoamérica)",
+        "es" to "Espaï¿½ol (Espaï¿½a)",
+        "es-419" to "Espaï¿½ol (Latinoamï¿½rica)",
         "eu" to "Euskara",
         "fil" to "Filipino",
-        "fr" to "Français",
-        "fr-CA" to "Français (Canada)",
+        "fr" to "Franï¿½ais",
+        "fr-CA" to "Franï¿½ais (Canada)",
         "gl" to "Galego",
         "hr" to "Hrvatski",
         "zu" to "IsiZulu",
-        "is" to "Íslenska",
+        "is" to "ï¿½slenska",
         "it" to "Italiano",
         "sw" to "Kiswahili",
         "lt" to "Lietuviu",
@@ -570,19 +575,19 @@ val LanguageCodeToName =
         "nl" to "Nederlands",
         "no" to "Norsk",
         "or" to "Odia",
-        "uz" to "O‘zbe",
+        "uz" to "Oï¿½zbe",
         "pl" to "Polski",
-        "pt-PT" to "Português",
-        "pt" to "Português (Brasil)",
-        "ro" to "Româna",
+        "pt-PT" to "Portuguï¿½s",
+        "pt" to "Portuguï¿½s (Brasil)",
+        "ro" to "Romï¿½na",
         "sq" to "Shqip",
         "sk" to "Slovencina",
-        "sl" to "Slovenšcina",
+        "sl" to "Slovenï¿½cina",
         "fi" to "Suomi",
         "sv" to "Svenska",
         "bo" to "Tibetan ????????",
         "vi" to "Ti?ng Vi?t",
-        "tr" to "Türkçe",
+        "tr" to "Tï¿½rkï¿½e",
         "bg" to "?????????",
         "ky" to "????????",
         "kk" to "????? ????",

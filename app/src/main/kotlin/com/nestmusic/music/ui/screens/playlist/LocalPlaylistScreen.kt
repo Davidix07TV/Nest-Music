@@ -14,6 +14,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -161,6 +162,8 @@ import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDateTime
+import com.nestmusic.music.ui.theme.useNestUi
+import com.nestmusic.music.ui.theme.NestSunsetBrush
 
 @SuppressLint("RememberReturnType")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -571,7 +574,7 @@ fun LocalPlaylistScreen(
                     val currentItem by rememberUpdatedState(song)
 
                     fun deleteFromPlaylist() {
-                        // Capture values before deletion — DB entry will be gone afterwards
+                        // Capture values before deletion ï¿½ DB entry will be gone afterwards
                         val browseId = playlist?.playlist?.browseId
                         val setVideoId = currentItem.map.setVideoId
                         val songId = currentItem.map.songId
@@ -1271,7 +1274,7 @@ fun LocalPlaylistHeader(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Metadata - Song Count • Duration
+        // Metadata - Song Count ï¿½ Duration
         val songCount =
             if (playlist.songCount == 0 && playlist.playlist.remoteSongCount != null) {
                 playlist.playlist.remoteSongCount
@@ -1377,6 +1380,7 @@ fun LocalPlaylistHeader(
             }
 
             // Play Button - Larger primary circular button
+            val nestUi = useNestUi()
             Surface(
                 onClick = {
                     playerConnection.playQueue(
@@ -1386,9 +1390,11 @@ fun LocalPlaylistHeader(
                         ),
                     )
                 },
-                color = MaterialTheme.colorScheme.primary,
+                color = if (nestUi) Color.Transparent else MaterialTheme.colorScheme.primary,
                 shape = CircleShape,
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier
+                    .size(72.dp)
+                    .then(if (nestUi) Modifier.background(NestSunsetBrush) else Modifier),
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -1397,7 +1403,7 @@ fun LocalPlaylistHeader(
                     Icon(
                         painter = painterResource(R.drawable.play),
                         contentDescription = stringResource(R.string.play),
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = if (nestUi) Color.White else MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp),
                     )
                 }

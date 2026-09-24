@@ -19,9 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.ui.theme.NestSunsetBrush
+import com.nestmusic.music.ui.theme.useNestUi
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -44,17 +47,25 @@ fun RandomizeGridItem(
         label = "loadingAlpha",
     )
 
+    val nestUi = useNestUi()
+
     Box(
         modifier =
             modifier
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(ThumbnailCornerRadius))
-                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .then(
+                    if (nestUi) {
+                        Modifier.background(NestSunsetBrush)
+                    } else {
+                        Modifier.background(MaterialTheme.colorScheme.secondaryContainer)
+                    },
+                )
                 .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         // Die Dots (5-pattern)
-        val dotColor = MaterialTheme.colorScheme.onSecondaryContainer
+        val dotColor = if (nestUi) Color.White else MaterialTheme.colorScheme.onSecondaryContainer
         val dotSize = 14.dp
         val padding = 24.dp
 
@@ -115,7 +126,7 @@ fun RandomizeGridItem(
         Box(modifier = Modifier.alpha(loadingAlpha)) {
             LoadingIndicator(
                 modifier = Modifier.size(48.dp),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = if (nestUi) Color.White else MaterialTheme.colorScheme.onSecondaryContainer,
             )
         }
     }

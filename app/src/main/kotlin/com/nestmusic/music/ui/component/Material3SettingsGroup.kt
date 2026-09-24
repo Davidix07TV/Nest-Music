@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import com.nestmusic.music.ui.theme.useNestUi
 
 /**
  * A Material 3 Expressive style settings group component
@@ -45,6 +46,7 @@ fun Material3SettingsGroup(
     items: List<Material3SettingsItem>,
     useLowContrast: Boolean = false
 ) {
+    val nestUi = useNestUi()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,10 +67,11 @@ fun Material3SettingsGroup(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items.forEachIndexed { index, item ->
+                val corner = if (nestUi) 28.dp else 24.dp
                 val shape = when {
-                    items.size == 1 -> RoundedCornerShape(24.dp)
-                    index == 0 -> RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 6.dp, bottomEnd = 6.dp)
-                    index == items.size - 1 -> RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp, bottomStart = 24.dp, bottomEnd = 24.dp)
+                    items.size == 1 -> RoundedCornerShape(corner)
+                    index == 0 -> RoundedCornerShape(topStart = corner, topEnd = corner, bottomStart = 6.dp, bottomEnd = 6.dp)
+                    index == items.size - 1 -> RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp, bottomStart = corner, bottomEnd = corner)
                     else -> RoundedCornerShape(6.dp)
                 }
 
@@ -118,7 +121,7 @@ private fun Material3SettingsItemRow(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(if (useNestUi()) 14.dp else 12.dp))
                     .background(
                         MaterialTheme.colorScheme.primary.copy(
                             alpha = if (item.isHighlighted) 0.15f else 0.1f

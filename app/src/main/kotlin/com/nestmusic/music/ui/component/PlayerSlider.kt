@@ -16,12 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.nestmusic.music.ui.theme.NestSunsetColors
+import com.nestmusic.music.ui.theme.useNestUi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +39,7 @@ fun PlayerSliderTrack(
     val inactiveTickColor = colors.inactiveTickColor
     val activeTickColor = colors.activeTickColor
     val valueRange = sliderState.valueRange
+    val nestUi = useNestUi()
     Canvas(
         modifier
             .fillMaxWidth()
@@ -53,7 +57,8 @@ fun PlayerSliderTrack(
             activeTrackColor,
             inactiveTickColor,
             activeTickColor,
-            trackHeight
+            trackHeight,
+            brandGradient = nestUi
         )
     }
 }
@@ -66,7 +71,8 @@ private fun DrawScope.drawTrack(
     activeTrackColor: Color,
     inactiveTickColor: Color,
     activeTickColor: Color,
-    trackHeight: Dp = 2.dp
+    trackHeight: Dp = 2.dp,
+    brandGradient: Boolean = false
 ) {
     val isRtl = layoutDirection == LayoutDirection.Rtl
     val sliderLeft = Offset(0f, center.y)
@@ -92,13 +98,24 @@ private fun DrawScope.drawTrack(
                 (sliderEnd.x - sliderStart.x) * activeRangeStart,
         center.y
     )
-    drawLine(
-        activeTrackColor,
-        sliderValueStart,
-        sliderValueEnd,
-        trackStrokeWidth,
-        StrokeCap.Round
-    )
+    // New UI paints the played portion with the sunset brand gradient
+    if (brandGradient) {
+        drawLine(
+            brush = Brush.horizontalGradient(NestSunsetColors),
+            start = sliderValueStart,
+            end = sliderValueEnd,
+            strokeWidth = trackStrokeWidth,
+            cap = StrokeCap.Round
+        )
+    } else {
+        drawLine(
+            activeTrackColor,
+            sliderValueStart,
+            sliderValueEnd,
+            trackStrokeWidth,
+            StrokeCap.Round
+        )
+    }
     for (tick in tickFractions) {
         val outsideFraction = tick > activeRangeEnd || tick < activeRangeStart
         drawCircle(

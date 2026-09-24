@@ -82,6 +82,7 @@ import com.nestmusic.music.constants.LyricsTextPositionKey
 import com.nestmusic.music.constants.LyricsTextSizeKey
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyle
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyleKey
+import com.nestmusic.music.constants.NestUiKey
 import com.nestmusic.music.constants.PlayerBackgroundStyle
 import com.nestmusic.music.constants.PlayerBackgroundStyleKey
 import com.nestmusic.music.constants.PlayerButtonsStyle
@@ -955,12 +956,44 @@ fun AppearanceSettings(
         }
     }
 
+    val (nestUi, onNestUiChange) = rememberPreference(NestUiKey, defaultValue = true)
+
     Column(
         Modifier
             .windowInsetsPadding(LocalPlayerAwareWindowInsets.current)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp),
     ) {
+        Material3SettingsGroup(
+            title = stringResource(R.string.nest_ui),
+            items =
+                buildList {
+                    add(
+                        Material3SettingsItem(
+                            icon = painterResource(R.drawable.palette),
+                            title = { Text(stringResource(R.string.nest_ui)) },
+                            description = {
+                                Text(
+                                    stringResource(
+                                        if (nestUi) R.string.nest_ui_new_desc else R.string.nest_ui_legacy_desc,
+                                    ),
+                                )
+                            },
+                            trailingContent = {
+                                Text(
+                                    stringResource(if (nestUi) R.string.nest_ui_new else R.string.nest_ui_legacy),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            },
+                            onClick = { onNestUiChange(!nestUi) },
+                        ),
+                    )
+                },
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Material3SettingsGroup(
             title = stringResource(R.string.theme),
             items =

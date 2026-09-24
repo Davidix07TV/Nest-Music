@@ -129,6 +129,9 @@ import com.nestmusic.music.viewmodels.ArtistViewModel
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.shape.CircleShape
+import com.nestmusic.music.ui.theme.NestSunsetBrush
+import com.nestmusic.music.ui.theme.useNestUi
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -970,14 +973,45 @@ fun ArtistScreen(
                     }
                 }
 
+                val nestUi = useNestUi()
                 if (showLocalFab) {
-                    androidx.compose.material3.SmallFloatingActionButton(
-                        modifier = Modifier.padding(16.dp).offset(x = (-4).dp), // Align center with standard FAB (56dp vs 48dp)
+                    val smallModifier = Modifier.padding(16.dp).offset(x = (-4).dp) // Align center with standard FAB (56dp vs 48dp)
+                    if (nestUi) {
+                        androidx.compose.material3.SmallFloatingActionButton(
+                            modifier = smallModifier.background(NestSunsetBrush, CircleShape),
+                            onClick = onPlayAllClick,
+                            containerColor = Color.Transparent,
+                            contentColor = Color.White,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.play),
+                                contentDescription = "Play All",
+                            )
+                        }
+                    } else {
+                        androidx.compose.material3.SmallFloatingActionButton(
+                            modifier = smallModifier,
+                            onClick = onPlayAllClick,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.play),
+                                contentDescription = "Play All",
+                            )
+                        }
+                    }
+                } else if (nestUi) {
+                    androidx.compose.material3.FloatingActionButton(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .background(NestSunsetBrush, CircleShape),
                         onClick = onPlayAllClick,
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.play),
                             contentDescription = "Play All",
+                            modifier = Modifier.size(32.dp),
                         )
                     }
                 } else {

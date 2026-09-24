@@ -60,6 +60,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.nestmusic.music.LocalNavController
 import com.nestmusic.music.R
 import com.nestmusic.music.ui.screens.settings.AccountSettings
+import com.nestmusic.music.ui.theme.useNestUi
 import kotlinx.coroutines.delay
 
 @Composable
@@ -72,13 +73,14 @@ fun DefaultDialog(
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val nestUi = useNestUi()
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
             modifier = Modifier.padding(24.dp),
-            shape = AlertDialogDefaults.shape,
+            shape = if (nestUi) RoundedCornerShape(28.dp) else AlertDialogDefaults.shape,
             color = AlertDialogDefaults.containerColor,
             tonalElevation = AlertDialogDefaults.TonalElevation,
         ) {
@@ -245,13 +247,14 @@ fun ListDialog(
     modifier: Modifier = Modifier,
     content: LazyListScope.() -> Unit,
 ) {
+    val nestUi = useNestUi()
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
             modifier = Modifier.padding(24.dp),
-            shape = AlertDialogDefaults.shape,
+            shape = if (nestUi) RoundedCornerShape(28.dp) else AlertDialogDefaults.shape,
             color = AlertDialogDefaults.containerColor,
             tonalElevation = AlertDialogDefaults.TonalElevation,
         ) {

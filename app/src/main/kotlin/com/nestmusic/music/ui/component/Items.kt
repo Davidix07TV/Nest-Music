@@ -119,6 +119,7 @@ import com.nestmusic.music.db.entities.Song
 import com.nestmusic.music.extensions.toMediaItem
 import com.nestmusic.music.models.MediaMetadata
 import com.nestmusic.music.playback.queues.LocalAlbumRadio
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.utils.resize
 import com.nestmusic.music.utils.joinByBullet
 import com.nestmusic.music.utils.joinToArtistString
@@ -136,6 +137,11 @@ import kotlin.math.roundToInt
 import kotlin.jvm.JvmName
 
 const val ActiveBoxAlpha = 0.6f
+
+/** Grid titles get a punchier weight in the new UI. */
+@Composable
+private fun gridTitleWeight(): FontWeight =
+    if (useNestUi()) FontWeight.ExtraBold else FontWeight.Bold
 
 @Composable
 fun currentGridThumbnailHeight(): Dp {
@@ -296,23 +302,26 @@ inline fun ListItem(
     isActive: Boolean = false,
     isAvailable: Boolean = true,
 ) {
+    val nestUi = useNestUi()
+    val itemRadius = if (nestUi) 16.dp else 8.dp
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = if (isActive) {
             modifier // playing highlight
                 .height(ListItemHeight)
                 .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(itemRadius))
                 .background(
                     color = // selected active
                         if (isSelected == true) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        else if (nestUi) MaterialTheme.colorScheme.primaryContainer
                         else MaterialTheme.colorScheme.secondaryContainer
                 )
         } else if (isSelected == true) {
             modifier // inactive selected
                 .height(ListItemHeight)
                 .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(itemRadius))
                 .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.4f))
         } else {
             modifier // default
@@ -354,7 +363,7 @@ inline fun ListItem(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
+                style = if (nestUi) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -495,7 +504,7 @@ fun GridItem(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
+            fontWeight = gridTitleWeight(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Start,
@@ -634,7 +643,7 @@ fun SongGridItem(
         Text(
             text = song.song.title,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
+            fontWeight = gridTitleWeight(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.basicMarquee().fillMaxWidth()
@@ -862,7 +871,7 @@ fun AlbumGridItem(
         Text(
             text = album.album.title,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
+            fontWeight = gridTitleWeight(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.basicMarquee().fillMaxWidth()
@@ -1028,7 +1037,7 @@ fun PlaylistGridItem(
         Text(
             text = playlist.playlist.name,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
+            fontWeight = gridTitleWeight(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.basicMarquee().fillMaxWidth()
@@ -1263,7 +1272,7 @@ fun YouTubeGridItem(
         Text(
             text = item.title,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
+            fontWeight = gridTitleWeight(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textAlign = if (item is ArtistItem) TextAlign.Center else TextAlign.Start,
@@ -1344,7 +1353,7 @@ fun LocalSongsGrid(
     fillMaxWidth: Boolean = false,
     modifier: Modifier = Modifier
 ) = GridItem(
-    title = { Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+    title = { Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = gridTitleWeight(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
     subtitle = {
         Text(
             text = subtitle,
@@ -1386,7 +1395,7 @@ fun LocalArtistsGrid(
     fillMaxWidth: Boolean = false,
     modifier: Modifier = Modifier
 ) = GridItem(
-    title = { Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+    title = { Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = gridTitleWeight(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
     subtitle = {
         Text(
             text = subtitle,
@@ -1428,7 +1437,7 @@ fun LocalAlbumsGrid(
     fillMaxWidth: Boolean = false,
     modifier: Modifier = Modifier
 ) = GridItem(
-    title = { Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+    title = { Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = gridTitleWeight(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
     subtitle = {
         Text(
             text = subtitle,

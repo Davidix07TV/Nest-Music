@@ -28,6 +28,7 @@ import com.nestmusic.innertube.models.SongItem
 import com.nestmusic.innertube.models.YTItem
 import com.nestmusic.music.R
 import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.utils.resize
 
 @Composable
@@ -79,7 +80,8 @@ fun SpeedDialGridItem(
         ) {
             Text(
                 text = item.title,
-                style = MaterialTheme.typography.titleSmall, // Smaller, punchier font
+                // Bolder hero tile title in the new UI
+                style = if (useNestUi()) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 maxLines = 1,
