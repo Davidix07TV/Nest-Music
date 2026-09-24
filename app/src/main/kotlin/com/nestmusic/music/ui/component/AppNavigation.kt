@@ -5,9 +5,13 @@
 
 package com.nestmusic.music.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -22,15 +26,20 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.nestmusic.music.ui.screens.Screens
+import com.nestmusic.music.ui.theme.NestSunsetBrushHorizontal
+import com.nestmusic.music.ui.theme.useNestUi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
@@ -66,6 +75,7 @@ fun AppNavigationRail(
     val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
     val haptics = LocalHapticFeedback.current
     val viewConfiguration = LocalViewConfiguration.current
+    val nestUi = useNestUi()
 
     NavigationRail(
         modifier = modifier,
@@ -121,10 +131,27 @@ fun AppNavigationRail(
                 },
                 interactionSource = interactionSource,
                 icon = {
-                    Icon(
-                        painter = painterResource(id = iconRes),
-                        contentDescription = stringResource(screen.titleId)
-                    )
+                    // New UI: sunset pill behind the active destination icon
+                    if (nestUi && isSelected) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(width = 56.dp, height = 32.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(NestSunsetBrushHorizontal),
+                        ) {
+                            Icon(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = stringResource(screen.titleId),
+                                tint = Color.White,
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(id = iconRes),
+                            contentDescription = stringResource(screen.titleId)
+                        )
+                    }
                 }
             )
         }
@@ -147,6 +174,7 @@ fun AppNavigationBar(
     val contentColor = if (pureBlack) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
     val haptics = LocalHapticFeedback.current
     val viewConfiguration = LocalViewConfiguration.current
+    val nestUi = useNestUi()
 
     NavigationBar(
         modifier = modifier,
@@ -201,17 +229,35 @@ fun AppNavigationBar(
                 },
                 interactionSource = interactionSource,
                 icon = {
-                    Icon(
-                        painter = painterResource(id = iconRes),
-                        contentDescription = stringResource(screen.titleId)
-                    )
+                    // New UI: sunset pill behind the active destination icon
+                    if (nestUi && isSelected) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(width = 64.dp, height = 32.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(NestSunsetBrushHorizontal),
+                        ) {
+                            Icon(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = stringResource(screen.titleId),
+                                tint = Color.White,
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(id = iconRes),
+                            contentDescription = stringResource(screen.titleId)
+                        )
+                    }
                 },
                 label = if (!slimNav) {
                     {
                         Text(
                             text = stringResource(screen.titleId),
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = if (nestUi && isSelected) FontWeight.Bold else null,
                         )
                     }
                 } else null

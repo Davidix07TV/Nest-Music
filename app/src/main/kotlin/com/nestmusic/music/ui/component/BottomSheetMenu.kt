@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.nestmusic.music.ui.theme.NestSunsetBrushHorizontal
+import com.nestmusic.music.ui.theme.useNestUi
 
 val LocalMenuState = compositionLocalOf { MenuState() }
 
@@ -135,12 +137,19 @@ fun BottomSheetMenu(
         containerColor = background,
         contentColor = MaterialTheme.colorScheme.onSurface,
         dragHandle = {
+            val nestUi = useNestUi()
             Box(
                 modifier = Modifier
                     .padding(vertical = 12.dp)
-                    .size(width = 40.dp, height = 4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                    .size(width = if (nestUi) 48.dp else 40.dp, height = if (nestUi) 5.dp else 4.dp)
+                    .clip(RoundedCornerShape(if (nestUi) 3.dp else 2.dp))
+                    .then(
+                        if (nestUi) {
+                            Modifier.background(NestSunsetBrushHorizontal)
+                        } else {
+                            Modifier.background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                        },
+                    )
             )
         },
         modifier = modifier.fillMaxHeight()

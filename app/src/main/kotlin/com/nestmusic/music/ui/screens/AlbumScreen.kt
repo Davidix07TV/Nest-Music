@@ -6,6 +6,7 @@
 package com.nestmusic.music.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -96,6 +98,8 @@ import com.nestmusic.music.ui.utils.resize
 import com.nestmusic.music.utils.makeTimeString
 import com.nestmusic.music.utils.rememberPreference
 import com.nestmusic.music.viewmodels.AlbumViewModel
+import com.nestmusic.music.ui.theme.useNestUi
+import com.nestmusic.music.ui.theme.NestSunsetBrush
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -247,7 +251,7 @@ fun AlbumScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Metadata - Year first, then song count • duration
+                    // Metadata - Year first, then song count ï¿½ duration
                     val totalDuration = albumWithSongs.songs.sumOf { it.song.duration }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -262,7 +266,7 @@ fun AlbumScreen(
                             )
                         }
 
-                        // Song Count • Duration
+                        // Song Count ï¿½ Duration
                         Text(
                             text =
                                 buildString {
@@ -333,6 +337,7 @@ fun AlbumScreen(
                         }
 
                         // Play Button - Larger primary circular button
+                        val nestUi = useNestUi()
                         Surface(
                             onClick = {
                                 if (!isListenTogetherGuest) {
@@ -342,9 +347,11 @@ fun AlbumScreen(
                                     )
                                 }
                             },
-                            color = MaterialTheme.colorScheme.primary,
+                            color = if (nestUi) Color.Transparent else MaterialTheme.colorScheme.primary,
                             shape = CircleShape,
-                            modifier = Modifier.size(72.dp),
+                            modifier = Modifier
+                                .size(72.dp)
+                                .then(if (nestUi) Modifier.background(NestSunsetBrush) else Modifier),
                         ) {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -353,7 +360,7 @@ fun AlbumScreen(
                                 Icon(
                                     painter = painterResource(R.drawable.play),
                                     contentDescription = stringResource(R.string.play),
-                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    tint = if (nestUi) Color.White else MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.size(32.dp),
                                 )
                             }
