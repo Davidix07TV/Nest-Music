@@ -1690,7 +1690,7 @@ fun PlaylistThumbnail(
     shape: Shape,
     cacheKey: String? = null
 ) {
-    val shape = if (useNestUi() && shape != CircleShape) coverShape() else shape
+    val resolvedShape = if (useNestUi() && shape != CircleShape) coverShape() else shape
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
     
     when (thumbnails.size) {
@@ -1717,12 +1717,12 @@ fun PlaylistThumbnail(
             error = painterResource(R.drawable.queue_music),
             modifier = Modifier
                 .size(size)
-                .clip(shape)
+                .clip(resolvedShape)
         )
         else -> Box(
             modifier = Modifier
                 .size(size)
-                .clip(shape)
+                .clip(resolvedShape)
         ) {
             listOf(
                 Alignment.TopStart,

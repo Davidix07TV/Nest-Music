@@ -175,6 +175,7 @@ import com.nestmusic.music.ui.component.WavySlider
 import com.nestmusic.music.ui.component.rememberBottomSheetState
 import com.nestmusic.music.ui.menu.PlayerMenu
 import com.nestmusic.music.ui.screens.settings.DarkMode
+import com.nestmusic.music.ui.theme.NestRaspberry
 import com.nestmusic.music.ui.theme.NestSunsetBrush
 import com.nestmusic.music.ui.theme.NestTangerine
 import com.nestmusic.music.ui.theme.NestViolet

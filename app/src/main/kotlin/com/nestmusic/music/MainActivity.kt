@@ -1700,6 +1700,3 @@ val LocalSyncUtils = staticCompositionLocalOf<SyncUtils> { error("No SyncUtils p
 val LocalListenTogetherManager = staticCompositionLocalOf<com.nestmusic.music.listentogether.ListenTogetherManager?> { null }
 val LocalChangelogState = staticCompositionLocalOf<MutableState<Boolean>> { error("No LocalChangelogState provided") }
 val LocalIsPlayerExpanded = compositionLocalOf { false }
-ether.ListenTogetherManager?> { null }
-val LocalChangelogState = staticCompositionLocalOf<MutableState<Boolean>> { error("No LocalChangelogState provided") }
-val LocalIsPlayerExpanded = compositionLocalOf { false }
