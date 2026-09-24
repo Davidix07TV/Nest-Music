@@ -5,6 +5,7 @@
 
 package com.nestmusic.music.ui.screens.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.asPaddingValues
@@ -34,8 +35,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -47,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -65,6 +69,7 @@ import com.nestmusic.music.constants.SearchSourceKey
 import com.nestmusic.music.db.entities.SearchHistory
 import com.nestmusic.music.playback.queues.YouTubeQueue
 import com.nestmusic.music.ui.component.HideOnScrollFAB
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.utils.SearchRoutes
 import com.nestmusic.music.utils.rememberEnumPreference
 import com.nestmusic.music.utils.rememberPreference
@@ -273,7 +278,11 @@ fun SearchScreen(
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+                        containerColor = when {
+                            pureBlack -> Color.Black
+                            nestUi -> MaterialTheme.colorScheme.surface
+                            else -> MaterialTheme.colorScheme.surfaceContainer
+                        },
                     ),
             )
         },

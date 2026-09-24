@@ -5,6 +5,7 @@
 
 package com.nestmusic.music.ui.theme
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -42,30 +43,23 @@ fun MetrolistTheme(
     val referenceColor = if (nestUi) DefaultThemeColor else LegacyThemeColor
     val effectiveThemeColor =
         if (!nestUi && themeColor == DefaultThemeColor) LegacyThemeColor else themeColor
-    // Determine if system dynamic colors should be used (Android S+ and default theme color)
-    val useSystemDynamicColor = (effectiveThemeColor == referenceColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-
-    // Select the appropriate color scheme generation method
-    val baseColorScheme = if (useSystemDynamicColor) {
-        // Use standard Material 3 dynamic color functions for system wallpaper colors
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-    } else {
-        // Use materialKolor only when a specific seed color is provided
-        rememberDynamicColorScheme(
-            seedColor = effectiveThemeColor, // themeColor is guaranteed non-default here
-            isDark = darkTheme,
-            specVersion = ColorSpec.SpecVersion.SPEC_2025,
-            style = PaletteStyle.TonalSpot // Keep existing style
+    // The logo look ignores wallpaper dynamic color. Classic keeps Material You.
+    // The classic path lives in its own composable so toggling the look
+    // does not reshuffle remember calls.
+    val colorScheme = if (nestUi) {
+        nestColorScheme(
+            darkTheme = darkTheme,
+            accent = effectiveThemeColor,
+            pureBlack = pureBlack,
         )
-    }
-
-    // Apply pureBlack modification if needed, similar to original logic
-    val colorScheme = remember(baseColorScheme, pureBlack, darkTheme) {
-        if (darkTheme && pureBlack) {
-            baseColorScheme.pureBlack(true)
-        } else {
-            baseColorScheme
-        }
+    } else {
+        classicColorScheme(
+            context = context,
+            darkTheme = darkTheme,
+            pureBlack = pureBlack,
+            themeColor = effectiveThemeColor,
+            referenceColor = referenceColor,
+        )
     }
 
     // Use standard MaterialTheme instead of MaterialExpressiveTheme
@@ -75,6 +69,30 @@ fun MetrolistTheme(
         shapes = if (nestUi) NestShapes else MaterialTheme.shapes,
         content = content
     )
+}
+
+@Composable
+private fun classicColorScheme(
+    context: Context,
+    darkTheme: Boolean,
+    pureBlack: Boolean,
+    themeColor: Color,
+    referenceColor: Color,
+): ColorScheme {
+    val useSystemDynamicColor = themeColor == referenceColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val baseColorScheme = if (useSystemDynamicColor) {
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else {
+        rememberDynamicColorScheme(
+            seedColor = themeColor,
+            isDark = darkTheme,
+            specVersion = ColorSpec.SpecVersion.SPEC_2025,
+            style = PaletteStyle.TonalSpot,
+        )
+    }
+    return remember(baseColorScheme, pureBlack, darkTheme) {
+        if (darkTheme && pureBlack) baseColorScheme.pureBlack(true) else baseColorScheme
+    }
 }
 
 fun Bitmap.extractThemeColor(): Color {

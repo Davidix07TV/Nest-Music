@@ -119,6 +119,7 @@ import com.nestmusic.music.db.entities.Song
 import com.nestmusic.music.extensions.toMediaItem
 import com.nestmusic.music.models.MediaMetadata
 import com.nestmusic.music.playback.queues.LocalAlbumRadio
+import com.nestmusic.music.ui.theme.coverShape
 import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.utils.resize
 import com.nestmusic.music.utils.joinByBullet
@@ -146,7 +147,8 @@ private fun gridTitleWeight(): FontWeight =
 @Composable
 fun currentGridThumbnailHeight(): Dp {
     val gridItemSize by rememberEnumPreference(GridItemsSizeKey, GridItemSize.BIG)
-    return if (gridItemSize == GridItemSize.BIG) GridThumbnailHeight else SmallGridThumbnailHeight
+    val base = if (gridItemSize == GridItemSize.BIG) GridThumbnailHeight else SmallGridThumbnailHeight
+    return if (useNestUi()) base + 32.dp else base
 }
 
 @JvmName("ClickableArtistTextEntities")
@@ -303,29 +305,48 @@ inline fun ListItem(
     isAvailable: Boolean = true,
 ) {
     val nestUi = useNestUi()
-    val itemRadius = if (nestUi) 16.dp else 8.dp
+    val itemRadius = if (nestUi) 18.dp else 8.dp
+    val rowHeight = if (nestUi) 74.dp else ListItemHeight
+    val rowShape = RoundedCornerShape(itemRadius)
+    val nestSurface = if (nestUi) {
+        Modifier
+            .padding(horizontal = 12.dp, vertical = 3.dp)
+            .clip(rowShape)
+            .background(
+                when {
+                    isActive && isSelected == true -> MaterialTheme.colorScheme.primary.copy(alpha = 0.28f)
+                    isActive -> MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+                    isSelected == true -> MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                    else -> MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.72f)
+                }
+            )
+    } else {
+        Modifier
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = if (isActive) {
-            modifier // playing highlight
-                .height(ListItemHeight)
+        modifier = if (nestUi) {
+            modifier
+                .height(rowHeight)
+                .then(nestSurface)
+        } else if (isActive) {
+            modifier
+                .height(rowHeight)
                 .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(itemRadius))
+                .clip(rowShape)
                 .background(
-                    color = // selected active
-                        if (isSelected == true) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                        else if (nestUi) MaterialTheme.colorScheme.primaryContainer
-                        else MaterialTheme.colorScheme.secondaryContainer
+                    color = if (isSelected == true) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                    else MaterialTheme.colorScheme.secondaryContainer
                 )
         } else if (isSelected == true) {
-            modifier // inactive selected
-                .height(ListItemHeight)
+            modifier
+                .height(rowHeight)
                 .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(itemRadius))
+                .clip(rowShape)
                 .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.4f))
         } else {
-            modifier // default
-                .height(ListItemHeight)
+            modifier
+                .height(rowHeight)
                 .padding(horizontal = 8.dp)
         }
     ) {
@@ -364,7 +385,7 @@ inline fun ListItem(
             Text(
                 text = title,
                 style = if (nestUi) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = if (nestUi) FontWeight.SemiBold else FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -1480,13 +1501,14 @@ fun ItemThumbnail(
     thumbnailRatio: Float = 1f
 ) {
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
-    
+    val resolvedShape = if (useNestUi() && shape != CircleShape) coverShape() else shape
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
             .aspectRatio(thumbnailRatio)
-            .clip(shape)
+            .clip(resolvedShape)
     ) {
         if (albumIndex == null) {
             AsyncImage(
@@ -1500,7 +1522,7 @@ fun ItemThumbnail(
                 contentScale = if (cropAlbumArt) ContentScale.Crop else ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(shape)
+                    .clip(resolvedShape)
             )
         }
 
@@ -1544,7 +1566,7 @@ fun ItemThumbnail(
                         Color.Transparent
                     else
                         Color.Black.copy(alpha = ActiveBoxAlpha),
-                    shape = shape
+                    shape = resolvedShape
                 )
         )
     }
@@ -1562,12 +1584,13 @@ fun LocalThumbnail(
     thumbnailRatio: Float = 1f
 ) {
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
-    
+    val resolvedShape = if (useNestUi() && shape != CircleShape) coverShape() else shape
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .aspectRatio(thumbnailRatio)
-            .clip(shape)
+            .clip(resolvedShape)
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -1590,7 +1613,7 @@ fun LocalThumbnail(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f), shape)
+                    .background(Color.Black.copy(alpha = 0.4f), resolvedShape)
             ) {
                 if (isPlaying) {
                     PlayingIndicator(
@@ -1667,6 +1690,7 @@ fun PlaylistThumbnail(
     shape: Shape,
     cacheKey: String? = null
 ) {
+    val shape = if (useNestUi() && shape != CircleShape) coverShape() else shape
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
     
     when (thumbnails.size) {

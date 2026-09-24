@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nestmusic.music.ui.theme.useNestUi
 
 /**
@@ -54,10 +55,14 @@ fun Material3SettingsGroup(
         // Section title
         title?.let {
             Text(
-                text = it,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+                text = if (nestUi) it.uppercase() else it,
+                style = if (nestUi) {
+                    MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.3.sp)
+                } else {
+                    MaterialTheme.typography.labelLarge
+                },
+                color = if (nestUi) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp, top = 8.dp, start = if (nestUi) 6.dp else 0.dp)
             )
         }
 

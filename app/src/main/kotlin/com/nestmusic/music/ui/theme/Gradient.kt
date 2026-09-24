@@ -9,18 +9,26 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 /**
- * Nest brand "sunset" palette, inspired by the app logo:
- * indigo sky fading into raspberry and a tangerine horizon.
+ * Sampled from the Nest logo: violet sky, raspberry, tangerine horizon,
+ * then the deep blue of the water.
  */
-val NestViolet = Color(0xFF341B87)
-val NestRaspberry = Color(0xFFD6246E)
-val NestTangerine = Color(0xFFF97316)
+val NestViolet = Color(0xFF40108A)
+val NestMagenta = Color(0xFF9A146E)
+val NestRaspberry = Color(0xFFE02049)
+val NestTangerine = Color(0xFFFB8016)
+val NestWater = Color(0xFF12144A)
+val NestNight = Color(0xFF07081C)
 
-/** Stops of the brand sunset, light-to-dark top to bottom. */
-val NestSunsetColors = listOf(NestViolet, NestRaspberry, NestTangerine)
+val NestInk = NestNight
+val NestEmber = NestTangerine
+val NestEmberDeep = NestRaspberry
+val NestSand = Color(0xFFE7D4FF)
+val NestCream = Color(0xFFFFF7F8)
 
-/** Vertical sunset brush, the default brand direction. */
+val NestSunsetColors = listOf(NestViolet, NestMagenta, NestRaspberry, NestTangerine)
+
 val NestSunsetBrush = Brush.verticalGradient(NestSunsetColors)
 
-/** Horizontal sunset brush, for wide surfaces. */
-val NestSunsetBrushHorizontal = Brush.horizontalGradient(NestSunsetColors)
+val NestSunsetBrushHorizontal = Brush.horizontalGradient(
+    listOf(NestViolet, NestRaspberry, NestTangerine),
+)
