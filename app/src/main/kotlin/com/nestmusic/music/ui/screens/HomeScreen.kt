@@ -139,6 +139,7 @@ import com.nestmusic.music.ui.component.ChipsRow
 import com.nestmusic.music.ui.component.HideOnScrollFAB
 import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.NestHomeHero
 import com.nestmusic.music.ui.component.NavigationTitle
 import com.nestmusic.music.ui.component.RandomizeGridItem
 import com.nestmusic.music.ui.component.SongGridItem
@@ -156,6 +157,7 @@ import com.nestmusic.music.ui.menu.YouTubeAlbumMenu
 import com.nestmusic.music.ui.menu.YouTubeArtistMenu
 import com.nestmusic.music.ui.menu.YouTubePlaylistMenu
 import com.nestmusic.music.ui.menu.YouTubeSongMenu
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.utils.SnapLayoutInfoProvider
 import com.nestmusic.music.ui.utils.resize
 import com.nestmusic.music.utils.joinByBullet
@@ -611,7 +613,7 @@ fun DailyDiscoverCard(
                         text =
                             stringResource(
                                 messageRes,
-                                "${dailyDiscover.seed.title} • ${dailyDiscover.seed.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name }}",
+                                "${dailyDiscover.seed.title} ï¿½ ${dailyDiscover.seed.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name }}",
                             ),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
@@ -639,6 +641,8 @@ fun HomeScreen(
     val haptic = LocalHapticFeedback.current
     val listenTogetherManager = LocalListenTogetherManager.current
     val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
+
+    val nestUi = useNestUi()
 
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsStateWithLifecycle()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
@@ -1172,6 +1176,17 @@ fun HomeScreen(
                 state = lazylistState,
                 contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
             ) {
+                if (nestUi) {
+                    item(key = "nest_home_hero") {
+                        NestHomeHero(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, top = 8.dp)
+                                .height(170.dp),
+                        )
+                    }
+                }
+
                 item {
                     ChipsRow(
                         chips = homePage?.chips?.map { it to it.title } ?: emptyList(),

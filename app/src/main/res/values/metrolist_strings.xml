@@ -1147,4 +1147,18 @@
     <string name="stream_source_web_creator_desc">Creator web client.</string>
     <string name="stream_source_android_creator">ANDROID_CREATOR</string>
     <string name="stream_source_android_creator_desc">Android creator client. Off by default; needs DroidGuard.</string>
+
+    <string name="nest_ui">Interface</string>
+    <string name="nest_ui_desc">Choose between the new 2026 interface and the classic one</string>
+    <string name="nest_ui_new">New UI</string>
+    <string name="nest_ui_new_desc">Nest Sunset: bold colors, sunset gradients and larger shapes</string>
+    <string name="nest_ui_legacy">Classic UI</string>
+    <string name="nest_ui_legacy_desc">The original interface you know</string>
+    <string name="nest_ui_choice_title">Welcome to Nest Music</string>
+    <string name="nest_ui_choice_message">Pick the interface you want to use. You can change it any time in Settings → Appearance.</string>
+    <string name="nest_ui_choice_recommended">Recommended</string>
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+    <string name="tap_to_start">Nothing playing yet</string>
 </resources>

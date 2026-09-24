@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.nestmusic.music.LocalPlayerAwareWindowInsets
 import com.nestmusic.music.R
 import com.nestmusic.music.ui.theme.NestSunsetBrush
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.utils.isScrollingUp
 
 @Composable
@@ -62,6 +64,7 @@ fun BoxScope.HideOnScrollFAB(
                     .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
             ),
     ) {
+        val nestUi = useNestUi()
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp)
@@ -81,10 +84,21 @@ fun BoxScope.HideOnScrollFAB(
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }
-            GradientFab(
-                icon = icon,
-                onClick = onClick,
-            )
+            if (nestUi) {
+                GradientFab(
+                    icon = icon,
+                    onClick = onClick,
+                )
+            } else {
+                FloatingActionButton(
+                    onClick = onClick,
+                ) {
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = null,
+                    )
+                }
+            }
         }
     }
 }
@@ -109,6 +123,7 @@ fun BoxScope.HideOnScrollFAB(
                     .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
             ),
     ) {
+        val nestUi = useNestUi()
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp)
@@ -128,10 +143,21 @@ fun BoxScope.HideOnScrollFAB(
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }
-            GradientFab(
-                icon = icon,
-                onClick = onClick,
-            )
+            if (nestUi) {
+                GradientFab(
+                    icon = icon,
+                    onClick = onClick,
+                )
+            } else {
+                FloatingActionButton(
+                    onClick = onClick,
+                ) {
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = null,
+                    )
+                }
+            }
         }
     }
 }
@@ -156,6 +182,7 @@ fun BoxScope.HideOnScrollFAB(
                     .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
             ),
     ) {
+        val nestUi = useNestUi()
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp)
@@ -175,10 +202,21 @@ fun BoxScope.HideOnScrollFAB(
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }
-            GradientFab(
-                icon = icon,
-                onClick = onClick,
-            )
+            if (nestUi) {
+                GradientFab(
+                    icon = icon,
+                    onClick = onClick,
+                )
+            } else {
+                FloatingActionButton(
+                    onClick = onClick,
+                ) {
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = null,
+                    )
+                }
+            }
         }
     }
 }

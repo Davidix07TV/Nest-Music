@@ -123,6 +123,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.nestmusic.music.ui.theme.NestSunsetColors
 import com.nestmusic.music.ui.theme.PlayerColorExtractor
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.menu.AddToPlaylistDialog
 
@@ -413,8 +414,15 @@ private fun NewMiniPlayer(
                     }
                 }
                 MiniPlayerBackgroundStyle.GRADIENT -> {
-                    // Fall back to the brand sunset when the cover yields no usable colors
-                    val colors = if (gradientColors.isNotEmpty()) gradientColors else NestSunsetColors
+                    // New UI falls back to the brand sunset when the cover yields no usable colors
+                    val colors = when {
+                        gradientColors.isNotEmpty() -> gradientColors
+                        useNestUi() -> NestSunsetColors
+                        else -> listOf(
+                            MaterialTheme.colorScheme.surfaceContainer,
+                            MaterialTheme.colorScheme.surfaceContainer,
+                        )
+                    }
                     Box(
                         Modifier
                             .fillMaxSize()
@@ -532,6 +540,7 @@ private fun NewMiniPlayerPlayButton(
     val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
     val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
     val isMuted by playerConnection.isMuted.collectAsStateWithLifecycle()
+    val nestUi = useNestUi()
 
     val trackColor = outlineColor.copy(alpha = 0.2f)
     val strokeWidth = 3.dp
@@ -561,16 +570,28 @@ private fun NewMiniPlayerPlayButton(
                         size = Size(diameter, diameter),
                         style = stroke,
                     )
-                    // Draw progress
-                    drawArc(
-                        color = primaryColor,
-                        startAngle = startAngle,
-                        sweepAngle = sweepAngle,
-                        useCenter = false,
-                        topLeft = topLeft,
-                        size = Size(diameter, diameter),
-                        style = stroke,
-                    )
+                    // Draw progress (sunset gradient in the new UI)
+                    if (nestUi) {
+                        drawArc(
+                            brush = Brush.linearGradient(NestSunsetColors),
+                            startAngle = startAngle,
+                            sweepAngle = sweepAngle,
+                            useCenter = false,
+                            topLeft = topLeft,
+                            size = Size(diameter, diameter),
+                            style = stroke,
+                        )
+                    } else {
+                        drawArc(
+                            color = primaryColor,
+                            startAngle = startAngle,
+                            sweepAngle = sweepAngle,
+                            useCenter = false,
+                            topLeft = topLeft,
+                            size = Size(diameter, diameter),
+                            style = stroke,
+                        )
+                    }
                 },
     ) {
         // Thumbnail with play/pause overlay

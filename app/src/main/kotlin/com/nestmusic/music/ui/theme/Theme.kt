@@ -34,11 +34,16 @@ fun MetrolistTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     pureBlack: Boolean = false,
     themeColor: Color = DefaultThemeColor,
+    nestUi: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
+    // When the classic UI is active, the "default" color is the old coral seed
+    val referenceColor = if (nestUi) DefaultThemeColor else LegacyThemeColor
+    val effectiveThemeColor =
+        if (!nestUi && themeColor == DefaultThemeColor) LegacyThemeColor else themeColor
     // Determine if system dynamic colors should be used (Android S+ and default theme color)
-    val useSystemDynamicColor = (themeColor == DefaultThemeColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+    val useSystemDynamicColor = (effectiveThemeColor == referenceColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
 
     // Select the appropriate color scheme generation method
     val baseColorScheme = if (useSystemDynamicColor) {
@@ -47,7 +52,7 @@ fun MetrolistTheme(
     } else {
         // Use materialKolor only when a specific seed color is provided
         rememberDynamicColorScheme(
-            seedColor = themeColor, // themeColor is guaranteed non-default here
+            seedColor = effectiveThemeColor, // themeColor is guaranteed non-default here
             isDark = darkTheme,
             specVersion = ColorSpec.SpecVersion.SPEC_2025,
             style = PaletteStyle.TonalSpot // Keep existing style
@@ -66,8 +71,8 @@ fun MetrolistTheme(
     // Use standard MaterialTheme instead of MaterialExpressiveTheme
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = AppTypography, // Use the defined AppTypography
-        shapes = NestShapes,
+        typography = if (nestUi) AppTypography else LegacyTypography,
+        shapes = if (nestUi) NestShapes else MaterialTheme.shapes,
         content = content
     )
 }

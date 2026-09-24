@@ -151,6 +151,8 @@ import com.nestmusic.music.constants.MiniPlayerBottomSpacing
 import com.nestmusic.music.constants.MiniPlayerHeight
 import com.nestmusic.music.constants.NavigationBarAnimationSpec
 import com.nestmusic.music.constants.NavigationBarHeight
+import com.nestmusic.music.constants.NestUiChoiceShownKey
+import com.nestmusic.music.constants.NestUiKey
 import com.nestmusic.music.constants.PauseListenHistoryKey
 import com.nestmusic.music.constants.PauseSearchHistoryKey
 import com.nestmusic.music.constants.PreferredLyricsProvider
@@ -181,6 +183,7 @@ import com.nestmusic.music.ui.component.BottomSheetMenu
 import com.nestmusic.music.ui.component.BottomSheetPage
 import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.NestUiChoiceDialog
 import com.nestmusic.music.ui.component.rememberBottomSheetState
 import com.nestmusic.music.ui.component.shimmer.ShimmerTheme
 import com.nestmusic.music.ui.menu.YouTubeSongMenu
@@ -583,6 +586,9 @@ class MainActivity : ComponentActivity() {
         val (selectedThemeColorInt) = rememberPreference(SelectedThemeColorKey, defaultValue = DefaultThemeColor.toArgb())
         val selectedThemeColor = Color(selectedThemeColorInt)
 
+        val (nestUi, onNestUiChange) = rememberPreference(NestUiKey, defaultValue = true)
+        val (uiChoiceShown, onUiChoiceShownChange) = rememberPreference(NestUiChoiceShownKey, defaultValue = false)
+
         val showChangelog = rememberSaveable { mutableStateOf(false) }
 
         var themeColor by rememberSaveable(stateSaver = ColorSaver) {
@@ -647,7 +653,18 @@ class MainActivity : ComponentActivity() {
             darkTheme = useDarkTheme,
             pureBlack = pureBlack,
             themeColor = themeColor,
+            nestUi = nestUi,
         ) {
+            // Ask which interface to use only on the very first launch
+            if (!uiChoiceShown) {
+                NestUiChoiceDialog(
+                    onChoose = { choice ->
+                        onNestUiChange(choice)
+                        onUiChoiceShownChange(true)
+                    },
+                )
+            }
+
             val currentDensity = LocalDensity.current
             val windowInfo = LocalWindowInfo.current
             val containerSize = windowInfo.containerDpSize
