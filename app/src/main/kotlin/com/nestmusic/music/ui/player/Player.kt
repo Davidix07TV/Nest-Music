@@ -175,7 +175,10 @@ import com.nestmusic.music.ui.component.WavySlider
 import com.nestmusic.music.ui.component.rememberBottomSheetState
 import com.nestmusic.music.ui.menu.PlayerMenu
 import com.nestmusic.music.ui.screens.settings.DarkMode
-import com.nestmusic.music.ui.theme.NestSunsetColors
+import com.nestmusic.music.ui.theme.NestRaspberry
+import com.nestmusic.music.ui.theme.NestSunsetBrush
+import com.nestmusic.music.ui.theme.NestTangerine
+import com.nestmusic.music.ui.theme.NestViolet
 import com.nestmusic.music.ui.theme.PlayerColorExtractor
 import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.theme.PlayerSliderColors
@@ -909,20 +912,40 @@ fun BottomSheetPlayer(
                                         .background(Color.Black.copy(alpha = 0.2f)),
                                 )
                             } else if (useNestUi()) {
-                                // No cover colors available in the new UI: fall back to the brand sunset
                                 Box(
                                     Modifier
                                         .fillMaxSize()
                                         .alpha(backgroundAlpha)
-                                        .background(Brush.verticalGradient(NestSunsetColors))
-                                        .background(Color.Black.copy(alpha = 0.2f)),
+                                        .background(
+                                            Brush.verticalGradient(
+                                                listOf(
+                                                    NestViolet.copy(alpha = 0.85f),
+                                                    NestRaspberry.copy(alpha = 0.35f),
+                                                    MaterialTheme.colorScheme.background,
+                                                ),
+                                            ),
+                                        ),
                                 )
                             }
                         }
                     }
 
                     else -> {
-                        PlayerBackgroundStyle.DEFAULT
+                        if (useNestUi()) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .alpha(backgroundAlpha)
+                                    .background(
+                                        Brush.verticalGradient(
+                                            listOf(
+                                                NestViolet.copy(alpha = 0.45f),
+                                                Color.Transparent,
+                                            ),
+                                        ),
+                                    ),
+                            )
+                        }
                     }
                 }
             }
@@ -947,7 +970,7 @@ fun BottomSheetPlayer(
     ) {
         val controlsContent: @Composable ColumnScope.(MediaMetadata) -> Unit = { mediaMetadata ->
             val playPauseRoundness by animateDpAsState(
-                targetValue = if (isPlaying) 24.dp else 36.dp,
+                targetValue = if (useNestUi() || !isPlaying) 36.dp else 24.dp,
                 animationSpec = tween(durationMillis = 90, easing = LinearEasing),
                 label = "playPauseRoundness",
             )
@@ -1134,23 +1157,32 @@ fun BottomSheetPlayer(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 if (useNewPlayerDesign) {
+                    val nestControls = useNestUi()
                     val shareShape =
-                        RoundedCornerShape(
-                            topStart = 50.dp,
-                            bottomStart = 50.dp,
-                            topEnd = 3.dp,
-                            bottomEnd = 3.dp,
-                        )
+                        if (nestControls) {
+                            RoundedCornerShape(22.dp)
+                        } else {
+                            RoundedCornerShape(
+                                topStart = 50.dp,
+                                bottomStart = 50.dp,
+                                topEnd = 3.dp,
+                                bottomEnd = 3.dp,
+                            )
+                        }
 
                     val favShape =
-                        RoundedCornerShape(
-                            topStart = 3.dp,
-                            bottomStart = 3.dp,
-                            topEnd = 50.dp,
-                            bottomEnd = 50.dp,
-                        )
+                        if (nestControls) {
+                            RoundedCornerShape(22.dp)
+                        } else {
+                            RoundedCornerShape(
+                                topStart = 3.dp,
+                                bottomStart = 3.dp,
+                                topEnd = 50.dp,
+                                bottomEnd = 50.dp,
+                            )
+                        }
 
-                    val middleShape = RoundedCornerShape(3.dp)
+                    val middleShape = RoundedCornerShape(if (nestControls) 22.dp else 3.dp)
 
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -1643,8 +1675,8 @@ fun BottomSheetPlayer(
                                 interactionSource = playPauseInteractionSource,
                                 colors =
                                     IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = textButtonColor,
-                                        contentColor = iconButtonColor,
+                                        containerColor = if (useNestUi()) NestTangerine else textButtonColor,
+                                        contentColor = if (useNestUi()) Color.White else iconButtonColor,
                                     ),
                                 modifier =
                                     Modifier
@@ -1758,15 +1790,15 @@ fun BottomSheetPlayer(
 
                             Spacer(Modifier.width(8.dp))
 
-                            val nestUiPlayGradient = useNestUi() && playerBackground == PlayerBackgroundStyle.DEFAULT
+                            val nestPlayDisc = useNestUi() && playerBackground == PlayerBackgroundStyle.DEFAULT
                             Box(
                                 modifier =
                                     Modifier
                                         .size(72.dp)
                                         .clip(RoundedCornerShape(playPauseRoundness))
                                         .then(
-                                            if (nestUiPlayGradient) {
-                                                Modifier.background(Brush.verticalGradient(NestSunsetColors))
+                                            if (nestPlayDisc) {
+                                                Modifier.background(NestSunsetBrush)
                                             } else {
                                                 Modifier.background(textButtonColor)
                                             },
@@ -1807,9 +1839,8 @@ fun BottomSheetPlayer(
                                             },
                                         ),
                                     contentDescription = null,
-                                    // White icon reads best on the sunset gradient
                                     colorFilter = ColorFilter.tint(
-                                        if (nestUiPlayGradient) Color.White else iconButtonColor,
+                                        if (nestPlayDisc) Color.White else iconButtonColor,
                                     ),
                                     modifier =
                                         Modifier

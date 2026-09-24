@@ -81,11 +81,13 @@ fun <E> ChipsRow(
                 label = { Text(label) },
                 selected = selected,
                 colors = FilterChipDefaults.filterChipColors(
-                    containerColor = if (nestUi && selected) MaterialTheme.colorScheme.primaryContainer else containerColor,
-                    labelColor = if (nestUi && selected) MaterialTheme.colorScheme.onPrimaryContainer else Color.Unspecified,
+                    containerColor = if (nestUi) MaterialTheme.colorScheme.surfaceContainerHigh else containerColor,
+                    labelColor = if (nestUi) MaterialTheme.colorScheme.onSurfaceVariant else Color.Unspecified,
+                    selectedContainerColor = if (nestUi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer,
+                    selectedLabelColor = if (nestUi) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer,
                 ),
                 onClick = { onValueUpdate(value) },
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(if (nestUi) 999.dp else 16.dp),
                 border = null
             )
 

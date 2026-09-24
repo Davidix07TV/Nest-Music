@@ -88,6 +88,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
@@ -184,6 +185,7 @@ import com.nestmusic.music.ui.component.BottomSheetPage
 import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.NestUiChoiceDialog
+import com.nestmusic.music.ui.theme.NestViolet
 import com.nestmusic.music.ui.component.rememberBottomSheetState
 import com.nestmusic.music.ui.component.shimmer.ShimmerTheme
 import com.nestmusic.music.ui.menu.YouTubeSongMenu
@@ -696,6 +698,21 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(if (pureBlack) Color.Black else MaterialTheme.colorScheme.surface),
             ) {
+                if (nestUi && !pureBlack) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(340.dp)
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
+                                        Color.Transparent,
+                                    ),
+                                ),
+                            ),
+                    )
+                }
                 val density = LocalDensity.current
                 val configuration = LocalWindowInfo.current
                 val cutoutInsets = WindowInsets.displayCutout
@@ -1009,7 +1026,11 @@ class MainActivity : ComponentActivity() {
                         !(pauseListenHistory && eventCount == 0)
                     }
 
-                val baseBg = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
+                val baseBg = when {
+                    pureBlack -> Color.Black
+                    nestUi -> Color.Transparent
+                    else -> MaterialTheme.colorScheme.surfaceContainer
+                }
 
                 CompositionLocalProvider(
                     LocalDatabase provides database,
@@ -1028,6 +1049,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     Scaffold(
+                        containerColor = if (nestUi && !pureBlack) Color.Transparent else if (pureBlack) Color.Black else MaterialTheme.colorScheme.surface,
                         snackbarHost = { SnackbarHost(snackbarHostState) },
                         topBar = {
                             AnimatedVisibility(
@@ -1039,8 +1061,11 @@ class MainActivity : ComponentActivity() {
                                     TopAppBar(
                                         title = {
                                             Text(
-                                                text = currentTitleRes?.let { stringResource(it) } ?: "",
-                                                style = MaterialTheme.typography.titleLarge,
+                                                text = when {
+                                                    nestUi && currentTitleRes == R.string.home -> stringResource(R.string.app_name)
+                                                    else -> currentTitleRes?.let { stringResource(it) } ?: ""
+                                                },
+                                                style = if (nestUi) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
                                             )
                                         },
                                         actions = {

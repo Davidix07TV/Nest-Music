@@ -60,6 +60,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -291,8 +292,9 @@ private fun NewMiniPlayer(
     }
 
     // Memoize colors
+    val nestUi = useNestUi()
     val backgroundColor = when (miniPlayerBackground) {
-        MiniPlayerBackgroundStyle.DEFAULT    -> MaterialTheme.colorScheme.surfaceContainer
+        MiniPlayerBackgroundStyle.DEFAULT    -> if (nestUi) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.surfaceContainer
         MiniPlayerBackgroundStyle.TRANSPARENT -> Color.Black.copy(alpha = 0.25f)
         MiniPlayerBackgroundStyle.BLUR       -> MaterialTheme.colorScheme.surfaceContainer
         MiniPlayerBackgroundStyle.GRADIENT   -> MaterialTheme.colorScheme.surfaceContainer
@@ -313,7 +315,7 @@ private fun NewMiniPlayer(
                 .fillMaxWidth()
                 .height(MiniPlayerHeight)
                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = if (nestUi) 16.dp else 12.dp)
                 .let { baseModifier ->
                     if (swipeThumbnail) {
                         baseModifier.pointerInput(Unit) {

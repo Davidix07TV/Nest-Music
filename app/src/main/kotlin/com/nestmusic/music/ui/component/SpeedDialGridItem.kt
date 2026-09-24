@@ -28,6 +28,7 @@ import com.nestmusic.innertube.models.SongItem
 import com.nestmusic.innertube.models.YTItem
 import com.nestmusic.music.R
 import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.ui.theme.coverShape
 import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.ui.utils.resize
 
@@ -43,7 +44,7 @@ fun SpeedDialGridItem(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1f) // Square aspect ratio
-            .clip(RoundedCornerShape(ThumbnailCornerRadius))
+            .clip(coverShape())
     ) {
         // Thumbnail
         ItemThumbnail(

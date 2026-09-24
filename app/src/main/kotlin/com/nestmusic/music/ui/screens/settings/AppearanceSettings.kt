@@ -83,6 +83,7 @@ import com.nestmusic.music.constants.LyricsTextSizeKey
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyle
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyleKey
 import com.nestmusic.music.constants.NestUiKey
+import com.nestmusic.music.ui.component.NestUiChoiceDialog
 import com.nestmusic.music.constants.PlayerBackgroundStyle
 import com.nestmusic.music.constants.PlayerBackgroundStyleKey
 import com.nestmusic.music.constants.PlayerButtonsStyle
@@ -957,6 +958,16 @@ fun AppearanceSettings(
     }
 
     val (nestUi, onNestUiChange) = rememberPreference(NestUiKey, defaultValue = true)
+    var showNestUiChoice by rememberSaveable { mutableStateOf(false) }
+    if (showNestUiChoice) {
+        NestUiChoiceDialog(
+            onChoose = { choice ->
+                onNestUiChange(choice)
+                showNestUiChoice = false
+            },
+            onDismiss = { showNestUiChoice = false },
+        )
+    }
 
     Column(
         Modifier
@@ -986,7 +997,7 @@ fun AppearanceSettings(
                                     color = MaterialTheme.colorScheme.primary,
                                 )
                             },
-                            onClick = { onNestUiChange(!nestUi) },
+                            onClick = { showNestUiChoice = true },
                         ),
                     )
                 },

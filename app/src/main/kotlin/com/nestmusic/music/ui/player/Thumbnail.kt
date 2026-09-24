@@ -81,6 +81,7 @@ import com.nestmusic.music.constants.PlayerHorizontalPadding
 import com.nestmusic.music.constants.SeekExtraSeconds
 import com.nestmusic.music.constants.SwipeThumbnailKey
 import com.nestmusic.music.constants.ThumbnailCornerRadius
+import com.nestmusic.music.ui.theme.useNestUi
 import com.nestmusic.music.listentogether.RoomRole
 import com.nestmusic.music.ui.component.CastButton
 import com.nestmusic.music.utils.rememberEnumPreference
@@ -352,11 +353,13 @@ fun Thumbnail(
                     }
                 ) {
                     // Calculate dimensions once per size change, considering landscape mode
-                    val dimensions = remember(maxWidth, maxHeight, isLandscape) {
+                    val artCorner = if (useNestUi()) 16.dp else ThumbnailCornerRadius
+                    val dimensions = remember(maxWidth, maxHeight, isLandscape, artCorner) {
                         calculateThumbnailDimensions(
                             containerWidth = maxWidth,
                             containerHeight = maxHeight,
-                            isLandscape = isLandscape
+                            isLandscape = isLandscape,
+                            cornerRadius = artCorner,
                         )
                     }
 

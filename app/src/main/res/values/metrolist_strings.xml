@@ -1149,13 +1149,13 @@
     <string name="stream_source_android_creator_desc">Android creator client. Off by default; needs DroidGuard.</string>
 
     <string name="nest_ui">Interface</string>
-    <string name="nest_ui_desc">Choose between the new 2026 interface and the classic one</string>
-    <string name="nest_ui_new">New UI</string>
-    <string name="nest_ui_new_desc">Nest Sunset: bold colors, sunset gradients and larger shapes</string>
+    <string name="nest_ui_desc">Choose the logo look or the classic interface</string>
+    <string name="nest_ui_new">Sunset</string>
+    <string name="nest_ui_new_desc">The logo, as an interface: violet sky, sunset gradient, blue water and a floating dock</string>
     <string name="nest_ui_legacy">Classic UI</string>
-    <string name="nest_ui_legacy_desc">The original interface you know</string>
-    <string name="nest_ui_choice_title">Welcome to Nest Music</string>
-    <string name="nest_ui_choice_message">Pick the interface you want to use. You can change it any time in Settings → Appearance.</string>
+    <string name="nest_ui_legacy_desc">The original Material interface, unchanged</string>
+    <string name="nest_ui_choice_title">Choose your Nest</string>
+    <string name="nest_ui_choice_message">The new look follows the Nest logo. Classic stays exactly as it was. You can switch any time in Settings → Appearance.</string>
     <string name="nest_ui_choice_recommended">Recommended</string>
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_afternoon">Good afternoon</string>

@@ -36,18 +36,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nestmusic.music.R
-import com.nestmusic.music.ui.theme.NestSunsetColors
+import com.nestmusic.music.ui.theme.NestSunsetBrush
+import com.nestmusic.music.ui.theme.NestWater
 
 /**
- * First-launch dialog asking whether to use the new "Nest Sunset 2026"
- * interface or the classic one. Dismissing it keeps the new UI (default).
+ * Asks whether to use the logo look or the classic interface.
+ * First launch treats a dismiss as "keep the new UI". Settings passes
+ * [onDismiss] so closing the dialog does not change the current choice.
  */
 @Composable
 fun NestUiChoiceDialog(
     onChoose: (useNestUi: Boolean) -> Unit,
+    onDismiss: () -> Unit = { onChoose(true) },
 ) {
     Dialog(
-        onDismissRequest = { onChoose(true) },
+        onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Column(
@@ -65,7 +68,7 @@ fun NestUiChoiceDialog(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(Brush.verticalGradient(NestSunsetColors)),
+                    .background(NestSunsetBrush),
             ) {
                 Icon(
                     painter = painterResource(R.drawable.small_icon),
@@ -97,12 +100,31 @@ fun NestUiChoiceDialog(
 
             NestUiChoiceCard(
                 preview = {
-                    Spacer(
+                    Box(
                         modifier = Modifier
                             .size(52.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Brush.verticalGradient(NestSunsetColors)),
-                    )
+                            .background(NestSunsetBrush),
+                    ) {
+                        Spacer(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(18.dp)
+                                .clip(CircleShape)
+                                .background(Color.White),
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .height(14.dp)
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(Color.Transparent, NestWater),
+                                    ),
+                                ),
+                        )
+                    }
                 },
                 title = stringResource(R.string.nest_ui_new),
                 badge = stringResource(R.string.nest_ui_choice_recommended),
@@ -115,12 +137,30 @@ fun NestUiChoiceDialog(
 
             NestUiChoiceCard(
                 preview = {
-                    Spacer(
+                    Box(
                         modifier = Modifier
                             .size(52.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                    )
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFE8EAED))
+                            .padding(8.dp),
+                    ) {
+                        Spacer(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(Color(0xFFED5564)),
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .fillMaxWidth()
+                                .height(16.dp)
+                                .clip(RoundedCornerShape(3.dp))
+                                .background(Color.White),
+                        )
+                    }
                 },
                 title = stringResource(R.string.nest_ui_legacy),
                 badge = null,

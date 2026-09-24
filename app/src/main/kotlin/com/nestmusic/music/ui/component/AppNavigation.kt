@@ -5,12 +5,29 @@
 
 package com.nestmusic.music.ui.component
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +37,6 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -29,6 +45,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -43,12 +60,6 @@ import com.nestmusic.music.ui.theme.NestSunsetBrushHorizontal
 import com.nestmusic.music.ui.theme.useNestUi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-
-@Immutable
-private data class NavItemState(
-    val isSelected: Boolean,
-    val iconRes: Int
-)
 
 @Stable
 private fun isRouteSelected(currentRoute: String?, screenRoute: String, navigationItems: List<Screens>): Boolean {
@@ -65,6 +76,190 @@ private fun isRouteSelected(currentRoute: String?, screenRoute: String, navigati
 }
 
 @Composable
+private fun rememberNavPressSource(
+    handleClick: Boolean,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)?,
+): MutableInteractionSource {
+    val interactionSource = remember { MutableInteractionSource() }
+    val haptics = LocalHapticFeedback.current
+    val viewConfiguration = LocalViewConfiguration.current
+    val currentOnClick by rememberUpdatedState(onClick)
+    val currentOnLongClick by rememberUpdatedState(onLongClick)
+    if (handleClick) {
+        LaunchedEffect(interactionSource) {
+            var isLongClick = false
+            interactionSource.interactions.collectLatest { interaction ->
+                when (interaction) {
+                    is PressInteraction.Press -> {
+                        isLongClick = false
+                        delay(viewConfiguration.longPressTimeoutMillis)
+                        isLongClick = true
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        currentOnLongClick?.invoke()
+                    }
+                    is PressInteraction.Release -> {
+                        if (!isLongClick) currentOnClick()
+                    }
+                    is PressInteraction.Cancel -> {
+                        isLongClick = false
+                    }
+                }
+            }
+        }
+    }
+    return interactionSource
+}
+
+@Composable
+private fun EmberDock(
+    navigationItems: List<Screens>,
+    currentRoute: String?,
+    onItemClick: (Screens, Boolean) -> Unit,
+    onSearchLongClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(32.dp)
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .shadow(16.dp, shape, ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.28f))
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f), shape)
+                .padding(horizontal = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            navigationItems.forEach { screen ->
+                val isSelected = remember(currentRoute, screen.route) {
+                    isRouteSelected(currentRoute, screen.route, navigationItems)
+                }
+                val currentIsSelected by rememberUpdatedState(isSelected)
+                val iconRes = if (isSelected) screen.iconIdActive else screen.iconIdInactive
+                val isSearchItem = screen == Screens.Search && onSearchLongClick != null
+                val interactionSource = rememberNavPressSource(
+                    handleClick = isSearchItem,
+                    onClick = { onItemClick(screen, currentIsSelected) },
+                    onLongClick = onSearchLongClick,
+                )
+                Row(
+                    modifier = Modifier
+                        .weight(if (isSelected) 1.4f else 1f)
+                        .height(46.dp)
+                        .clip(RoundedCornerShape(23.dp))
+                        .then(
+                            if (isSelected) Modifier.background(NestSunsetBrushHorizontal) else Modifier,
+                        )
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = LocalIndication.current,
+                            onClick = {
+                                if (!isSearchItem) onItemClick(screen, currentIsSelected)
+                            },
+                        ),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(iconRes),
+                        contentDescription = stringResource(screen.titleId),
+                        tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp),
+                    )
+                    if (isSelected) {
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(screen.titleId),
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmberRail(
+    navigationItems: List<Screens>,
+    currentRoute: String?,
+    onItemClick: (Screens, Boolean) -> Unit,
+    onSearchLongClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(30.dp)
+    Box(
+        modifier = modifier
+            .width(84.dp)
+            .fillMaxHeight()
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Vertical))
+            .padding(vertical = 16.dp, horizontal = 10.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(60.dp)
+                .shadow(12.dp, shape)
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f), shape)
+                .padding(vertical = 12.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            navigationItems.forEach { screen ->
+                val isSelected = remember(currentRoute, screen.route) {
+                    isRouteSelected(currentRoute, screen.route, navigationItems)
+                }
+                val currentIsSelected by rememberUpdatedState(isSelected)
+                val iconRes = if (isSelected) screen.iconIdActive else screen.iconIdInactive
+                val isSearchItem = screen == Screens.Search && onSearchLongClick != null
+                val interactionSource = rememberNavPressSource(
+                    handleClick = isSearchItem,
+                    onClick = { onItemClick(screen, currentIsSelected) },
+                    onLongClick = onSearchLongClick,
+                )
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .then(
+                            if (isSelected) Modifier.background(NestSunsetBrushHorizontal) else Modifier,
+                        )
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = LocalIndication.current,
+                            onClick = {
+                                if (!isSearchItem) onItemClick(screen, currentIsSelected)
+                            },
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(iconRes),
+                        contentDescription = stringResource(screen.titleId),
+                        tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun AppNavigationRail(
     navigationItems: List<Screens>,
     currentRoute: String?,
@@ -73,10 +268,38 @@ fun AppNavigationRail(
     pureBlack: Boolean = false,
     onSearchLongClick: (() -> Unit)? = null
 ) {
+    if (useNestUi()) {
+        EmberRail(
+            navigationItems = navigationItems,
+            currentRoute = currentRoute,
+            onItemClick = onItemClick,
+            onSearchLongClick = onSearchLongClick,
+            modifier = modifier,
+        )
+    } else {
+        LegacyAppNavigationRail(
+            navigationItems = navigationItems,
+            currentRoute = currentRoute,
+            onItemClick = onItemClick,
+            modifier = modifier,
+            pureBlack = pureBlack,
+            onSearchLongClick = onSearchLongClick,
+        )
+    }
+}
+
+@Composable
+private fun LegacyAppNavigationRail(
+    navigationItems: List<Screens>,
+    currentRoute: String?,
+    onItemClick: (Screens, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    pureBlack: Boolean = false,
+    onSearchLongClick: (() -> Unit)? = null,
+) {
     val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
     val haptics = LocalHapticFeedback.current
     val viewConfiguration = LocalViewConfiguration.current
-    val nestUi = useNestUi()
 
     NavigationRail(
         modifier = modifier,
@@ -96,7 +319,6 @@ fun AppNavigationRail(
             val isSearchItem = screen == Screens.Search && onSearchLongClick != null
             val interactionSource = remember { MutableInteractionSource() }
 
-            // Long press detection using InteractionSource
             if (isSearchItem) {
                 LaunchedEffect(interactionSource) {
                     var isLongClick = false
@@ -128,31 +350,13 @@ fun AppNavigationRail(
                     if (!isSearchItem) {
                         onItemClick(screen, currentIsSelected)
                     }
-                    // For search item, click is handled via InteractionSource
                 },
                 interactionSource = interactionSource,
                 icon = {
-                    // New UI: sunset pill behind the active destination icon
-                    if (nestUi && isSelected) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(width = 56.dp, height = 32.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(NestSunsetBrushHorizontal),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = iconRes),
-                                contentDescription = stringResource(screen.titleId),
-                                tint = Color.White,
-                            )
-                        }
-                    } else {
-                        Icon(
-                            painter = painterResource(id = iconRes),
-                            contentDescription = stringResource(screen.titleId)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = stringResource(screen.titleId)
+                    )
                 }
             )
         }
@@ -171,11 +375,41 @@ fun AppNavigationBar(
     slimNav: Boolean = false,
     onSearchLongClick: (() -> Unit)? = null
 ) {
+    if (useNestUi()) {
+        EmberDock(
+            navigationItems = navigationItems,
+            currentRoute = currentRoute,
+            onItemClick = onItemClick,
+            onSearchLongClick = onSearchLongClick,
+            modifier = modifier,
+        )
+    } else {
+        LegacyAppNavigationBar(
+            navigationItems = navigationItems,
+            currentRoute = currentRoute,
+            onItemClick = onItemClick,
+            modifier = modifier,
+            pureBlack = pureBlack,
+            slimNav = slimNav,
+            onSearchLongClick = onSearchLongClick,
+        )
+    }
+}
+
+@Composable
+private fun LegacyAppNavigationBar(
+    navigationItems: List<Screens>,
+    currentRoute: String?,
+    onItemClick: (Screens, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    pureBlack: Boolean = false,
+    slimNav: Boolean = false,
+    onSearchLongClick: (() -> Unit)? = null,
+) {
     val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
     val contentColor = if (pureBlack) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
     val haptics = LocalHapticFeedback.current
     val viewConfiguration = LocalViewConfiguration.current
-    val nestUi = useNestUi()
 
     NavigationBar(
         modifier = modifier,
@@ -194,7 +428,6 @@ fun AppNavigationBar(
             val isSearchItem = screen == Screens.Search && onSearchLongClick != null
             val interactionSource = remember { MutableInteractionSource() }
 
-            // Long press detection using InteractionSource
             if (isSearchItem) {
                 LaunchedEffect(interactionSource) {
                     var isLongClick = false
@@ -226,31 +459,13 @@ fun AppNavigationBar(
                     if (!isSearchItem) {
                         onItemClick(screen, currentIsSelected)
                     }
-                    // For search item, click is handled via InteractionSource
                 },
                 interactionSource = interactionSource,
                 icon = {
-                    // New UI: sunset pill behind the active destination icon
-                    if (nestUi && isSelected) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(width = 64.dp, height = 32.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(NestSunsetBrushHorizontal),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = iconRes),
-                                contentDescription = stringResource(screen.titleId),
-                                tint = Color.White,
-                            )
-                        }
-                    } else {
-                        Icon(
-                            painter = painterResource(id = iconRes),
-                            contentDescription = stringResource(screen.titleId)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = stringResource(screen.titleId)
+                    )
                 },
                 label = if (!slimNav) {
                     {
@@ -258,7 +473,6 @@ fun AppNavigationBar(
                             text = stringResource(screen.titleId),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontWeight = if (nestUi && isSelected) FontWeight.Bold else null,
                         )
                     }
                 } else null

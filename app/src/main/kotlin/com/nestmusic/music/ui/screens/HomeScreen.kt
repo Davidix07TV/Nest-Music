@@ -1179,10 +1179,14 @@ fun HomeScreen(
                 if (nestUi) {
                     item(key = "nest_home_hero") {
                         NestHomeHero(
+                            accountName = accountName.takeIf { it.isNotBlank() && it != "Guest" },
+                            onHistory = { navController.navigate("history") },
+                            onStats = { navController.navigate("stats") },
+                            onRecognize = { navController.navigate("recognition") },
+                            onSearch = { navController.navigate(Screens.Search.route) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, top = 8.dp, end = 16.dp)
-                                .height(170.dp),
+                                .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 6.dp),
                         )
                     }
                 }

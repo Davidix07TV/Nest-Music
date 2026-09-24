@@ -131,9 +131,9 @@ val LegacyTypography = Typography(
 )
 
 /**
- * Whether the new "Nest Sunset 2026" interface is active.
- * Default is true: first launches (and users who dismissed the choice
- * dialog without picking) get the new UI.
+ * Whether the logo (Sunset) interface is active.
+ * Default is true. Classic (the pre-redesign Material UI) stays available
+ * from the first-launch choice and from Settings → Appearance.
  */
 @Composable
 fun useNestUi(): Boolean {

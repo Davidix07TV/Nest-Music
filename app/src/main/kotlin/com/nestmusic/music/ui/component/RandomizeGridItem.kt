@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -22,8 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.nestmusic.music.constants.ThumbnailCornerRadius
 import com.nestmusic.music.ui.theme.NestSunsetBrush
+import com.nestmusic.music.ui.theme.coverShape
 import com.nestmusic.music.ui.theme.useNestUi
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -53,7 +52,7 @@ fun RandomizeGridItem(
         modifier =
             modifier
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(ThumbnailCornerRadius))
+                .clip(coverShape())
                 .then(
                     if (nestUi) {
                         Modifier.background(NestSunsetBrush)
