@@ -125,7 +125,7 @@ body:
       description: |
         You can find your Nest Music version in **Settings**.
       placeholder: |
-        Example: "13.1.1"
+        Example: "1.0.5"
     validations:
       required: true
 
