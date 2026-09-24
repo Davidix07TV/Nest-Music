@@ -68,12 +68,12 @@ fun NestHomeHero(
         modifier = modifier
             .clip(RoundedCornerShape(24.dp)),
     ) {
-        Box(
+        Spacer(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Brush.verticalGradient(NestSunsetColors)),
         )
-        Box(
+        Spacer(
             modifier = Modifier
                 .fillMaxSize()
                 .background(

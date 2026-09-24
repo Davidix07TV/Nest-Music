@@ -97,7 +97,7 @@ fun NestUiChoiceDialog(
 
             NestUiChoiceCard(
                 preview = {
-                    Box(
+                    Spacer(
                         modifier = Modifier
                             .size(52.dp)
                             .clip(RoundedCornerShape(16.dp))
@@ -115,7 +115,7 @@ fun NestUiChoiceDialog(
 
             NestUiChoiceCard(
                 preview = {
-                    Box(
+                    Spacer(
                         modifier = Modifier
                             .size(52.dp)
                             .clip(RoundedCornerShape(16.dp))
@@ -184,8 +184,7 @@ private fun NestUiChoiceCard(
         }
 
         if (highlight) {
-            Box(
-                contentAlignment = Alignment.Center,
+            Spacer(
                 modifier = Modifier
                     .size(10.dp)
                     .clip(CircleShape)

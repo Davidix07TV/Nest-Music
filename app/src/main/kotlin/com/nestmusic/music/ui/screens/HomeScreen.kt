@@ -1181,7 +1181,7 @@ fun HomeScreen(
                         NestHomeHero(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, top = 8.dp)
+                                .padding(start = 16.dp, top = 8.dp, end = 16.dp)
                                 .height(170.dp),
                         )
                     }
