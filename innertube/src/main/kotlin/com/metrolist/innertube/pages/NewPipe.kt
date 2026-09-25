@@ -4,6 +4,8 @@ import com.nestmusic.innertube.models.YouTubeClient
 import com.nestmusic.innertube.models.response.PlayerResponse
 import io.ktor.http.URLBuilder
 import io.ktor.http.parseQueryString
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.schabi.newpipe.extractor.NewPipe
@@ -51,8 +53,7 @@ private class NewPipeDownloaderImpl(
                 } ?: response.request
             }.build()
 
-    @Throws(IOException::class, ReCaptchaException::class)
-    override fun execute(request: Request): Response {
+    private fun buildOkHttpRequest(request: Request): okhttp3.Request {
         val httpMethod = request.httpMethod()
         val url = request.url()
         val headers = request.headers()
@@ -76,12 +77,23 @@ private class NewPipeDownloaderImpl(
             }
         }
 
-        val response = client.newCall(requestBuilder.build()).execute()
+        return requestBuilder.build()
+    }
 
+    /**
+     * Maps an okhttp response to the extractor one. [requestUrl] is only used for the
+     * [ReCaptchaException] so that it keeps reporting the URL that was actually requested,
+     * even when the response comes from a redirect.
+     */
+    @Throws(IOException::class, ReCaptchaException::class)
+    private fun toExtractorResponse(
+        requestUrl: String,
+        response: okhttp3.Response,
+    ): Response {
         if (response.code == 429) {
             response.close()
 
-            throw ReCaptchaException("reCaptcha Challenge requested", url)
+            throw ReCaptchaException("reCaptcha Challenge requested", requestUrl)
         }
 
         val latestUrl = response.request.url.toString()
@@ -96,8 +108,53 @@ private class NewPipeDownloaderImpl(
         )
     }
 
-    override fun executeAsync(request: Request, callback: AsyncCallback?): CancellableCall {
-        TODO("Placeholder")
+    @Throws(IOException::class, ReCaptchaException::class)
+    override fun execute(request: Request): Response =
+        toExtractorResponse(request.url(), client.newCall(buildOkHttpRequest(request)).execute())
+
+    override fun executeAsync(
+        request: Request,
+        callback: AsyncCallback?,
+    ): CancellableCall {
+        val call = client.newCall(buildOkHttpRequest(request))
+        val cancellableCall = CancellableCall(call)
+
+        call.enqueue(
+            object : Callback {
+                override fun onFailure(
+                    call: Call,
+                    e: IOException,
+                ) {
+                    cancellableCall.setFinished()
+                    callback?.onError(e)
+                }
+
+                override fun onResponse(
+                    call: Call,
+                    response: okhttp3.Response,
+                ) {
+                    val extractorResponse =
+                        try {
+                            toExtractorResponse(request.url(), response)
+                        } catch (e: Exception) {
+                            cancellableCall.setFinished()
+                            callback?.onError(e)
+                            return
+                        }
+
+                    cancellableCall.setFinished()
+                    // A failure raised by the callback itself is not a download failure: forward it
+                    // so the extractor can decide how to treat a parse error.
+                    try {
+                        callback?.onSuccess(extractorResponse)
+                    } catch (e: Exception) {
+                        callback?.onError(e)
+                    }
+                }
+            },
+        )
+
+        return cancellableCall
     }
 }
 
