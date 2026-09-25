@@ -18,7 +18,7 @@ class SearchSummaryPageTest {
             title = "Howling",
             metadata = listOf(
                 Run("Song", null),
-                Run(" • ", null),
+                Run(" \u2022 ", null),
                 Run("3:04", null),
                 Run("6m\u00a0plays", null),
             ),
