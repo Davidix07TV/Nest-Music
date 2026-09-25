@@ -1,0 +1,89 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    name: JVM unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
+          cache-cleanup: on-success
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run unit tests
+        run: ./gradlew --console=plain :app:testFossDebugUnitTest :innertube:testDebugUnitTest :betterlyrics:testDebugUnitTest --warning-mode summary
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: unit-test-reports
+          path: |
+            app/build/reports/tests/
+            innertube/build/reports/tests/
+            betterlyrics/build/reports/tests/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # Advisory only: these paths are owned by tooling, not by hand-written edits.
+  # It never fails a PR, it annotates it.
+  repo-hygiene:
+    name: Crowdin & Room ownership (warnings)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Check owned paths
+        if: github.event_name == 'pull_request'
+        run: |
+          set -uo pipefail
+          files=$(git diff --name-only "HEAD^1" "HEAD^2" 2>/dev/null || git diff --name-only "HEAD" "HEAD~1")
+
+          crowdin=$(printf '%s\n' "$files" | grep -E '^app/src/main/res/values-[^/]+/.*\.xml$' || true)
+          if [ -n "$crowdin" ]; then
+            {
+              echo "::warning::These locale files are owned by the Crowdin sync and will be overwritten on the next run; new English strings belong in app/src/main/res/values/metrolist_strings.xml"
+              printf '%s\n' "$crowdin"
+            } | head -40
+          fi
+
+          schemas=$(printf '%s\n' "$files" | grep -E '^app/schemas/' || true)
+          if [ -n "$schemas" ]; then
+            {
+              echo "::warning::app/schemas/ is exported by Room and must not be edited by hand; a schema change also needs a hand-written migration"
+              printf '%s\n' "$schemas"
+            } | head -40
+          fi
