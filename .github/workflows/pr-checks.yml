@@ -39,8 +39,47 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run unit tests
-        run: ./gradlew --console=plain :app:testFossDebugUnitTest :innertube:testDebugUnitTest :betterlyrics:testDebugUnitTest --warning-mode summary
+      # One step per module: the failing step name already says which module is red.
+      - name: Unit tests · :app (fossDebug)
+        run: ./gradlew --console=plain :app:testFossDebugUnitTest --warning-mode summary
+
+      - name: Unit tests · :innertube
+        if: ${{ !cancelled() }}
+        run: ./gradlew --console=plain :innertube:testDebugUnitTest --warning-mode summary
+
+      - name: Unit tests · :betterlyrics
+        if: ${{ !cancelled() }}
+        run: ./gradlew --console=plain :betterlyrics:testDebugUnitTest --warning-mode summary
+
+      # Annotate the failing test cases so the PR page is self-describing; gradle's own
+      # output only lives in the log, which is easy to skim past on a red check.
+      - name: Report failing tests
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import glob, xml.etree.ElementTree as ET
+
+          lines = []
+          for path in sorted(glob.glob('**/build/test-results/**/*.xml', recursive=True)):
+              try:
+                  root = ET.parse(path).getroot()
+              except Exception:
+                  continue
+              for case in root.iter('testcase'):
+                  for bad in list(case.iter('failure')) + list(case.iter('error')):
+                      raw = (bad.get('message') or (bad.text or '')).strip().splitlines()
+                      detail = raw[0][:200] if raw else 'no message'
+                      detail = detail.replace('%', '%25').replace('\r', ' ').replace('\n', ' ')
+                      lines.append(f"::error::{case.get('classname')} > {case.get('name')}: {detail}")
+
+          if not lines:
+              print('No JUnit XML failures found: the step probably failed before running tests '
+                    '(compile error, missing SDK, or Robolectric artifact download).')
+          for line in lines[:40]:
+              print(line)
+          if len(lines) > 40:
+              print(f"::warning::{len(lines) - 40} more failing cases not annotated")
+          PY
 
       - name: Upload test reports
         if: failure()
