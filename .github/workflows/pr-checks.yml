@@ -93,6 +93,78 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  # Blocking, but only for what a PR *introduces*: the repo already carries non-UTF-8 bytes
+  # (an editor that round-tripped sources through Windows-1252), and that legacy is tracked
+  # separately. This step stops the next file from being destroyed the same way.
+  encoding-guard:
+    name: UTF-8 (new regressions)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Reject sources this PR turns into invalid UTF-8
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 - <<'PY'
+          import subprocess
+
+          EXTS = ('.kt', '.kts', '.java', '.swift', '.xml', '.py', '.js', '.jsx',
+                  '.ts', '.tsx', '.proto', '.md', '.yml', '.yaml')
+
+
+          def run(args):
+              return subprocess.run(args, capture_output=True)
+
+
+          def is_utf8(blob):
+              try:
+                  blob.decode('utf-8')
+                  return True
+              except UnicodeDecodeError:
+                  return False
+
+
+          def changed_files():
+              for ref in ('HEAD^1 HEAD^2', 'HEAD~1 HEAD'):
+                  out = run(['git', 'diff', '--name-only'] + ref.split()).stdout.decode().split()
+                  if out:
+                      return out
+              return []
+
+
+          regressions, legacy = [], []
+          for path in changed_files():
+              if not path.endswith(EXTS):
+                  continue
+              head = run(['git', 'show', f'HEAD:{path}'])
+              if head.returncode != 0 or is_utf8(head.stdout):
+                  continue  # deleted, or already fine
+              base = run(['git', 'show', f'HEAD^1:{path}'])
+              if base.returncode == 0 and not is_utf8(base.stdout):
+                  legacy.append(path)
+              else:
+                  regressions.append(path)
+
+          for path in regressions:
+              print(f"::error file={path}::This PR makes the file invalid UTF-8. A non-UTF-8 "
+                    f"charset round-trip has replaced its non-ASCII characters (in this repo that "
+                    f"silently broke data tables and comparisons). Save the file as UTF-8; prefer "
+                    f"\\uXXXX escapes for characters that carry meaning in code.")
+          if regressions:
+              raise SystemExit(1)
+
+          if legacy:
+              print('Left alone (invalid before this PR):')
+              for path in legacy:
+                  print('  -', path)
+          else:
+              print('All changed sources are valid UTF-8.')
+          PY
+
   # Advisory only: these paths are owned by tooling, not by hand-written edits.
   # It never fails a PR, it annotates it.
   repo-hygiene:
