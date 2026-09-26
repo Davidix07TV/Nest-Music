@@ -198,6 +198,31 @@ val DiscordUserStatusKey = stringPreferencesKey("discordUserStatus")
 // Google Cast
 val EnableGoogleCastKey = booleanPreferencesKey("enableGoogleCast")
 
+// Lossless / Hi-Res streaming (Qobuz-backed)
+val PlaybackSourceKey = stringPreferencesKey("playbackSource")
+val FlacStreamingQualityKey = stringPreferencesKey("flacStreamingQuality")
+val FlacDownloadQualityKey = stringPreferencesKey("flacDownloadQuality")
+val EnableLosslessKey = booleanPreferencesKey("enable_lossless")
+val QobuzAppIdKey = stringPreferencesKey("qobuz_app_id")
+val QobuzAppSecretKey = stringPreferencesKey("qobuz_app_secret")
+val QobuzUserAuthTokenKey = stringPreferencesKey("qobuz_user_auth_token")
+val QobuzAppSecretsKey = stringPreferencesKey("qobuz_app_secrets_map")
+val MemoryCacheToggleKey = booleanPreferencesKey("memoryCacheToggle")
+val DownloadLocationUriKey = stringPreferencesKey("downloadLocationUri")
+val LowDataModeKey = booleanPreferencesKey("lowDataMode")
+val NetworkMeteredKey = booleanPreferencesKey("networkMetered")
+
+enum class PlaybackSource {
+    YT_MUSIC,
+    FLAC
+}
+
+enum class FlacQuality(val streamQuality: Int) {
+    CD(6),
+    HI_RES(7),
+    MAX(27)
+}
+
 // Listen Together
 val ListenTogetherServerUrlKey = stringPreferencesKey("listenTogetherServerUrl")
 val ListenTogetherUsernameKey = stringPreferencesKey("listenTogetherUsername")
