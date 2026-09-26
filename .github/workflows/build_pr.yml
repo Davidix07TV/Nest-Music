@@ -10,9 +10,6 @@ on:
       - "fastlane/**"
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
@@ -97,39 +94,3 @@ jobs:
         with:
           name: app-foss-release
           path: app/build/outputs/apk/foss/release/*.apk
-
-      - name: Upload APK to release v1.0.6-lossless
-        if: success() && (github.head_ref == 'arena/01a0deb1-nest-music' || contains(github.head_ref, 'arena/01a0deb1-nest-music'))
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          APK=$(ls app/build/outputs/apk/foss/release/*.apk 2>/dev/null | head -n 1)
-          if [ -z "$APK" ]; then echo "No APK"; exit 0; fi
-          cp "$APK" ./Nest-Music-v1.0.6-lossless-foss.apk
-          gh release view v1.0.6-lossless >/dev/null 2>&1 || gh release create v1.0.6-lossless --title "Nest Music v1.0.6 - Hi-Res Lossless FLAC" --notes "Auto build from PR" --prerelease --target ${{ github.head_ref }}
-          gh release upload v1.0.6-lossless ./Nest-Music-v1.0.6-lossless-foss.apk --clobber || echo "upload failed but continue"
-
-      - name: Push APK to output branch
-        if: success() && (github.head_ref == 'arena/01a0deb1-nest-music' || contains(github.head_ref, 'arena/01a0deb1-nest-music'))
-        run: |
-          set -e
-          APK=$(ls app/build/outputs/apk/foss/release/*.apk 2>/dev/null | head -n 1)
-          if [ -z "$APK" ]; then echo "No APK found"; exit 0; fi
-          cp "$APK" /tmp/nest-foss-release.apk
-          ls -lh /tmp/nest-foss-release.apk
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          cd /tmp
-          rm -rf apk_branch
-          mkdir apk_branch
-          cd apk_branch
-          git init
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git fetch origin arena/01a0deb1-nest-music-apk-output 2>/dev/null || echo "branch not exists yet"
-          git checkout -B arena/01a0deb1-nest-music-apk-output
-          cp /tmp/nest-foss-release.apk ./Nest-Music-foss-release.apk
-          echo "${{ github.sha }}" > commit.txt
-          date >> commit.txt
-          git add -A
-          git commit -m "ci: apk from ${{ github.sha }}" || echo "nothing to commit"
-          git push -f origin arena/01a0deb1-nest-music-apk-output
