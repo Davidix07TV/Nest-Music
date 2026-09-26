@@ -18,8 +18,7 @@ class FlacCoreLosslessStreamResolver @Inject constructor(
             artist = artistName.ifBlank { "Unknown Artist" },
             title = song.title,
             album = song.album?.title,
-            isrc = song.song.isrc?.takeIf { it.isNotBlank() },
-            durationMs = song.song.duration * 1000L,
+            durationMs = song.song.duration.takeIf { it > 0 }?.let { it * 1000L },
             explicit = song.song.explicit
         )
         return registry.resolve(query, quality.streamQuality)
