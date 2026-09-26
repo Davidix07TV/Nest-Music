@@ -97,8 +97,18 @@ import com.nestmusic.music.ui.component.SongListItem
 import com.nestmusic.music.ui.component.TextFieldDialog
 import com.nestmusic.music.ui.utils.ShowMediaInfo
 import com.nestmusic.music.viewmodels.CachePlaylistViewModel
+import com.nestmusic.music.constants.PlaybackSourceKey
+import com.nestmusic.music.constants.PlaybackSource
+import com.nestmusic.music.constants.FlacQuality
+import com.nestmusic.music.constants.FlacDownloadQualityKey
+import com.nestmusic.music.constants.QobuzUserAuthTokenKey
+import com.nestmusic.music.lossless.download.FlacDownloader
+import com.nestmusic.music.utils.rememberEnumPreference
+import com.nestmusic.music.utils.rememberPreference
+import com.nestmusic.music.extensions.toEnum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -908,82 +918,98 @@ fun SongMenu(
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
         item {
+            val (playbackSourcePref) = rememberEnumPreference(PlaybackSourceKey, defaultValue = PlaybackSource.YT_MUSIC)
+            val (flacDownloadQualityPref) = rememberEnumPreference(FlacDownloadQualityKey, defaultValue = FlacQuality.HI_RES)
+            val (qobuzPool) = rememberPreference(QobuzUserAuthTokenKey, "")
+            val hasFlacCreds = qobuzPool.isNotBlank()
+
             Material3MenuGroup(
                 items =
-                    listOf(
-                        when (download?.state) {
-                            Download.STATE_COMPLETED -> {
-                                Material3MenuItemData(
-                                    title = {
-                                        Text(
-                                            text = stringResource(R.string.remove_download),
-                                        )
-                                    },
-                                    icon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.offline),
-                                            contentDescription = null,
-                                        )
-                                    },
-                                    onClick = {
-                                        DownloadService.sendRemoveDownload(
-                                            context,
-                                            ExoDownloadService::class.java,
-                                            song.id,
-                                            false,
-                                        )
-                                    },
-                                )
-                            }
-
-                            Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> {
-                                Material3MenuItemData(
-                                    title = { Text(text = stringResource(R.string.downloading)) },
-                                    icon = {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(24.dp),
-                                            strokeWidth = 2.dp,
-                                        )
-                                    },
-                                    onClick = {
-                                        DownloadService.sendRemoveDownload(
-                                            context,
-                                            ExoDownloadService::class.java,
-                                            song.id,
-                                            false,
-                                        )
-                                    },
-                                )
-                            }
-
-                            else -> {
-                                Material3MenuItemData(
-                                    title = { Text(text = stringResource(R.string.action_download)) },
-                                    description = { Text(text = stringResource(R.string.download_desc)) },
-                                    icon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.download),
-                                            contentDescription = null,
-                                        )
-                                    },
-                                    onClick = {
-                                        val downloadRequest =
-                                            DownloadRequest
-                                                .Builder(song.id, song.id.toUri())
+                    buildList {
+                        // YouTube download
+                        add(
+                            when (download?.state) {
+                                Download.STATE_COMPLETED -> {
+                                    Material3MenuItemData(
+                                        title = { Text(text = stringResource(R.string.remove_download)) },
+                                        icon = {
+                                            Icon(painter = painterResource(R.drawable.offline), contentDescription = null)
+                                        },
+                                        onClick = {
+                                            DownloadService.sendRemoveDownload(
+                                                context,
+                                                ExoDownloadService::class.java,
+                                                song.id,
+                                                false,
+                                            )
+                                        },
+                                    )
+                                }
+                                Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> {
+                                    Material3MenuItemData(
+                                        title = { Text(text = stringResource(R.string.downloading)) },
+                                        icon = {
+                                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                                        },
+                                        onClick = {
+                                            DownloadService.sendRemoveDownload(
+                                                context,
+                                                ExoDownloadService::class.java,
+                                                song.id,
+                                                false,
+                                            )
+                                        },
+                                    )
+                                }
+                                else -> {
+                                    Material3MenuItemData(
+                                        title = { Text(text = stringResource(R.string.action_download)) },
+                                        description = { Text(text = stringResource(R.string.download_desc)) },
+                                        icon = {
+                                            Icon(painter = painterResource(R.drawable.download), contentDescription = null)
+                                        },
+                                        onClick = {
+                                            val downloadRequest = DownloadRequest.Builder(song.id, song.id.toUri())
                                                 .setCustomCacheKey(song.id)
                                                 .setData(song.song.title.toByteArray())
                                                 .build()
-                                        DownloadService.sendAddDownload(
-                                            context,
-                                            ExoDownloadService::class.java,
-                                            downloadRequest,
-                                            false,
+                                            DownloadService.sendAddDownload(
+                                                context,
+                                                ExoDownloadService::class.java,
+                                                downloadRequest,
+                                                false,
+                                            )
+                                        },
+                                    )
+                                }
+                            }
+                        )
+                        // FLAC download - useful high-quality option
+                        if (hasFlacCreds) {
+                            add(
+                                Material3MenuItemData(
+                                    title = { Text(text = "Download FLAC (${flacDownloadQualityPref.name})") },
+                                    description = { Text(text = stringResource(R.string.flac_download_quality)) },
+                                    icon = {
+                                        Icon(painter = painterResource(R.drawable.download), contentDescription = null)
+                                    },
+                                    onClick = {
+                                        onDismiss()
+                                        val artistName = song.artists.firstOrNull()?.name ?: "Unknown"
+                                        val albumName = song.song.albumName ?: "Unknown Album"
+                                        FlacDownloader.downloadFlac(
+                                            context = context,
+                                            songId = song.id,
+                                            title = song.song.title,
+                                            artist = artistName,
+                                            album = albumName
                                         )
+                                        Toast.makeText(context, context.getString(R.string.downloading) + ": ${song.song.title}", Toast.LENGTH_SHORT).show()
                                     },
                                 )
-                            }
-                        },
-                    ),
+                            )
+                        }
+                    },
             )
         }
 

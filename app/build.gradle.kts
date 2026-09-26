@@ -399,6 +399,9 @@ dependencies {
     implementation(libs.apache.lang3)
 
     implementation(libs.hilt)
+    implementation(libs.work.runtime)
+    implementation(libs.hilt.work)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.jsoup)
     ksp(libs.hilt.compiler)
 
