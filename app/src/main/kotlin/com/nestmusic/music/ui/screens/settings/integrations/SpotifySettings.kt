@@ -143,6 +143,23 @@ fun SpotifySettings(
         Material3SettingsGroup(
             title = stringResource(R.string.account),
             items = listOf(
+                if (spDc.isBlank()) {
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.login),
+                        title = { Text(stringResource(R.string.spotify_log_in)) },
+                        description = { Text(stringResource(R.string.spotify_log_in_desc)) },
+                        onClick = {
+                            navController.navigate("settings/integrations/spotify_login")
+                        }
+                    )
+                } else {
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.logout),
+                        title = { Text(stringResource(R.string.spotify_logged_in)) },
+                        description = { Text(stringResource(R.string.spotify_log_out_desc)) },
+                        onClick = { onSpDcChange("") }
+                    )
+                },
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.token),
                     title = { Text(stringResource(R.string.spotify_sp_dc)) },

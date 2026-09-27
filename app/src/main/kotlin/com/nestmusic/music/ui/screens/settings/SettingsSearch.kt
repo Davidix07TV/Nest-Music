@@ -216,7 +216,8 @@ val SETTINGS_SEARCH_ENTRIES: List<SettingsSearchEntry> = listOf(
     ),
     SettingsSearchEntry(
         R.string.spotify_integration, R.drawable.graphic_eq, "settings/integrations/spotify",
-        parent = R.string.integrations, keywords = "canvas video sp_dc cookie player",
+        parent = R.string.integrations,
+        keywords = "canvas video sp_dc cookie player login email password account sign",
     ),
     SettingsSearchEntry(
         R.string.listen_together, R.drawable.sync, "settings/integrations/listen_together",

@@ -450,6 +450,10 @@ fun NavGraphBuilder.navigationBuilder(
         SpotifySettings(navController)
     }
 
+    composable("settings/integrations/spotify_login") {
+        SpotifyLoginScreen(navController)
+    }
+
     composable(route = "settings/integrations/listen_together") {
         ListenTogetherSettings(navController)
     }

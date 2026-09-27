@@ -1200,6 +1200,10 @@
     <string name="spotify_integration">Spotify</string>
     <string name="spotify_canvas_title">Canvas videos</string>
     <string name="spotify_canvas_desc">Loop short videos in the player when a song has one</string>
+    <string name="spotify_log_in">Log in to Spotify</string>
+    <string name="spotify_log_in_desc">Sign in with your email and password on Spotify\'s official page</string>
+    <string name="spotify_logged_in">Connected to Spotify</string>
+    <string name="spotify_log_out_desc">Tap to disconnect</string>
     <string name="spotify_sp_dc">Session cookie</string>
     <string name="spotify_sp_dc_set">Cookie saved</string>
     <string name="spotify_sp_dc_help">Paste the sp_dc cookie of open.spotify.com from your browser\'s cookies</string>
