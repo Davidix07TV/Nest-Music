@@ -248,6 +248,10 @@ val EnableLastFMScrobblingKey = booleanPreferencesKey("lastfmScrobblingEnable")
 // ListenBrainz scrobbling (runs alongside Last.fm)
 val EnableListenBrainzKey = booleanPreferencesKey("enableListenBrainzScrobbling")
 val ListenBrainzTokenKey = stringPreferencesKey("listenBrainzUserToken")
+
+// Spotify Canvas (optional sp_dc cookie, decorative player videos)
+val SpotifyCanvasEnabledKey = booleanPreferencesKey("spotifyCanvasEnabled")
+val SpotifySpDcKey = stringPreferencesKey("spotifySpDc")
 val LastFMUseNowPlaying = booleanPreferencesKey("lastfmUseNowPlaying")
 
 val LastFMUseSendLikes = booleanPreferencesKey("lastfmUseSendLikes")

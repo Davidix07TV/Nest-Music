@@ -1195,4 +1195,12 @@
     <!-- Settings search -->
     <string name="settings_search_hint">Search settings</string>
     <string name="settings_search_no_results">No matching settings</string>
+
+    <!-- Spotify Canvas -->
+    <string name="spotify_integration">Spotify</string>
+    <string name="spotify_canvas_title">Canvas videos</string>
+    <string name="spotify_canvas_desc">Loop short videos in the player when a song has one</string>
+    <string name="spotify_sp_dc">Session cookie</string>
+    <string name="spotify_sp_dc_set">Cookie saved</string>
+    <string name="spotify_sp_dc_help">Paste the sp_dc cookie of open.spotify.com from your browser\'s cookies</string>
 </resources>
