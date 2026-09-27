@@ -69,7 +69,14 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Release APK (foss)
-        run: ./gradlew --console=plain assembleFossRelease --warning-mode summary
+        run: |
+          set -o pipefail
+          ./gradlew --console=plain assembleFossRelease --warning-mode summary 2>&1 | tee gradle-build.log || status=$?
+          if [ "${status:-0}" -ne 0 ]; then
+            echo "::error::assembleFossRelease failed — compiler/Gradle error lines:"
+            grep -E "^e: |^FAILURE:|What went wrong|^Caused by:|error:" gradle-build.log | tail -40 | sed 's/^/::error::/'
+            exit "$status"
+          fi
         env:
           NESTMUSIC_APPLICATION_ID: com.nestmusic.music
           NESTMUSIC_APP_NAME: Nest Music
@@ -170,3 +177,12 @@ jobs:
             echo "- **APK**: nest-music-${{ steps.version.outputs.version }}.apk"
             echo "- **Release**: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }}"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: gradle-build-log
+          path: gradle-build.log
+          if-no-files-found: ignore
+          retention-days: 7
