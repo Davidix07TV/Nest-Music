@@ -41,7 +41,14 @@ jobs:
 
       # One step per module: the failing step name already says which module is red.
       - name: Unit tests · :app (fossDebug)
-        run: ./gradlew --console=plain :app:testFossDebugUnitTest --warning-mode summary
+        run: |
+          set -o pipefail
+          ./gradlew --console=plain :app:testFossDebugUnitTest --warning-mode summary 2>&1 | tee "$RUNNER_TEMP/gradle-app-tests.log" || status=$?
+          if [ "${status:-0}" -ne 0 ]; then
+            echo "::error:::app:testFossDebugUnitTest failed — compiler/Gradle error lines:"
+            grep -E "^e: |^FAILURE:|What went wrong|^Caused by:|error:" "$RUNNER_TEMP/gradle-app-tests.log" | tail -40 | sed 's/^/::error::/'
+            exit "$status"
+          fi
 
       - name: Unit tests · :innertube
         if: ${{ !cancelled() }}
@@ -90,6 +97,7 @@ jobs:
             app/build/reports/tests/
             innertube/build/reports/tests/
             betterlyrics/build/reports/tests/
+            ${{ runner.temp }}/gradle-app-tests.log
           if-no-files-found: ignore
           retention-days: 7
 
