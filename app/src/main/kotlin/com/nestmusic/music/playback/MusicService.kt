@@ -138,11 +138,13 @@ import com.nestmusic.music.discord.DiscordActivityBuilder
 import com.nestmusic.music.discord.DiscordTemplateRenderer
 import com.nestmusic.music.discord.PresenceStatus
 import com.nestmusic.music.constants.EnableLastFMScrobblingKey
+import com.nestmusic.music.constants.EnableListenBrainzKey
 import com.nestmusic.music.constants.EnableSongCacheKey
 import com.nestmusic.music.constants.HideExplicitKey
 import com.nestmusic.music.constants.HideVideoSongsKey
 import com.nestmusic.music.constants.HistoryDuration
 import com.nestmusic.music.constants.LastFMUseNowPlaying
+import com.nestmusic.music.constants.ListenBrainzTokenKey
 import com.nestmusic.music.constants.MediaSessionConstants
 import com.nestmusic.music.constants.MediaSessionConstants.CommandAddToTargetPlaylist
 import com.nestmusic.music.constants.MediaSessionConstants.CommandToggleLike
@@ -220,6 +222,7 @@ import com.nestmusic.music.constants.LowDataModeKey
 import com.nestmusic.music.lossless.FlacCoreLosslessStreamResolver
 import com.nestmusic.music.lossless.model.FlacStreamUrl
 import com.nestmusic.music.utils.CoilBitmapLoader
+import com.nestmusic.music.utils.ListenBrainz
 import com.nestmusic.music.utils.NetworkConnectivityObserver
 import com.nestmusic.music.utils.ScrobbleManager
 import com.nestmusic.music.utils.SyncUtils
@@ -1176,12 +1179,15 @@ class MusicService :
             }
         }
 
-        dataStore.data
-            .map { it[EnableLastFMScrobblingKey] ?: false }
+        combine(
+            dataStore.data.map { it[EnableLastFMScrobblingKey] ?: false },
+            dataStore.data.map { it[EnableListenBrainzKey] ?: false },
+        ) { lastFmEnabled, listenBrainzEnabled -> lastFmEnabled to listenBrainzEnabled }
             .debounce(300)
             .distinctUntilChanged()
-            .collect(scope) { enabled ->
-                if (enabled && scrobbleManager == null) {
+            .collect(scope) { (lastFmEnabled, listenBrainzEnabled) ->
+                val active = lastFmEnabled || listenBrainzEnabled
+                if (active && scrobbleManager == null) {
                     val delayPercent = dataStore.get(ScrobbleDelayPercentKey, LastFM.DEFAULT_SCROBBLE_DELAY_PERCENT)
                     val minSongDuration =
                         dataStore.get(ScrobbleMinSongDurationKey, LastFM.DEFAULT_SCROBBLE_MIN_SONG_DURATION)
@@ -1194,11 +1200,26 @@ class MusicService :
                             scrobbleDelaySeconds = delaySeconds,
                         )
                     scrobbleManager?.useNowPlaying = dataStore.get(LastFMUseNowPlaying, false)
-                } else if (!enabled && scrobbleManager != null) {
+                    scrobbleManager?.lastFmEnabled = lastFmEnabled
+                    scrobbleManager?.listenBrainzEnabled = listenBrainzEnabled
+                } else if (!active && scrobbleManager != null) {
                     scrobbleManager?.destroy()
                     scrobbleManager = null
+                } else {
+                    // One service toggled while the manager is already up.
+                    scrobbleManager?.lastFmEnabled = lastFmEnabled
+                    scrobbleManager?.listenBrainzEnabled = listenBrainzEnabled
                 }
             }
+
+        // ListenBrainz auth token: keep it on the client so submissions work
+        // regardless of which manager branch created the scrobbler.
+        scope.launch {
+            dataStore.data
+                .map { it[ListenBrainzTokenKey] }
+                .distinctUntilChanged()
+                .collect { ListenBrainz.token = it }
+        }
 
         dataStore.data
             .map { it[LastFMUseNowPlaying] ?: false }

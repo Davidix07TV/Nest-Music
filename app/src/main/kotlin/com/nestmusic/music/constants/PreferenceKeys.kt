@@ -244,6 +244,10 @@ val ListenTogetherSessionTimestampKey = longPreferencesKey("listenTogetherSessio
 val LastFMSessionKey = stringPreferencesKey("lastfmSession")
 val LastFMUsernameKey = stringPreferencesKey("lastfmUsername")
 val EnableLastFMScrobblingKey = booleanPreferencesKey("lastfmScrobblingEnable")
+
+// ListenBrainz scrobbling (runs alongside Last.fm)
+val EnableListenBrainzKey = booleanPreferencesKey("enableListenBrainzScrobbling")
+val ListenBrainzTokenKey = stringPreferencesKey("listenBrainzUserToken")
 val LastFMUseNowPlaying = booleanPreferencesKey("lastfmUseNowPlaying")
 
 val LastFMUseSendLikes = booleanPreferencesKey("lastfmUseSendLikes")

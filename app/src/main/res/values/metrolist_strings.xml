@@ -1176,4 +1176,11 @@
     <string name="segment_music_offtopic">Non-music section</string>
     <string name="segment_filler">Filler</string>
     <string name="segment_preview">Preview</string>
+
+    <!-- ListenBrainz scrobbling -->
+    <string name="listenbrainz_integration">ListenBrainz</string>
+    <string name="listenbrainz_enable_desc">Submit listens to your ListenBrainz profile while you play music</string>
+    <string name="listenbrainz_token">User token</string>
+    <string name="listenbrainz_token_set">Token saved</string>
+    <string name="listenbrainz_token_help">Create one at listenbrainz.org → Settings → API tokens</string>
 </resources>
