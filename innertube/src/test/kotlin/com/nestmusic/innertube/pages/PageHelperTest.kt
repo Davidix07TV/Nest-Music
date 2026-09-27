@@ -23,7 +23,7 @@ class PageHelperTest {
     fun `search metadata is not parsed as an artist`() {
         val runs = listOf(
             Run("Song", null),
-            Run(" • ", null),
+            Run(" \u2022 ", null),
             Run("3:04", null),
             Run("6m\u00a0plays", null),
         )
@@ -36,7 +36,7 @@ class PageHelperTest {
     fun `linked artist is found after search type label`() {
         val runs = listOf(
             Run("Song", null),
-            Run(" • ", null),
+            Run(" \u2022 ", null),
             Run(
                 "Lupus Nocte",
                 NavigationEndpoint(browseEndpoint = BrowseEndpoint(browseId = "UC123")),
@@ -51,9 +51,9 @@ class PageHelperTest {
         val artists = PageHelper.extractArtists(
             listOf(
                 Run("Artist", null),
-                Run(" • ", null),
+                Run(" \u2022 ", null),
                 Run("Album", null),
-                Run(" • ", null),
+                Run(" \u2022 ", null),
                 Run("3:42", null),
             ),
         )

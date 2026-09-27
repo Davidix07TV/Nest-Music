@@ -29,7 +29,7 @@ generated code).
 | `desktop/` | Tauri desktop client + Flask sidecar. See `desktop/README.md` and `desktop/CLAUDE.md`. |
 | `ios/` | SwiftUI client + `NestMusicTests`. |
 | `codemagic.yaml`, `fastlane/` | iOS CI + store metadata. |
-| `.github/workflows/` | `build.yml` (APKs), `build_pr.yml`, `build_quick.yml` (manual), `desktop-{windows,linux}.yml`, `release.yml`. |
+| `.github/workflows/` | `build.yml` (APKs), `build_pr.yml`, `pr-checks.yml` (JVM unit tests + ownership warnings), `build_quick.yml` (manual), `desktop-{windows,linux}.yml`, `release.yml`. |
 | `development_guide.md` | Local setup walkthrough. Keep it in sync when setup steps change. |
 
 ## Rules for working on the project
@@ -112,6 +112,12 @@ will not compile.
   `assemble` is the real gate. Use `-x lint -x lintFossRelease` to keep local builds fast.
 - CI (`build_pr.yml`) verifies PRs with `./gradlew --console=plain assembleFossRelease --warning-mode
   summary -x lint -x lintFossRelease` on JDK 21.
+- CI (`pr-checks.yml`) runs the JVM unit tests of the modules that have them (`:app:testFossDebugUnitTest`,
+  `:innertube:testDebugUnitTest`, `:betterlyrics:testDebugUnitTest`) — one step per module, plus annotations
+  built from the JUnit XML — and uploads the reports on failure. It posts non-blocking warnings when a PR
+  edits `app/src/main/res/values-*/` or `app/schemas/`, and it *does* block a PR that turns a source file it
+  touches into invalid UTF-8 (see the quirk below). Whether any of it blocks a merge depends on branch
+  protection, not on the workflow.
 - Last.fm keys are read from `local.properties` or the environment (`LASTFM_API_KEY`,
   `LASTFM_SECRET`); the build works with empty values. Debug builds can be rebranded/renamed via
   `NESTMUSIC_APPLICATION_ID`, `NESTMUSIC_APP_NAME`, `NESTMUSIC_DEBUG_KEYSTORE_PATH`.
@@ -139,6 +145,10 @@ have a Mac, otherwise state that iOS was not verified.
 
 - Agent scratch dirs (`.claude`, `.gemini`, `.cursor*`, `.codeium`, `.opencode`, …) are gitignored,
   so files dropped there are invisible to git history and to other contributors.
+- Some sources contain bytes that are not valid UTF-8: an editor round-tripped them through Windows-1252,
+  which stores `•` as `0x95` and `—` as `0x97`. Behaviour that depends on such bytes is charset-dependent, and
+  the non-ASCII *keys* of the romanisation tables in `lyrics/LyricsUtils.kt` were flattened to literal `?`.
+  `pr-checks.yml` blocks new damage; repairing the legacy files is a separate change.
 - `.aislop/config.yml` defines an external quality gate (format/lint/security/AI-slop) that only
   scores the JS/Python tree under `desktop/`; Kotlin and Swift are reported as "not scoreable".
   It is not wired into `.github/workflows/`.
