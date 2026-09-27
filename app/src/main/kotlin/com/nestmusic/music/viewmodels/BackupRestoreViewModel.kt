@@ -158,10 +158,10 @@ class BackupRestoreViewModel @Inject constructor(
                                     FileOutputStream(restoreDbPath).use { inputStream.copyTo(it) }
                                 }
                                 "${InternalDatabase.DB_NAME}-wal" -> {
-                                    // Skip WAL — we'll open cleanly
+                                    // Skip WAL â€” we'll open cleanly
                                 }
                                 "${InternalDatabase.DB_NAME}-shm" -> {
-                                    // Skip SHM — we'll open cleanly
+                                    // Skip SHM â€” we'll open cleanly
                                 }
                                 else -> Timber.tag("RESTORE").i("Skipping unexpected entry: ${entry.name}")
                             }
@@ -193,7 +193,7 @@ class BackupRestoreViewModel @Inject constructor(
                         }
                         return@launch
                     }
-                    // Read current database version dynamically — this matches whatever Room
+                    // Read current database version dynamically â€” this matches whatever Room
                     // annotation says, even when the schema version changes in future builds.
                     currentDbVersion = database.openHelper.writableDatabase.version
                     if (backupDbVersion > currentDbVersion) {
@@ -209,7 +209,7 @@ class BackupRestoreViewModel @Inject constructor(
 
                 // === Proceed with restore ===
 
-                // 1. Stop service first — ensures no pending DB writes during swap
+                // 1. Stop service first â€” ensures no pending DB writes during swap
                 context.stopService(Intent(context, MusicService::class.java))
                 try {
                     kotlinx.coroutines.withTimeout(5000) {
@@ -219,10 +219,10 @@ class BackupRestoreViewModel @Inject constructor(
                     Timber.e(e, "Timeout waiting for MusicService to shutdown")
                 }
 
-                // 2. Close the database — all operations should be done by now
+                // 2. Close the database â€” all operations should be done by now
                 database.close()
 
-                // 3. Swap DB files — staged copy to avoid corrupting the live DB
+                // 3. Swap DB files â€” staged copy to avoid corrupting the live DB
                 var dbSwapSucceeded = true
                 if (foundDb) {
                     try {
@@ -310,7 +310,7 @@ class BackupRestoreViewModel @Inject constructor(
                     context.filesDir.resolve(PERSISTENT_AUTOMIX_FILE).delete()
                     context.filesDir.resolve(PERSISTENT_PLAYER_STATE_FILE).delete()
 
-                    // 4. Restart — Room will open the swapped DB and run migrations if needed
+                    // 4. Restart â€” Room will open the swapped DB and run migrations if needed
                     val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     }

@@ -105,7 +105,7 @@
   --font-size-t32: var(--t32);
 }
 
-/* â”€â”€â”€ Font Awesome â€” loaded via Vite asset pipeline (guaranteed absolute path) â”€
+/* ─── Font Awesome — loaded via Vite asset pipeline (guaranteed absolute path) ─
    The public/webfonts/ copies are kept for the @font-face rules in all.min.css,
    but these declarations take priority (index.css loads first) and use Vite-
    processed paths that are always accessible in the Tauri embedded filesystem. */
@@ -173,7 +173,7 @@
 }
 
 :root {
-  /* â”€â”€ Surfaces â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Surfaces ────────────────────────────────────────────────────── */
   --bg-base:     #0d0d0d;    /* App background */
   --bg-surface:  #141414;    /* Sidebar / panels  (= surface-0) */
   --bg-elevated: #1c1c1c;    /* Raised content    (= surface-1) */
@@ -184,21 +184,21 @@
   --surface-2:   #313131;   /* Buttons / controls default */
   --surface-3:   #3c3c3c;   /* Buttons / controls hovered */
 
-  /* â”€â”€ Acrylic material â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Acrylic material ────────────────────────────────────────────── */
   --acrylic: rgba(13, 13, 13, 0.84);
 
-  /* â”€â”€ Stroke / Borders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Stroke / Borders ────────────────────────────────────────────── */
   --stroke:      rgba(255,255,255,0.082);
   --stroke-dim:  rgba(255,255,255,0.050);
   --stroke-med:  rgba(255,255,255,0.145);
   --border:      var(--stroke);   /* legacy alias */
 
-  /* â”€â”€ Fill states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Fill states ─────────────────────────────────────────────────── */
   --fill-subtle: rgba(255,255,255,0.055);
   --fill-mod:    rgba(255,255,255,0.093);
   --fill-strong: rgba(255,255,255,0.14);
 
-  /* â”€â”€ Text opacity hierarchy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Text opacity hierarchy ──────────────────────────────────────── */
   --t1: rgba(255,255,255,0.886);  /* Primary   ~89% */
   --t2: rgba(255,255,255,0.544);  /* Secondary ~54% */
   --t3: rgba(255,255,255,0.373);  /* Tertiary  ~37% */
@@ -208,11 +208,11 @@
   --text-secondary: var(--t2);
   --text-muted:     var(--t3);
 
-  /* â”€â”€ Accent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Accent ──────────────────────────────────────────────────────── */
   --accent:     #e040fb;
   --accent-dim: rgba(224,64,251,0.08);
 
-  /* â”€â”€ Radius scale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Radius scale ────────────────────────────────────────────────── */
   --r-xs:  3px;
   --r-sm:  4px;
   --r-md:  6px;
@@ -227,7 +227,7 @@
   --radius:    var(--r-lg);
   --radius-lg: var(--r-xl);
 
-  /* â”€â”€ Misc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Misc ────────────────────────────────────────────────────────── */
   /* Semantic status ----------------------------------------------------------
      One value per role. Before these existed the app used three different reds for
      "error" (#f44336 / #ff7070 / #e05252), two greens and two ambers, so the colour
@@ -259,7 +259,7 @@
   --font: 'MiSans Latin', system-ui, sans-serif;
 }
 
-/* â”€â”€â”€ OLED Theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── OLED Theme ───────────────────────────────────────────────────────── */
 [data-theme="oled"] {
   --bg-base:    #000000;
   --bg-surface: #080808;
@@ -283,7 +283,7 @@
   --slider-track: #282828;
 }
 
-/* â”€â”€â”€ Light Theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Light Theme ──────────────────────────────────────────────────────── */
 [data-theme="light"] {
   --bg-base:    #f0f0f0;
   --bg-surface: #ffffff;
@@ -320,7 +320,7 @@
   --elevation-5: 0 28px 70px rgba(0,0,0,0.32);
 }
 
-/* â”€â”€â”€ High Contrast Mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── High Contrast Mode ───────────────────────────────────────────────── */
 /* Works on top of any theme. Maximises contrast for accessibility. */
 [data-highcontrast="true"] {
   --t2: rgba(255,255,255,0.850);
@@ -381,9 +381,9 @@ html, body, #root {
   overflow: hidden;
 }
 
-/* â”€â”€â”€ Scrollbars â€” fixed track size, no layout shift â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   Track width stays constant at 8px. The thumb appears narrow (â‰ˆ3px) via
-   transparent border + background-clip, and widens (â‰ˆ6px) on hover â€”
+/* ─── Scrollbars — fixed track size, no layout shift ──────────────────────
+   Track width stays constant at 8px. The thumb appears narrow (≈3px) via
+   transparent border + background-clip, and widens (≈6px) on hover —
    purely visual, zero reflow.                                              */
 ::-webkit-scrollbar               { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track         { background: transparent; }
@@ -444,7 +444,7 @@ html, body, #root {
   background-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Scrollable containers â€” dimmer thumb until container is hovered */
+/* Scrollable containers — dimmer thumb until container is hovered */
 .scrollable::-webkit-scrollbar-thumb         { background-color: #2a2a2a; }
 .scrollable:hover::-webkit-scrollbar-thumb   { background-color: #666; border-width: 1px; }
 /* Reserve the scrollbar's track width up front, so content (e.g. centered headers) doesn't
@@ -507,7 +507,7 @@ html, body, #root {
   .gcard-thumb, .gcard-img, .gcard-btn { transition: none !important; }
 }
 
-/* Lyrics view â€” scrollbar auto-hides; only visible while data-scroll-active="true"
+/* Lyrics view — scrollbar auto-hides; only visible while data-scroll-active="true"
    (driven by cursor movement + an idle timeout in the component). */
 .lyrics-scroll::-webkit-scrollbar-thumb {
   background-color: transparent;
@@ -529,12 +529,12 @@ html, body, #root {
 .home-card-play-btn:hover { transform: scale(1.12); filter: brightness(1.1); box-shadow: var(--elevation-3) !important; }
 .home-card-play-btn:active { transform: scale(1.04); }
 
-/* Horizontal carousels â€” same treatment, vertical size stays 8px */
+/* Horizontal carousels — same treatment, vertical size stays 8px */
 .carousel::-webkit-scrollbar-thumb           { background-color: #2a2a2a; }
 .carousel:hover::-webkit-scrollbar-thumb     { background-color: #666; border-width: 1px; }
 
-/* â”€â”€â”€ Ambient Visualizer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   CSS-only effect â€” transform + opacity only for GPU compositing, zero reflow.
+/* ─── Ambient Visualizer ────────────────────────────────────────────────────
+   CSS-only effect — transform + opacity only for GPU compositing, zero reflow.
    ambientBreathe:     LyricsOverlay bg (starts at scale 1.1)
    ambientBreatheCover: CoverView bg    (starts at scale 1.15)
    blobDrift1/2/3:     floating colour blobs, staggered timing               */
@@ -608,7 +608,7 @@ html, body, #root {
   to   { opacity: 0; transform: scale(0.94) translateY(-6px); }
 }
 
-/* â”€â”€â”€ Sidebar Nav Items â€” Fluent Design â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Sidebar Nav Items — Fluent Design ─────────────────────────────────── */
 .sidebar-nav-item {
   position: relative;
   overflow: hidden;
@@ -633,7 +633,7 @@ html, body, #root {
 }
 .sidebar-nav-item.active::before { height: 16px; }
 
-/* Radial reveal highlight â€” follows cursor via --rx / --ry */
+/* Radial reveal highlight — follows cursor via --rx / --ry */
 .sidebar-nav-item::after {
   content: '';
   position: absolute;
@@ -658,7 +658,7 @@ html, body, #root {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
-/* â”€â”€â”€ Radial hover glow â€” lightweight version without overflow:hidden â”€â”€â”€â”€â”€â”€â”€
+/* ─── Radial hover glow — lightweight version without overflow:hidden ───────
    Use on sidebar buttons that can't have overflow:hidden (e.g. profile button
    which renders a dropdown). Gives the same cursor-follow glow as
    sidebar-nav-item::after but without clipping children.                     */
@@ -683,7 +683,7 @@ html, body, #root {
 .sidebar-glow:hover::after { opacity: 1; }
 .sidebar-glow > * { position: relative; z-index: 1; }
 
-/* â”€â”€â”€ Desktop cursor â€” no pointer hand on interactive elements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Desktop cursor — no pointer hand on interactive elements ───────────── */
 button, a, select, label,
 [role="button"], [role="tab"], [role="option"],
 .sidebar-nav-item {

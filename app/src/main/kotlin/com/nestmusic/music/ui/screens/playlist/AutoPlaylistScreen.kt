@@ -921,7 +921,7 @@ private fun AutoPlaylistHeader(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Metadata - Song Count • Duration
+        // Metadata - Song Count â€¢ Duration
         Text(
             text =
                 buildString {

@@ -472,7 +472,7 @@ class HomeViewModel @Inject constructor(
         val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
         val fromTimeStamp = LocalDateTime.now().minusWeeks(2)
 
-        // Phase 1: Load essential sections in parallel — local DB (fast) + YouTube home page.
+        // Phase 1: Load essential sections in parallel â€” local DB (fast) + YouTube home page.
         // isLoading is set to false as soon as all Phase 1 tasks complete so the UI appears quickly.
         coroutineScope {
             launch(Dispatchers.IO) { getQuickPicks() }
@@ -516,7 +516,7 @@ class HomeViewModel @Inject constructor(
             .filter { it is Song || it is Album }
         isLoading.value = false
 
-        // Phase 2: Heavy multi-request operations — run in background without blocking the UI.
+        // Phase 2: Heavy multi-request operations â€” run in background without blocking the UI.
         viewModelScope.launch(Dispatchers.IO) { getDailyDiscover() }
 
         viewModelScope.launch(Dispatchers.IO) { getCommunityPlaylists() }

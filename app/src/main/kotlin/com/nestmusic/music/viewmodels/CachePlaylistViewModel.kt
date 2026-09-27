@@ -46,12 +46,12 @@ class CachePlaylistViewModel
                     val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
 
                     // Candidate set: anything currently present in either cache. We no longer
-                    // SET dateDownload here — that decision belongs solely to MusicService's
+                    // SET dateDownload here â€” that decision belongs solely to MusicService's
                     // markCachedIfFullyDownloaded(), which only fires once a track actually
                     // finishes playing naturally (MEDIA_ITEM_TRANSITION_REASON_AUTO). This loop
                     // only displays already-flagged songs and self-heals: if a song's dateDownload
                     // is set but its backing cache data is gone now (evicted, or manually removed
-                    // via removeSongFromCache), the flag gets cleared so the list — and the DB —
+                    // via removeSongFromCache), the flag gets cleared so the list â€” and the DB â€”
                     // stay honest.
                     val candidateIds = playerCache.keys.toSet() + downloadCache.keys.toSet()
                     val songs =

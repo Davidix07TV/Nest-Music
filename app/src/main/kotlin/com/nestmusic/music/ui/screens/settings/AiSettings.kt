@@ -529,7 +529,7 @@ fun AiSettings(navController: NavController) {
                                 description = {
                                     Text(
                                         if (deeplApiKey.isNotEmpty()) {
-                                            "•".repeat(minOf(deeplApiKey.length, 8))
+                                            "â€¢".repeat(minOf(deeplApiKey.length, 8))
                                         } else {
                                             stringResource(R.string.not_set)
                                         },
@@ -563,7 +563,7 @@ fun AiSettings(navController: NavController) {
                                 description = {
                                     Text(
                                         if (openRouterApiKey.isNotEmpty()) {
-                                            "•".repeat(minOf(openRouterApiKey.length, 8))
+                                            "â€¢".repeat(minOf(openRouterApiKey.length, 8))
                                         } else {
                                             stringResource(R.string.not_set)
                                         },
@@ -624,7 +624,7 @@ fun AiSettings(navController: NavController) {
                                     Text(
                                         if (aiSystemPrompt.isNotBlank()) {
                                             aiSystemPrompt.take(60).let {
-                                                if (aiSystemPrompt.length > 60) "$it…" else it
+                                                if (aiSystemPrompt.length > 60) "$itâ€¦" else it
                                             }
                                         } else {
                                             stringResource(R.string.ai_system_prompt_default)

@@ -175,7 +175,7 @@ fun LibraryPodcastsScreen(
                     },
                 ),
     ) {
-        // Chip row header — same pattern as LibrarySongsScreen
+        // Chip row header â€” same pattern as LibrarySongsScreen
         val chipsHeader = @Composable {
             Row {
                 Spacer(Modifier.width(12.dp))
@@ -273,7 +273,7 @@ fun LibraryPodcastsScreen(
                 }
             }
 
-            // -- CHANNELS tab — podcast host artist pages from YT Music ---
+            // -- CHANNELS tab â€” podcast host artist pages from YT Music ---
             PodcastFilter.CHANNELS -> {
                 LazyColumn(
                     state = lazyListState,
@@ -490,7 +490,7 @@ fun LibraryPodcastsScreen(
     }
 }
 
-/** Auto-playlist card — mirrors YT Music design. Used for both SE and RDPN playlists. */
+/** Auto-playlist card â€” mirrors YT Music design. Used for both SE and RDPN playlists. */
 @Composable
 private fun AutoPlaylistCard(
     title: String,
@@ -549,7 +549,7 @@ private fun AutoPlaylistCard(
                     buildString {
                         append(stringResource(R.string.auto_playlist))
                         if (!episodeCount.isNullOrBlank()) {
-                            append(" • ")
+                            append(" â€¢ ")
                             append(episodeCount)
                         }
                     },
@@ -562,7 +562,7 @@ private fun AutoPlaylistCard(
     }
 }
 
-/** Episode playlist row shown in the Episodes tab — represents a saved podcast show */
+/** Episode playlist row shown in the Episodes tab â€” represents a saved podcast show */
 @Composable
 private fun PodcastEpisodePlaylistItem(
     podcast: PodcastEntity,

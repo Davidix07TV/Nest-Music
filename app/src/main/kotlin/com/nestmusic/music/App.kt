@@ -100,7 +100,7 @@ class App :
             initializeSettings()
 
             // Warm the cipher WebView off the first-play critical path. It needs no session, so kick it
-            // as soon as settings settle (don't gate it behind visitorData — that's the bigger cold
+            // as soon as settings settle (don't gate it behind visitorData â€” that's the bigger cold
             // cost). Best-effort; on failure the WebView is created lazily on first play.
             launch(Dispatchers.IO) {
                 delay(1500)
@@ -340,7 +340,7 @@ class App :
                 settings.remove(AccountChannelHandleKey)
             }
             if (!cleared) {
-                Timber.e("forgetAccount: Failed to clear DataStore preferences — proceeding with in-memory cleanup only")
+                Timber.e("forgetAccount: Failed to clear DataStore preferences â€” proceeding with in-memory cleanup only")
             } else {
                 Timber.d("forgetAccount: DataStore preferences cleared")
             }

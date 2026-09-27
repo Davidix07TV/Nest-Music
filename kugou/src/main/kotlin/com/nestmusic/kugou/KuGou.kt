@@ -155,7 +155,7 @@ object KuGou {
     private fun normalizeTitle(title: String) =
         title.replace("\\(.*\\)".toRegex(), "").replace("(.*)".toRegex(), "")
             .replace("?.*?".toRegex(), "").replace("?.*?".toRegex(), "")
-            .replace("<.*>".toRegex(), "").replace("«.*»".toRegex(), "")
+            .replace("<.*>".toRegex(), "").replace("Â«.*Â»".toRegex(), "")
             .replace("<.*>".toRegex(), "").replace("<.*>".toRegex(), "")
 
     private fun normalizeArtist(artist: String) =

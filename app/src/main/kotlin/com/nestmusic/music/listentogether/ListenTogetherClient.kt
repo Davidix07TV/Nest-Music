@@ -296,7 +296,7 @@ class ListenTogetherClient
         val events: SharedFlow<ListenTogetherEvent> = _events.asSharedFlow()
         private val eventQueue = Channel<ListenTogetherEvent>(Channel.UNLIMITED)
 
-        // Used from [loadPersistedSession] launched in init — must be declared before init (Kotlin
+        // Used from [loadPersistedSession] launched in init â€” must be declared before init (Kotlin
         // initialization order + IO thread can run the coroutine before later properties run).
         private val json =
             Json {

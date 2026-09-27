@@ -100,7 +100,7 @@ class DiscordAuth(
                 redirectUri = REDIRECT_URI,
             )
         } finally {
-            // no cleanup needed — no local server
+            // no cleanup needed â€” no local server
         }
     }
 

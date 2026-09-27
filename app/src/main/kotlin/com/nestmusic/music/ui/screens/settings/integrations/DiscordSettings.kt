@@ -619,14 +619,14 @@ fun DiscordSettings(
                             if (btn1Enabled) {
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_label)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_label)}") },
                                         description = { Text(btn1Label) },
                                         onClick = { showBtn1LabelDialog = true },
                                     ),
                                 )
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_url)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_url)}") },
                                         description = { Text(btn1Url) },
                                         onClick = { showBtn1UrlDialog = true },
                                     ),
@@ -662,14 +662,14 @@ fun DiscordSettings(
                             if (btn2Enabled) {
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_label)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_label)}") },
                                         description = { Text(btn2Label) },
                                         onClick = { showBtn2LabelDialog = true },
                                     ),
                                 )
                                 add(
                                     Material3SettingsItem(
-                                        title = { Text("${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_url)}") },
+                                        title = { Text("${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_url)}") },
                                         description = { Text(btn2Url) },
                                         onClick = { showBtn2UrlDialog = true },
                                     ),
@@ -795,7 +795,7 @@ fun DiscordSettings(
 
     if (showBtn1LabelDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_label)}",
+            title = "${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_label)}",
             value = btn1Label,
             onDone = {
                 onBtn1LabelChange(it)
@@ -810,7 +810,7 @@ fun DiscordSettings(
 
     if (showBtn1UrlDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_1)} — ${stringResource(R.string.discord_button_url)}",
+            title = "${stringResource(R.string.discord_button_1)} â€” ${stringResource(R.string.discord_button_url)}",
             value = btn1Url,
             onDone = {
                 onBtn1UrlChange(it)
@@ -825,7 +825,7 @@ fun DiscordSettings(
 
     if (showBtn2LabelDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_label)}",
+            title = "${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_label)}",
             value = btn2Label,
             onDone = {
                 onBtn2LabelChange(it)
@@ -840,7 +840,7 @@ fun DiscordSettings(
 
     if (showBtn2UrlDialog) {
         TemplateFieldDialog(
-            title = "${stringResource(R.string.discord_button_2)} — ${stringResource(R.string.discord_button_url)}",
+            title = "${stringResource(R.string.discord_button_2)} â€” ${stringResource(R.string.discord_button_url)}",
             value = btn2Url,
             onDone = {
                 onBtn2UrlChange(it)

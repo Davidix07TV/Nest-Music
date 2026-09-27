@@ -145,10 +145,13 @@ have a Mac, otherwise state that iOS was not verified.
 
 - Agent scratch dirs (`.claude`, `.gemini`, `.cursor*`, `.codeium`, `.opencode`, …) are gitignored,
   so files dropped there are invisible to git history and to other contributors.
-- Some sources contain bytes that are not valid UTF-8: an editor round-tripped them through Windows-1252,
-  which stores `•` as `0x95` and `—` as `0x97`. Behaviour that depends on such bytes is charset-dependent, and
-  the non-ASCII *keys* of the romanisation tables in `lyrics/LyricsUtils.kt` were flattened to literal `?`.
-  `pr-checks.yml` blocks new damage; repairing the legacy files is a separate change.
+- Some sources were once round-tripped through Windows-1252 by an editor, which stores `•` as `0x95` and
+  `—` as `0x97`. That legacy is repaired: every text file in the repository is valid UTF-8 again, and the
+  non-ASCII *keys* of the romanisation tables in `lyrics/LyricsUtils.kt` — which that round-trip had
+  flattened to a literal `?`, silently disabling romanisation — were restored from the upstream Metrolist
+  commit the fork's copy came from. `LyricsUtilsTest` pins those tables so the failure cannot hide again,
+  and the `encoding-guard` job in `pr-checks.yml` blocks a new file that stops being valid UTF-8. Write
+  non-ASCII text as UTF-8; if an editor ever offers to "fix" the encoding of these files, refuse.
 - `.aislop/config.yml` defines an external quality gate (format/lint/security/AI-slop) that only
   scores the JS/Python tree under `desktop/`; Kotlin and Swift are reported as "not scoreable".
   It is not wired into `.github/workflows/`.

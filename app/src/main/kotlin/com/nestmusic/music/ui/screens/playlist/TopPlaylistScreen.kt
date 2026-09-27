@@ -577,7 +577,7 @@ private fun TopPlaylistHeader(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Metadata - Song Count • Duration
+        // Metadata - Song Count â€¢ Duration
         Text(
             text = buildString {
                 append(pluralStringResource(R.plurals.n_song, songs.size, songs.size))

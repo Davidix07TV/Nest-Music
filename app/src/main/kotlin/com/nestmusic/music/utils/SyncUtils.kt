@@ -1459,7 +1459,7 @@ class SyncUtils @Inject constructor(
                                 executeSyncPlaylist(playlist.id, playlistEntity.id)
                                 delay(DB_OPERATION_DELAY_MS)
                             } else {
-                                Timber.d("Skipping playlist ${playlist.title} — remove in progress")
+                                Timber.d("Skipping playlist ${playlist.title} â€” remove in progress")
                             }
                             delay(DB_OPERATION_DELAY_MS)
                         } catch (e: Exception) {
@@ -1498,7 +1498,7 @@ class SyncUtils @Inject constructor(
             autoSyncPlaylists.forEach { playlist ->
                 // Skip playlists with a pending remove operation
                 if (isPlaylistBeingModified(playlist.id)) {
-                    Timber.d("Skipping playlist ${playlist.name} — remove in progress")
+                    Timber.d("Skipping playlist ${playlist.name} â€” remove in progress")
                     return@forEach
                 }
                 try {

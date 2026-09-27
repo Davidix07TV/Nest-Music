@@ -70,7 +70,7 @@ object ComposeToImage {
             val backgroundRect = RectF(0f, 0f, imageWidth.toFloat(), imageHeight.toFloat())
 
             // Base scale on width relative to the reference design (340dp)
-            // 2160 / 340 ˜ 6.35
+            // 2160 / 340 Ëœ 6.35
             val scale = imageWidth / 340f
             val cornerRadius = 20f * scale
             val exportPath =

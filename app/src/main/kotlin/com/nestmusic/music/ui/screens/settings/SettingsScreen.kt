@@ -117,7 +117,7 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Android Auto Section — only shown if Android Auto is installed
+        // Android Auto Section â€” only shown if Android Auto is installed
         if (hasAndroidAuto) {
             Material3SettingsGroup(
                 title = "Android Auto",

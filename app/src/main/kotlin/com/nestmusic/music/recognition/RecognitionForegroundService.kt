@@ -163,7 +163,7 @@ class RecognitionForegroundService : Service() {
             }
 
             is RecognitionStatus.Success -> {
-                Timber.tag(TAG).i("Status: Success — '%s' by %s", status.result.title, status.result.artist)
+                Timber.tag(TAG).i("Status: Success â€” '%s' by %s", status.result.title, status.result.artist)
                 handleSuccess(status.result)
             }
 
@@ -186,7 +186,7 @@ class RecognitionForegroundService : Service() {
             is RecognitionStatus.Error -> {
                 if (terminalStateHandled) return
                 terminalStateHandled = true
-                Timber.tag(TAG).w("Status: Error — %s", status.message)
+                Timber.tag(TAG).w("Status: Error â€” %s", status.message)
                 updateNotification(
                     title = getString(R.string.recognize_music),
                     contentText = getString(R.string.recognition_notification_failed),
