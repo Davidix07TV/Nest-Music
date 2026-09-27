@@ -45,8 +45,8 @@ jobs:
           set -o pipefail
           ./gradlew --console=plain :app:testFossDebugUnitTest --warning-mode summary 2>&1 | tee "$RUNNER_TEMP/gradle-app-tests.log" || status=$?
           if [ "${status:-0}" -ne 0 ]; then
-            echo "::error:::app:testFossDebugUnitTest failed — compiler/Gradle error lines:"
-            grep -E "^e: |^FAILURE:|What went wrong|^Caused by:|error:" "$RUNNER_TEMP/gradle-app-tests.log" | tail -40 | sed 's/^/::error::/'
+            echo "::error:::app:testFossDebugUnitTest failed — error lines:"
+            { grep -E "^e: |^FAILURE:|What went wrong|^Caused by:|^> " "$RUNNER_TEMP/gradle-app-tests.log" || tail -30 "$RUNNER_TEMP/gradle-app-tests.log"; } | tail -60 | sed 's/^/::error::/'
             exit "$status"
           fi
 
