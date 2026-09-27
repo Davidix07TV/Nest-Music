@@ -5,6 +5,7 @@
 
 package com.nestmusic.music.ui.screens.settings
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -52,7 +54,10 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.nestmusic.music.LocalPlayerAwareWindowInsets
 import com.nestmusic.music.R
+import com.nestmusic.music.api.SpotifyClient
+import com.nestmusic.music.db.entities.ArtistEntity
 import com.nestmusic.music.db.entities.Song
+import com.nestmusic.music.db.entities.SongEntity
 import com.nestmusic.music.ui.component.DefaultDialog
 import com.nestmusic.music.ui.component.IconButton
 import com.nestmusic.music.ui.component.Material3SettingsGroup
@@ -91,6 +96,11 @@ fun BackupAndRestore(
     var progressPercentage by rememberSaveable {
         mutableIntStateOf(0)
     }
+
+    // Spotify playlist import (URL → fetch → same flow as CSV import)
+    var showSpotifyImportDialog by rememberSaveable { mutableStateOf(false) }
+    var spotifyUrlInput by rememberSaveable { mutableStateOf("") }
+    var spotifyImporting by remember { mutableStateOf(false) }
 
     // CSV column mapping state
     var csvImportState by remember { mutableStateOf<CsvImportState?>(null) }
@@ -213,6 +223,12 @@ fun BackupAndRestore(
                             )
                         },
                     ),
+                    Material3SettingsItem(
+                        title = { Text(stringResource(R.string.import_spotify_playlist)) },
+                        description = { Text(stringResource(R.string.spotify_playlist_url_hint)) },
+                        icon = painterResource(R.drawable.playlist_play),
+                        onClick = { showSpotifyImportDialog = true },
+                    ),
                 ),
         )
     }
@@ -231,6 +247,90 @@ fun BackupAndRestore(
             }
         },
     )
+
+    if (showSpotifyImportDialog) {
+        DefaultDialog(
+            onDismiss = { if (!spotifyImporting) showSpotifyImportDialog = false },
+            title = { Text(stringResource(R.string.import_spotify_playlist)) },
+            buttons = {
+                TextButton(
+                    onClick = { showSpotifyImportDialog = false },
+                    enabled = !spotifyImporting,
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                TextButton(
+                    onClick = {
+                        val input = spotifyUrlInput
+                        if (input.isBlank() || spotifyImporting) return@TextButton
+                        spotifyImporting = true
+                        coroutineScope.launch {
+                            SpotifyClient.fetchPlaylist(input)
+                                .onSuccess { playlist ->
+                                    spotifyImporting = false
+                                    importedSongs.clear()
+                                    importedSongs.addAll(
+                                        playlist.tracks.map { track ->
+                                            Song(
+                                                song = SongEntity(
+                                                    id = "",
+                                                    title = track.title,
+                                                    duration = (track.durationMs / 1000)
+                                                        .coerceAtLeast(0).toInt(),
+                                                ),
+                                                artists = track.artists.map { name ->
+                                                    ArtistEntity(id = "", name = name)
+                                                },
+                                            )
+                                        },
+                                    )
+                                    importedTitle = playlist.name
+                                    if (importedSongs.isNotEmpty()) {
+                                        showSpotifyImportDialog = false
+                                        showChoosePlaylistDialogOnline = true
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            R.string.spotify_import_empty,
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                    }
+                                }
+                                .onFailure {
+                                    spotifyImporting = false
+                                    Toast.makeText(
+                                        context,
+                                        R.string.spotify_import_failed,
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                }
+                        }
+                    },
+                    enabled = !spotifyImporting,
+                ) {
+                    if (spotifyImporting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        Text(stringResource(R.string.import_spotify))
+                    }
+                }
+            },
+            content = {
+                OutlinedTextField(
+                    value = spotifyUrlInput,
+                    onValueChange = { spotifyUrlInput = it },
+                    label = { Text(stringResource(R.string.spotify_playlist_url)) },
+                    supportingText = { Text(stringResource(R.string.spotify_playlist_url_hint)) },
+                    singleLine = true,
+                    enabled = !spotifyImporting,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+        )
+    }
 
     AddToPlaylistDialogOnline(
         isVisible = showChoosePlaylistDialogOnline,
