@@ -235,7 +235,7 @@ fun AccountSettings(
                 maxLines = 20,
                 isInputValid = { fullText ->
                     // Extract the cookie value from the formatted template line,
-                    // then validate it separately — avoids the bug where parseCookieString
+                    // then validate it separately â€” avoids the bug where parseCookieString
                     // received the entire multi-line template and failed to find "SAPISID"
                     // as a key because the "***INNERTUBE COOKIE*** =" prefix shadowed it.
                     val cookieLine = fullText.lines()

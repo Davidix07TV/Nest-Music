@@ -75,7 +75,7 @@ constructor(
                     // The FILTER_EPISODE API returns episodes in a format that differs from the
                     // summary search: playlistItemData is absent and the subtitle structure is
                     // different, making reliable isEpisode detection fail for many items.
-                    // Reuse the "Episodes" section from the summary page instead — it is already
+                    // Reuse the "Episodes" section from the summary page instead â€” it is already
                     // parsed correctly by fromMusicResponsiveListItemRenderer and guaranteed to
                     // show the same results as the episodes section in the "All" filter.
                     if (viewStateMap[filter.value] == null) {

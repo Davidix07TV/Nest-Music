@@ -159,7 +159,7 @@ constructor(
                     ),
                 )
 
-                // Metadata registration only — dateDownload is intentionally NOT set here.
+                // Metadata registration only â€” dateDownload is intentionally NOT set here.
                 // It belongs solely to onDownloadChanged()'s STATE_COMPLETED branch below,
                 // which only fires once the download has actually finished. Setting it here
                 // (at URL-resolve time, i.e. the moment the download merely *starts*) would

@@ -200,7 +200,7 @@ class MusicRecognizerWidgetService : Service() {
                         }
                     }
                     is RecognitionStatus.NoMatch -> {
-                        Timber.tag(TAG).i("Widget recognition: no match — %s", result.message)
+                        Timber.tag(TAG).i("Widget recognition: no match â€” %s", result.message)
                         prefs.edit()
                             .putInt(PREF_STATE, STATE_NO_MATCH)
                             .putString(PREF_ERROR_MESSAGE, result.message)

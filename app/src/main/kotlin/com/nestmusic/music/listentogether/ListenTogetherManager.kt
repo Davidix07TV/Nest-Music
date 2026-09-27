@@ -989,7 +989,7 @@ class ListenTogetherManager
             if (serverTrack?.id == expectedTrackId) {
                 Timber
                     .tag(TAG)
-                    .w("Guest: wrong local track — reloading ${serverTrack.title} from room state")
+                    .w("Guest: wrong local track â€” reloading ${serverTrack.title} from room state")
                 applyPlaybackState(
                     currentTrack = serverTrack,
                     isPlaying = wantPlaying,
@@ -1001,7 +1001,7 @@ class ListenTogetherManager
                 Timber
                     .tag(TAG)
                     .w(
-                        "Guest: track mismatch (PLAY/PAUSE expected id=$expectedTrackId, room has ${serverTrack?.id}) — requestSync",
+                        "Guest: track mismatch (PLAY/PAUSE expected id=$expectedTrackId, room has ${serverTrack?.id}) â€” requestSync",
                     )
                 client.requestSync()
             }
@@ -1040,7 +1040,7 @@ class ListenTogetherManager
                         ) {
                             Timber
                                 .tag(TAG)
-                                .w("Guest: PLAY targets $playTarget but was buffering $bufferingTrackId — switching")
+                                .w("Guest: PLAY targets $playTarget but was buffering $bufferingTrackId â€” switching")
                             pendingSyncState = null
                             bufferCompleteReceivedForTrack = null
                             bufferingTrackId = null

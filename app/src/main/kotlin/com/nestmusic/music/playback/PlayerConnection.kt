@@ -553,7 +553,7 @@ class PlayerConnection(
             val startTime = LocalTime.parse(startStr, timeFormatter)
             val endTime = LocalTime.parse(endStr, timeFormatter)
 
-            // Support overnight ranges (e.g. 22:00–06:00) in addition to normal ranges
+            // Support overnight ranges (e.g. 22:00â€“06:00) in addition to normal ranges
             val isTimeInRange =
                 if (endTime.isAfter(startTime)) {
                     currentTime.isAfter(startTime) && currentTime.isBefore(endTime)

@@ -3,7 +3,7 @@ package com.nestmusic.music.recognition
 /**
  * Audio fingerprint generator for Shazam-compatible signatures.
  *
- * Pure Kotlin implementation — no native C++ or FFTW3 dependency required.
+ * Pure Kotlin implementation â€” no native C++ or FFTW3 dependency required.
  * Uses [ShazamSignatureGenerator] which ports the vibra algorithm to JVM.
  */
 object VibraSignature {

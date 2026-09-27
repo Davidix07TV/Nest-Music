@@ -64,7 +64,7 @@ class AccountSettingsViewModel @Inject constructor(
     suspend fun logoutAndClearLibraryData(context: Context) {
         Timber.d("[LOGOUT_CLEAR] ViewModel: logoutAndClearLibraryData called")
         withContext(Dispatchers.IO) {
-            // Forget account first — clears cookie/auth from DataStore.
+            // Forget account first â€” clears cookie/auth from DataStore.
             // Once isLoggedIn() returns false, ALL sync operations will skip.
             App.forgetAccount(context)
 
@@ -112,7 +112,7 @@ class AccountSettingsViewModel @Inject constructor(
                 settings[AccountChannelHandleKey] = accountChannelHandle
             }
             if (!saved) {
-                Timber.e("saveTokenAndRestart: DataStore write failed — skipping restart to avoid losing credentials")
+                Timber.e("saveTokenAndRestart: DataStore write failed â€” skipping restart to avoid losing credentials")
                 return@launch
             }
             withContext(Dispatchers.Main) {

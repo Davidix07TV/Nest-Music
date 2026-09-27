@@ -39,9 +39,9 @@ import java.io.File
  * AppWidgetProvider for the Music Recognizer Widget.
  *
  * Sizes:
- *  - 1×1 (minWidth < 110dp): Only the animated mic circle
- *  - 1×3 (minWidth 110–229dp): Album art + song info + mic button (compact)
- *  - 1×4 (minWidth = 230dp): Album art + song info + mic button (wide, default)
+ *  - 1Ã—1 (minWidth < 110dp): Only the animated mic circle
+ *  - 1Ã—3 (minWidth 110â€“229dp): Album art + song info + mic button (compact)
+ *  - 1Ã—4 (minWidth = 230dp): Album art + song info + mic button (wide, default)
  *
  * Click behaviour:
  *  - Mic button  ? start / stop recognition

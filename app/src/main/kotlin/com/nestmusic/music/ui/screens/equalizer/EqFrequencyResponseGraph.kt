@@ -239,7 +239,7 @@ private fun computeGraphData(bands: List<ParametricEQBand>, preamp: Double): Gra
         if (totalDb > maxDb) maxDb = totalDb
     }
 
-    // Always center on 0 dB — symmetric range based on whichever extreme is larger
+    // Always center on 0 dB â€” symmetric range based on whichever extreme is larger
     val dbStep = 2.5
     val peakAbs = max(abs(minDb), abs(maxDb))
     val halfRange = max(ceil((peakAbs + 1.0) / dbStep) * dbStep, dbStep)

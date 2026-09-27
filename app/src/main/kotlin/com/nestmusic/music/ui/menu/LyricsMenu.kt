@@ -506,10 +506,10 @@ fun LyricsMenu(
                                         checked = hasTranslations,
                                         onCheckedChange = { newCheckedState ->
                                             if (newCheckedState) {
-                                                // Enable translations – hasActiveTranslations updates when done
+                                                // Enable translations â€“ hasActiveTranslations updates when done
                                                 LyricsTranslationHelper.triggerManualTranslation()
                                             } else {
-                                                // Disable translations – triggerClearTranslations resets hasActiveTranslations
+                                                // Disable translations â€“ triggerClearTranslations resets hasActiveTranslations
                                                 lyricsProvider()?.let { lyrics ->
                                                     val clearedLyrics = LyricsTranslationHelper.clearTranslations(lyrics)
                                                     database.query {

@@ -201,7 +201,7 @@ fun StatsScreen(
             if (prevOptionOrdinal == null) prevOptionOrdinal = selectedOption
             if (prevIndexChips == null) prevIndexChips = indexChips
             viewModel.selectedOption.value = OptionStats.CONTINUOUS // "throughout time" in your VM
-            viewModel.indexChips.value = StatPeriod.ALL.ordinal // optional: ensure it’s actually “now -> throughout time”
+            viewModel.indexChips.value = StatPeriod.ALL.ordinal // optional: ensure itâ€™s actually â€œnow -> throughout timeâ€
         }
     }
 

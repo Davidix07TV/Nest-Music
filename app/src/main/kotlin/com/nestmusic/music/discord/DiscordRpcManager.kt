@@ -172,13 +172,13 @@ object DiscordRpcManager {
         }
 
         if (_ready && _authorized) {
-            Timber.tag(TAG).d("authorize: short-circuit — already ready and authorized")
+            Timber.tag(TAG).d("authorize: short-circuit â€” already ready and authorized")
             authorizeInProgress = false
             scope.launch(Dispatchers.Main) { onComplete(true) }
             return
         }
         if (_authorized) {
-            Timber.tag(TAG).d("authorize: short-circuit — authorized but not ready, reconnecting")
+            Timber.tag(TAG).d("authorize: short-circuit â€” authorized but not ready, reconnecting")
             authorizeInProgress = false
             reconnectWithToken(accessToken ?: "")
             scope.launch(Dispatchers.Main) { onComplete(true) }
@@ -302,7 +302,7 @@ object DiscordRpcManager {
         status: PresenceStatus = PresenceStatus.Online,
     ) {
         if (!_ready) {
-            Timber.tag(TAG).w("setActivity: skipping — not ready (name=%s)", activity.name)
+            Timber.tag(TAG).w("setActivity: skipping â€” not ready (name=%s)", activity.name)
             return
         }
 
@@ -366,7 +366,7 @@ object DiscordRpcManager {
         if (largeImageUrl.isNullOrEmpty() && smallImageUrl.isNullOrEmpty()) return
 
         Timber.tag(TAG).d(
-            "setActivity: resolving images — large=%s, small=%s",
+            "setActivity: resolving images â€” large=%s, small=%s",
             largeImageUrl?.take(80),
             smallImageUrl?.take(80),
         )
@@ -429,7 +429,7 @@ object DiscordRpcManager {
 
     fun clear() {
         if (!_ready) {
-            Timber.tag(TAG).w("clear: skipping — not ready")
+            Timber.tag(TAG).w("clear: skipping â€” not ready")
             return
         }
         if (lastActivity == null && currentSongId == null) {
