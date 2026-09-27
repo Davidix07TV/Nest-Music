@@ -167,6 +167,8 @@ import com.nestmusic.music.constants.ShufflePlaylistFirstKey
 import com.nestmusic.music.constants.SimilarContent
 import com.nestmusic.music.constants.SkipSilenceInstantKey
 import com.nestmusic.music.constants.SkipSilenceKey
+import com.nestmusic.music.constants.SponsorBlockCategoriesKey
+import com.nestmusic.music.constants.SponsorBlockEnabledKey
 import com.nestmusic.music.constants.StopMusicOnTaskClearKey
 import com.nestmusic.music.db.MusicDatabase
 import com.nestmusic.music.db.entities.Event
@@ -526,6 +528,17 @@ class MusicService :
     private var cachedShufflePlaylistFirst = false
     @Volatile
     private var cachedAutoLoadMore = true
+    @Volatile
+    private var cachedSponsorBlockEnabled = true
+    @Volatile
+    private var cachedSponsorBlockCategories: Set<String> = DEFAULT_SKIP_CATEGORIES
+
+    // Skip segments of the media item that is currently loaded (fetched on
+    // transition, then consumed by the polling loop in onCreate)
+    @Volatile
+    private var skipSegmentsVideoId: String? = null
+    @Volatile
+    private var skipSegments: List<SkipSegment> = emptyList()
 
     // URL cache for stream URLs - class-level so it can be invalidated on errors
     private val songUrlCache = StreamUrlCache()
@@ -1250,6 +1263,24 @@ class MusicService :
         scope.launch {
             dataStore.data.map { it[AutoLoadMoreKey] ?: true }.distinctUntilChanged().collect { cachedAutoLoadMore = it }
         }
+        scope.launch {
+            dataStore.data.map { it[SponsorBlockEnabledKey] ?: true }.distinctUntilChanged().collect {
+                cachedSponsorBlockEnabled = it
+                // Picking the feature up mid-track: load segments right away.
+                if (it) refreshSkipSegments(player.currentMetadata)
+            }
+        }
+        scope.launch {
+            dataStore.data
+                .map { it[SponsorBlockCategoriesKey] ?: DEFAULT_SKIP_CATEGORIES }
+                .distinctUntilChanged()
+                .collect {
+                    cachedSponsorBlockCategories = it
+                    // Re-apply the new selection immediately; the repository
+                    // serves this from its per-video cache without a refetch.
+                    refreshSkipSegments(player.currentMetadata)
+                }
+        }
         // Keep YTPlayerUtils in sync with the stream source toggles (Settings ? Stream sources).
         // Map to the derived set + distinctUntilChanged so an unrelated preference write doesn't
         // rebuild the set and rewrite the @Volatile field on every DataStore emission.
@@ -1266,6 +1297,32 @@ class MusicService :
                 }
                 .distinctUntilChanged()
                 .collect { YTPlayerUtils.disabledStreamClients = it }
+        }
+
+        // Watch the playback position and jump over the selected skip
+        // segments of the current item. Same lifetime as the other service
+        // loops; a no-op until segments have been loaded for this item.
+        scope.launch {
+            while (isActive) {
+                delay(if (cachedSponsorBlockEnabled) 500L else 2_000L)
+                if (!cachedSponsorBlockEnabled) continue
+                if (!player.isPlaying) continue
+                if (castConnectionHandler?.isCasting?.value == true) continue
+                if (::listenTogetherManager.isInitialized && listenTogetherManager.roomState.value != null) continue
+                val segments = skipSegments
+                if (segments.isEmpty()) continue
+                if (player.currentMetadata?.id != skipSegmentsVideoId) continue
+                val position = player.currentPosition
+                val active = SkipSegmentsRepository.findActive(position, segments) ?: continue
+                val duration = player.duration
+                // Never seek past the end of the item: an oversized segment
+                // simply finishes the track instead of looping on itself.
+                val target = if (duration > 0) minOf(active.endMs, duration) else active.endMs
+                if (target > position) {
+                    Timber.tag(TAG).d("skipping ${active.category} segment ($position -> $target ms)")
+                    player.seekTo(target)
+                }
+            }
         }
 
         if (startupPrefs!![PersistentQueueKey] ?: true) {
@@ -2563,6 +2620,30 @@ class MusicService :
         }
     }
 
+    /**
+     * Loads the community-maintained skip segments for the media item that is
+     * about to play. Local files and other non-YouTube ids are left alone; the
+     * fetched list is kept until the next transition (the repository caches
+     * per-video results, so a replay never hits the network twice).
+     */
+    private fun refreshSkipSegments(metadata: com.nestmusic.music.models.MediaMetadata?) {
+        val videoId = metadata?.id
+        skipSegmentsVideoId = videoId
+        skipSegments = emptyList()
+        if (!cachedSponsorBlockEnabled || videoId.isNullOrEmpty()) return
+        // YouTube video ids are 11 URL-safe base64 chars; anything else
+        // (local paths, content uris, …) never has segments.
+        if (videoId.length != 11 || videoId.any { !it.isLetterOrDigit() && it != '_' && it != '-' }) return
+        if (cachedSponsorBlockCategories.isEmpty()) return
+        val categories = cachedSponsorBlockCategories
+        scope.launch {
+            val segments = SkipSegmentsRepository.fetch(videoId, categories)
+            if (skipSegmentsVideoId == videoId) {
+                skipSegments = segments
+            }
+        }
+    }
+
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
         reason: Int,
@@ -2615,6 +2696,7 @@ class MusicService :
         lastPlaybackSpeed = -1.0f // force update song
 
         setupAudioNormalization()
+        refreshSkipSegments(newMetadata)
 
         scrobbleManager?.onSongStop()
         if (player.playWhenReady && player.playbackState == Player.STATE_READY) {

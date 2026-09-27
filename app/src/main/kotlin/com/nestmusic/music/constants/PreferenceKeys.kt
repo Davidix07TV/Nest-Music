@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -539,6 +540,10 @@ val RepeatModeKey = intPreferencesKey("repeatMode")
 val SearchSourceKey = stringPreferencesKey("searchSource")
 val SwipeThumbnailKey = booleanPreferencesKey("swipeThumbnail")
 val SwipeSensitivityKey = floatPreferencesKey("swipeSensitivity")
+// Auto-skip segments (skip ranges of non-music parts inside videos)
+val SponsorBlockEnabledKey = booleanPreferencesKey("sponsorBlockEnabled")
+val SponsorBlockCategoriesKey = stringSetPreferencesKey("sponsorBlockCategories")
+
 val SleepTimerEnabledKey = booleanPreferencesKey("sleepTimerEnabled")
 val SleepTimerRepeatKey = stringPreferencesKey("sleepTimerRepeat")
 val SleepTimerStartTimeKey = stringPreferencesKey("sleepTimerStartTime")
