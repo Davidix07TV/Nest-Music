@@ -695,9 +695,10 @@ private fun CanvasOverlay(
 
     val title = item.mediaMetadata.title?.toString().orEmpty()
     if (title.isBlank()) return
-    val artists = item.mediaMetadata.artists?.map { it.toString() }
-        .orEmpty()
-        .ifEmpty { listOfNotNull(item.mediaMetadata.artist?.toString()) }
+    val artists = buildList {
+        item.mediaMetadata.artist?.toString()?.let { add(it) }
+        item.mediaMetadata.albumArtist?.toString()?.let { add(it) }
+    }.distinct()
     val durationMs = item.mediaMetadata.durationMs ?: 0L
     val mediaId = item.mediaId
 
