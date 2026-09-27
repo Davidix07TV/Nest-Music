@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -243,6 +244,14 @@ val ListenTogetherSessionTimestampKey = longPreferencesKey("listenTogetherSessio
 val LastFMSessionKey = stringPreferencesKey("lastfmSession")
 val LastFMUsernameKey = stringPreferencesKey("lastfmUsername")
 val EnableLastFMScrobblingKey = booleanPreferencesKey("lastfmScrobblingEnable")
+
+// ListenBrainz scrobbling (runs alongside Last.fm)
+val EnableListenBrainzKey = booleanPreferencesKey("enableListenBrainzScrobbling")
+val ListenBrainzTokenKey = stringPreferencesKey("listenBrainzUserToken")
+
+// Spotify Canvas (optional sp_dc cookie, decorative player videos)
+val SpotifyCanvasEnabledKey = booleanPreferencesKey("spotifyCanvasEnabled")
+val SpotifySpDcKey = stringPreferencesKey("spotifySpDc")
 val LastFMUseNowPlaying = booleanPreferencesKey("lastfmUseNowPlaying")
 
 val LastFMUseSendLikes = booleanPreferencesKey("lastfmUseSendLikes")
@@ -539,6 +548,10 @@ val RepeatModeKey = intPreferencesKey("repeatMode")
 val SearchSourceKey = stringPreferencesKey("searchSource")
 val SwipeThumbnailKey = booleanPreferencesKey("swipeThumbnail")
 val SwipeSensitivityKey = floatPreferencesKey("swipeSensitivity")
+// Auto-skip segments (skip ranges of non-music parts inside videos)
+val SponsorBlockEnabledKey = booleanPreferencesKey("sponsorBlockEnabled")
+val SponsorBlockCategoriesKey = stringSetPreferencesKey("sponsorBlockCategories")
+
 val SleepTimerEnabledKey = booleanPreferencesKey("sleepTimerEnabled")
 val SleepTimerRepeatKey = stringPreferencesKey("sleepTimerRepeat")
 val SleepTimerStartTimeKey = stringPreferencesKey("sleepTimerStartTime")

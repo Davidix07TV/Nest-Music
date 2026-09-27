@@ -1161,4 +1161,50 @@
     <string name="greeting_afternoon">Good afternoon</string>
     <string name="greeting_evening">Good evening</string>
     <string name="tap_to_start">Nothing playing yet</string>
+
+    <!-- Segment skipping -->
+    <string name="segment_skipping">Segment skipping</string>
+    <string name="auto_skip_segments">Auto-skip segments</string>
+    <string name="auto_skip_segments_desc">Automatically jump over sponsors, intros, outros and other non-music parts of videos using community-maintained data</string>
+    <string name="skip_segments_categories">Categories to skip</string>
+    <string name="skip_segments_categories_desc">Chosen %1$d of %2$d</string>
+    <string name="segment_sponsor">Sponsor</string>
+    <string name="segment_intro">Intro</string>
+    <string name="segment_outro">Outro</string>
+    <string name="segment_selfpromo">Self-promotion</string>
+    <string name="segment_interaction">Interaction reminder</string>
+    <string name="segment_music_offtopic">Non-music section</string>
+    <string name="segment_filler">Filler</string>
+    <string name="segment_preview">Preview</string>
+
+    <!-- ListenBrainz scrobbling -->
+    <string name="listenbrainz_integration">ListenBrainz</string>
+    <string name="listenbrainz_enable_desc">Submit listens to your ListenBrainz profile while you play music</string>
+    <string name="listenbrainz_token">User token</string>
+    <string name="listenbrainz_token_set">Token saved</string>
+    <string name="listenbrainz_token_help">Create one at listenbrainz.org → Settings → API tokens</string>
+
+    <!-- Spotify playlist import -->
+    <string name="import_spotify_playlist">Import from Spotify</string>
+    <string name="import_spotify">Import</string>
+    <string name="spotify_playlist_url">Playlist link</string>
+    <string name="spotify_playlist_url_hint">Paste a Spotify playlist link</string>
+    <string name="spotify_import_failed">Could not import this playlist</string>
+    <string name="spotify_import_empty">No tracks found in this playlist</string>
+
+    <!-- Settings search -->
+    <string name="settings_search_hint">Search settings</string>
+    <string name="settings_search_no_results">No matching settings</string>
+
+    <!-- Spotify Canvas -->
+    <string name="spotify_integration">Spotify</string>
+    <string name="spotify_canvas_title">Canvas videos</string>
+    <string name="spotify_canvas_desc">Loop short videos in the player when a song has one</string>
+    <string name="spotify_log_in">Log in to Spotify</string>
+    <string name="spotify_log_in_desc">Sign in with your email and password on Spotify\'s official page</string>
+    <string name="spotify_logged_in">Connected to Spotify</string>
+    <string name="spotify_log_out_desc">Tap to disconnect</string>
+    <string name="spotify_sp_dc">Session cookie</string>
+    <string name="spotify_sp_dc_set">Cookie saved</string>
+    <string name="spotify_sp_dc_help">Paste the sp_dc cookie of open.spotify.com from your browser\'s cookies</string>
 </resources>

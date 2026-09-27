@@ -12,6 +12,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
@@ -21,6 +22,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -38,7 +44,6 @@ import com.nestmusic.music.ui.component.Material3SettingsItem
 import com.nestmusic.music.ui.component.ReleaseNotesCard
 import com.nestmusic.music.ui.utils.backToMain
 import com.nestmusic.music.utils.Updater
-import androidx.compose.runtime.remember
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +65,23 @@ fun SettingsScreen(
         }
     }
 
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val resolvedEntries = remember {
+        SETTINGS_SEARCH_ENTRIES.map { entry ->
+            val title = context.getString(entry.title)
+            val parent = entry.parent?.let { context.getString(it) }.orEmpty()
+            ResolvedSettingsEntry(
+                entry = entry,
+                title = title,
+                text = "$title $parent ${entry.keywords}".lowercase(),
+            )
+        }
+    }
+    val searchResults = remember(searchQuery, resolvedEntries) {
+        matchSettingsEntries(resolvedEntries, searchQuery)
+    }
+
+
     Column(
         Modifier
             .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
@@ -74,202 +96,253 @@ fun SettingsScreen(
             )
         )
 
-        // User Interface Section
-        Material3SettingsGroup(
-            title = stringResource(R.string.settings_section_ui),
-            items = listOf(
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.palette),
-                    title = { Text(stringResource(R.string.appearance)) },
-                    onClick = { navController.navigate("settings/appearance") }
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text(stringResource(R.string.settings_search_hint)) },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.search),
+                    contentDescription = null,
                 )
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Player & Content Section (moved up and combined with content)
-        Material3SettingsGroup(
-            title = stringResource(R.string.settings_section_player_content),
-            items = listOf(
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.play),
-                    title = { Text(stringResource(R.string.player_and_audio)) },
-                    onClick = { navController.navigate("settings/player") }
-                ),
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.radio),
-                    title = { Text(stringResource(R.string.stream_sources)) },
-                    onClick = { navController.navigate("settings/stream_sources") }
-                ),
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.language),
-                    title = { Text(stringResource(R.string.content)) },
-                    onClick = { navController.navigate("settings/content") }
-                ),
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.translate),
-                    title = { Text(stringResource(R.string.ai_lyrics_translation)) },
-                    onClick = { navController.navigate("settings/ai") }
-                )
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Android Auto Section — only shown if Android Auto is installed
-        if (hasAndroidAuto) {
-            Material3SettingsGroup(
-                title = "Android Auto",
-                items = listOf(
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.ic_android_auto),
-                        title = { Text(stringResource(R.string.android_auto)) },
-                        onClick = { navController.navigate("settings/android_auto") }
-                    )
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        
-        // Privacy & Security Section
-        Material3SettingsGroup(
-            title = stringResource(R.string.settings_section_privacy),
-            items = listOf(
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.security),
-                    title = { Text(stringResource(R.string.privacy)) },
-                    onClick = { navController.navigate("settings/privacy") }
-                )
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Storage & Data Section
-        Material3SettingsGroup(
-            title = stringResource(R.string.settings_section_storage),
-            items = listOf(
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.storage),
-                    title = { Text(stringResource(R.string.storage)) },
-                    onClick = { navController.navigate("settings/storage") }
-                ),
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.restore),
-                    title = { Text(stringResource(R.string.backup_restore)) },
-                    onClick = { navController.navigate("settings/backup_restore") }
-                )
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // System & About Section
-        Material3SettingsGroup(
-            title = stringResource(R.string.settings_section_system),
-            items = buildList {
-                if (isAndroid12OrLater) {
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.link),
-                            title = { Text(stringResource(R.string.default_links)) },
-                            onClick = {
-                                try {
-                                    val intent = Intent(
-                                        Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-                                        "package:${context.packageName}".toUri()
-                                    )
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    when (e) {
-                                        is ActivityNotFoundException -> {
-                                            Toast.makeText(
-                                                context,
-                                                R.string.open_app_settings_error,
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-
-                                        is SecurityException -> {
-                                            Toast.makeText(
-                                                context,
-                                                R.string.open_app_settings_error,
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-
-                                        else -> {
-                                            Toast.makeText(
-                                                context,
-                                                R.string.open_app_settings_error,
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-                                    }
-                                }
-                            }
-                        )
-                    )
-                }
-                if (BuildConfig.UPDATER_AVAILABLE) {
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.update),
-                            title = { Text(stringResource(R.string.updater)) },
-                            onClick = { navController.navigate("settings/updater") }
-                        )
-                    )
-                }
-                val showChangelog = com.nestmusic.music.LocalChangelogState.current
-                add(
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.newspaper),
-                        title = { Text(stringResource(R.string.changelog)) },
-                        onClick = { showChangelog.value = true }
-                    )
-                )
-                add(
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.info),
-                        title = { Text(stringResource(R.string.about)) },
-                        onClick = { navController.navigate("settings/about") }
-                    )
-                )
-                if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
-                    val releaseInfo = Updater.getCachedLatestRelease()
-                    val downloadUrl = releaseInfo?.let { Updater.getDownloadUrlForCurrentVariant(it) }
-
-                    if (downloadUrl != null) {
-                        add(
-                            Material3SettingsItem(
-                                icon = painterResource(R.drawable.update),
-                                title = { 
-                                    Text(
-                                        text = stringResource(R.string.new_version_available),
-                                    )
-                                },
-                                description = {
-                                    Text(
-                                        text = latestVersionName,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                },
-                                showBadge = true,
-                                onClick = { uriHandler.openUri(downloadUrl) }
-                            )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(
+                        onClick = { searchQuery = "" },
+                        onLongClick = { searchQuery = "" },
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.close),
+                            contentDescription = null,
                         )
                     }
                 }
-            }
+            },
+            singleLine = true,
         )
-    if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (searchQuery.isNotBlank()) {
+            if (searchResults.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.settings_search_no_results),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 24.dp),
+                )
+            } else {
+                Material3SettingsGroup(
+                    items = searchResults.map { result ->
+                        Material3SettingsItem(
+                            icon = painterResource(result.entry.icon),
+                            title = { Text(result.title) },
+                            description = parentDescription(result.entry.parent),
+                            onClick = { navController.navigate(result.entry.route) },
+                        )
+                    },
+                )
+            }
+        } else {
+            // User Interface Section
+            Material3SettingsGroup(
+                title = stringResource(R.string.settings_section_ui),
+                items = listOf(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.palette),
+                        title = { Text(stringResource(R.string.appearance)) },
+                        onClick = { navController.navigate("settings/appearance") }
+                    )
+                )
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
-            ReleaseNotesCard()
-        }
+
+            // Player & Content Section (moved up and combined with content)
+            Material3SettingsGroup(
+                title = stringResource(R.string.settings_section_player_content),
+                items = listOf(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.play),
+                        title = { Text(stringResource(R.string.player_and_audio)) },
+                        onClick = { navController.navigate("settings/player") }
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.radio),
+                        title = { Text(stringResource(R.string.stream_sources)) },
+                        onClick = { navController.navigate("settings/stream_sources") }
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.language),
+                        title = { Text(stringResource(R.string.content)) },
+                        onClick = { navController.navigate("settings/content") }
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.translate),
+                        title = { Text(stringResource(R.string.ai_lyrics_translation)) },
+                        onClick = { navController.navigate("settings/ai") }
+                    )
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Android Auto Section — only shown if Android Auto is installed
+            if (hasAndroidAuto) {
+                Material3SettingsGroup(
+                    title = "Android Auto",
+                    items = listOf(
+                        Material3SettingsItem(
+                            icon = painterResource(R.drawable.ic_android_auto),
+                            title = { Text(stringResource(R.string.android_auto)) },
+                            onClick = { navController.navigate("settings/android_auto") }
+                        )
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        
+            // Privacy & Security Section
+            Material3SettingsGroup(
+                title = stringResource(R.string.settings_section_privacy),
+                items = listOf(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.security),
+                        title = { Text(stringResource(R.string.privacy)) },
+                        onClick = { navController.navigate("settings/privacy") }
+                    )
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Storage & Data Section
+            Material3SettingsGroup(
+                title = stringResource(R.string.settings_section_storage),
+                items = listOf(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.storage),
+                        title = { Text(stringResource(R.string.storage)) },
+                        onClick = { navController.navigate("settings/storage") }
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.restore),
+                        title = { Text(stringResource(R.string.backup_restore)) },
+                        onClick = { navController.navigate("settings/backup_restore") }
+                    )
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // System & About Section
+            Material3SettingsGroup(
+                title = stringResource(R.string.settings_section_system),
+                items = buildList {
+                    if (isAndroid12OrLater) {
+                        add(
+                            Material3SettingsItem(
+                                icon = painterResource(R.drawable.link),
+                                title = { Text(stringResource(R.string.default_links)) },
+                                onClick = {
+                                    try {
+                                        val intent = Intent(
+                                            Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                                            "package:${context.packageName}".toUri()
+                                        )
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        when (e) {
+                                            is ActivityNotFoundException -> {
+                                                Toast.makeText(
+                                                    context,
+                                                    R.string.open_app_settings_error,
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+
+                                            is SecurityException -> {
+                                                Toast.makeText(
+                                                    context,
+                                                    R.string.open_app_settings_error,
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+
+                                            else -> {
+                                                Toast.makeText(
+                                                    context,
+                                                    R.string.open_app_settings_error,
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        )
+                    }
+                    if (BuildConfig.UPDATER_AVAILABLE) {
+                        add(
+                            Material3SettingsItem(
+                                icon = painterResource(R.drawable.update),
+                                title = { Text(stringResource(R.string.updater)) },
+                                onClick = { navController.navigate("settings/updater") }
+                            )
+                        )
+                    }
+                    val showChangelog = com.nestmusic.music.LocalChangelogState.current
+                    add(
+                        Material3SettingsItem(
+                            icon = painterResource(R.drawable.newspaper),
+                            title = { Text(stringResource(R.string.changelog)) },
+                            onClick = { showChangelog.value = true }
+                        )
+                    )
+                    add(
+                        Material3SettingsItem(
+                            icon = painterResource(R.drawable.info),
+                            title = { Text(stringResource(R.string.about)) },
+                            onClick = { navController.navigate("settings/about") }
+                        )
+                    )
+                    if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
+                        val releaseInfo = Updater.getCachedLatestRelease()
+                        val downloadUrl = releaseInfo?.let { Updater.getDownloadUrlForCurrentVariant(it) }
+
+                        if (downloadUrl != null) {
+                            add(
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.update),
+                                    title = { 
+                                        Text(
+                                            text = stringResource(R.string.new_version_available),
+                                        )
+                                    },
+                                    description = {
+                                        Text(
+                                            text = latestVersionName,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    showBadge = true,
+                                    onClick = { uriHandler.openUri(downloadUrl) }
+                                )
+                            )
+                        }
+                    }
+                }
+            )
+        if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
+                Spacer(modifier = Modifier.height(16.dp))
+                ReleaseNotesCard()
+            }
+        } // end settings list / search results
 
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -288,4 +361,11 @@ fun SettingsScreen(
             }
         }
     )
+}
+
+
+/** Result description pointing at the screen an entry lives in. */
+private fun parentDescription(parent: Int?): (@Composable () -> Unit)? {
+    if (parent == null) return null
+    return { Text(stringResource(parent)) }
 }

@@ -10,8 +10,11 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
@@ -20,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -27,12 +31,14 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -74,6 +80,8 @@ import com.nestmusic.music.constants.ShufflePlaylistFirstKey
 import com.nestmusic.music.constants.SimilarContent
 import com.nestmusic.music.constants.SkipSilenceInstantKey
 import com.nestmusic.music.constants.SkipSilenceKey
+import com.nestmusic.music.constants.SponsorBlockCategoriesKey
+import com.nestmusic.music.constants.SponsorBlockEnabledKey
 import com.nestmusic.music.constants.StopMusicOnTaskClearKey
 import com.nestmusic.music.constants.VarispeedKey
 import com.nestmusic.music.constants.PlaybackSource
@@ -94,6 +102,8 @@ import com.nestmusic.music.ui.component.IconButton
 import com.nestmusic.music.ui.component.Material3SettingsGroup
 import com.nestmusic.music.ui.component.Material3SettingsItem
 import com.nestmusic.music.ui.utils.backToMain
+import com.nestmusic.music.playback.DEFAULT_SKIP_CATEGORIES
+import com.nestmusic.music.playback.SKIP_CATEGORIES
 import com.nestmusic.music.utils.rememberEnumPreference
 import com.nestmusic.music.utils.rememberPreference
 import kotlin.math.roundToInt
@@ -109,6 +119,22 @@ import com.nestmusic.music.ui.component.encodeDayTimes
 import com.nestmusic.music.constants.SleepTimerFadeOutKey
 import com.nestmusic.music.constants.SleepTimerStopAfterCurrentSongKey
 import com.nestmusic.music.ui.utils.getLoudnessLevelLabel
+
+/**
+ * String resource for one skip-category id shown in the selection dialog.
+ * Ids and their order live in [SKIP_CATEGORIES]; only labels live here.
+ */
+private fun segmentCategoryLabel(category: String): Int = when (category) {
+    "sponsor" -> R.string.segment_sponsor
+    "intro" -> R.string.segment_intro
+    "outro" -> R.string.segment_outro
+    "selfpromo" -> R.string.segment_selfpromo
+    "interaction" -> R.string.segment_interaction
+    "music_offtopic" -> R.string.segment_music_offtopic
+    "filler" -> R.string.segment_filler
+    "preview" -> R.string.segment_preview
+    else -> R.string.skip_segments_categories
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -837,6 +863,98 @@ fun PlayerSettings(
                 ))
             }
         )
+
+        Spacer(modifier = Modifier.height(27.dp))
+
+        var showSkipSegmentCategoriesDialog by remember { mutableStateOf(false) }
+        val (skipSegmentsEnabled, onSkipSegmentsEnabledChange) =
+            rememberPreference(SponsorBlockEnabledKey, defaultValue = true)
+        val (skipSegmentsCategories, onSkipSegmentsCategoriesChange) =
+            rememberPreference(SponsorBlockCategoriesKey, defaultValue = DEFAULT_SKIP_CATEGORIES)
+
+        Material3SettingsGroup(
+            title = stringResource(R.string.segment_skipping),
+            items = buildList {
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.skip_next),
+                    title = { Text(stringResource(R.string.auto_skip_segments)) },
+                    description = { Text(stringResource(R.string.auto_skip_segments_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = skipSegmentsEnabled,
+                            onCheckedChange = onSkipSegmentsEnabledChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (skipSegmentsEnabled) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onSkipSegmentsEnabledChange(!skipSegmentsEnabled) }
+                ))
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.list),
+                    title = { Text(stringResource(R.string.skip_segments_categories)) },
+                    description = {
+                        Text(
+                            stringResource(
+                                R.string.skip_segments_categories_desc,
+                                skipSegmentsCategories.size,
+                                SKIP_CATEGORIES.size,
+                            )
+                        )
+                    },
+                    enabled = skipSegmentsEnabled,
+                    onClick = { showSkipSegmentCategoriesDialog = true }
+                ))
+            }
+        )
+
+        if (showSkipSegmentCategoriesDialog) {
+            DefaultDialog(
+                onDismiss = { showSkipSegmentCategoriesDialog = false },
+                title = { Text(stringResource(R.string.skip_segments_categories)) },
+                buttons = {
+                    TextButton(onClick = { showSkipSegmentCategoriesDialog = false }) {
+                        Text(stringResource(R.string.save))
+                    }
+                },
+                content = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        SKIP_CATEGORIES.forEach { category ->
+                            val checked = category in skipSegmentsCategories
+                            val toggle = {
+                                onSkipSegmentsCategoriesChange(
+                                    if (checked) skipSegmentsCategories - category
+                                    else skipSegmentsCategories + category
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(onClick = toggle)
+                            ) {
+                                Checkbox(
+                                    checked = checked,
+                                    onCheckedChange = { toggle() }
+                                )
+                                Spacer(modifier = Modifier.size(4.dp))
+                                Text(text = stringResource(segmentCategoryLabel(category)))
+                            }
+                        }
+                    }
+                }
+            )
+        }
 
         Spacer(modifier = Modifier.height(27.dp))
 

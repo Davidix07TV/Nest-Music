@@ -26,6 +26,10 @@ class ScrobbleManager(
     private var songStarted = false
     var useNowPlaying = true
 
+    // Which backends receive submissions; both can run side by side.
+    var lastFmEnabled = true
+    var listenBrainzEnabled = false
+
     fun destroy() {
         scrobbleJob?.cancel()
         scrobbleRemainingMillis = 0L
@@ -39,7 +43,7 @@ class ScrobbleManager(
         songStartedAt = System.currentTimeMillis() / 1000
         songStarted = true
         startScrobbleTimer(metadata, duration)
-        if (useNowPlaying) {
+        if (useNowPlaying || listenBrainzEnabled) {
             updateNowPlaying(metadata)
         }
     }
@@ -108,24 +112,45 @@ class ScrobbleManager(
 
     private fun scrobbleSong(metadata: MediaMetadata) {
         scope.launch {
-            LastFM.scrobble(
-                artist = metadata.artists.joinToString { it.name },
-                track = metadata.title,
-                duration = metadata.duration,
-                timestamp = songStartedAt,
-                album = metadata.album?.title,
-            )
+            if (lastFmEnabled) {
+                LastFM.scrobble(
+                    artist = metadata.artists.joinToString { it.name },
+                    track = metadata.title,
+                    duration = metadata.duration,
+                    timestamp = songStartedAt,
+                    album = metadata.album?.title,
+                )
+            }
+            if (listenBrainzEnabled) {
+                ListenBrainz.scrobble(
+                    artist = metadata.artists.joinToString { it.name },
+                    track = metadata.title,
+                    timestamp = songStartedAt,
+                    album = metadata.album?.title,
+                    durationSeconds = metadata.duration,
+                )
+            }
         }
     }
 
     private fun updateNowPlaying(metadata: MediaMetadata) {
         scope.launch {
-            LastFM.updateNowPlaying(
-                artist = metadata.artists.joinToString { it.name },
-                track = metadata.title,
-                album = metadata.album?.title,
-                duration = metadata.duration
-            )
+            if (lastFmEnabled && useNowPlaying) {
+                LastFM.updateNowPlaying(
+                    artist = metadata.artists.joinToString { it.name },
+                    track = metadata.title,
+                    album = metadata.album?.title,
+                    duration = metadata.duration
+                )
+            }
+            if (listenBrainzEnabled) {
+                ListenBrainz.submitNowPlaying(
+                    artist = metadata.artists.joinToString { it.name },
+                    track = metadata.title,
+                    album = metadata.album?.title,
+                    durationSeconds = metadata.duration,
+                )
+            }
         }
     }
 

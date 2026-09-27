@@ -60,7 +60,9 @@ import com.nestmusic.music.ui.screens.settings.UpdaterScreen
 import com.nestmusic.music.ui.screens.settings.integrations.DiscordSettings
 import com.nestmusic.music.ui.screens.settings.integrations.IntegrationScreen
 import com.nestmusic.music.ui.screens.settings.integrations.LastFMSettings
+import com.nestmusic.music.ui.screens.settings.integrations.ListenBrainzSettings
 import com.nestmusic.music.ui.screens.settings.integrations.ListenTogetherSettings
+import com.nestmusic.music.ui.screens.settings.integrations.SpotifySettings
 
 import com.nestmusic.music.ui.screens.wrapped.WrappedScreen
 import com.nestmusic.music.utils.rememberEnumPreference
@@ -438,6 +440,18 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/integrations/lastfm") {
         LastFMSettings(navController)
+    }
+
+    composable("settings/integrations/listenbrainz") {
+        ListenBrainzSettings(navController)
+    }
+
+    composable("settings/integrations/spotify") {
+        SpotifySettings(navController)
+    }
+
+    composable("settings/integrations/spotify_login") {
+        SpotifyLoginScreen(navController)
     }
 
     composable(route = "settings/integrations/listen_together") {
