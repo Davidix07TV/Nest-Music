@@ -1026,43 +1026,68 @@ fun BottomSheetPlayer(
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
+                    val currentStreamClient by playerConnection.currentStreamClient.collectAsState()
+                    val isFlac = currentStreamClient?.startsWith("FLAC") == true
+
                     AnimatedContent(
                         targetState = mediaMetadata.title,
                         transitionSpec = { fadeIn() togetherWith fadeOut() },
                         label = "",
                     ) { title ->
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = TextBackgroundColor,
-                            modifier =
-                                Modifier
-                                    .basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp)
-                                    .combinedClickable(
-                                        enabled = true,
-                                        indication = null,
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        onClick = {
-                                            val albumId = mediaMetadata.album?.id
-                                                ?: currentSong?.album?.id
-                                                ?: currentSong?.song?.albumId
-                                            if (albumId != null) {
-                                                navController.navigate("album/$albumId")
-                                                state.collapseSoft()
-                                            }
-                                        },
-                                        onLongClick = {
-                                            val clip = ClipData.newPlainText(copiedTitleStr, title)
-                                            clipboardManager.setPrimaryClip(clip)
-                                            Toast
-                                                .makeText(context, copiedTitleStr, Toast.LENGTH_SHORT)
-                                                .show()
-                                        },
-                                    ),
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = TextBackgroundColor,
+                                modifier =
+                                    Modifier
+                                        .weight(1f, fill = false)
+                                        .basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp)
+                                        .combinedClickable(
+                                            enabled = true,
+                                            indication = null,
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            onClick = {
+                                                val albumId = mediaMetadata.album?.id
+                                                    ?: currentSong?.album?.id
+                                                    ?: currentSong?.song?.albumId
+                                                if (albumId != null) {
+                                                    navController.navigate("album/$albumId")
+                                                    state.collapseSoft()
+                                                }
+                                            },
+                                            onLongClick = {
+                                                val clip = ClipData.newPlainText(copiedTitleStr, title)
+                                                clipboardManager.setPrimaryClip(clip)
+                                                Toast
+                                                    .makeText(context, copiedTitleStr, Toast.LENGTH_SHORT)
+                                                    .show()
+                                            },
+                                        ),
+                            )
+                            if (isFlac) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primaryContainer,
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text(
+                                        text = currentStreamClient ?: "FLAC",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     Row(

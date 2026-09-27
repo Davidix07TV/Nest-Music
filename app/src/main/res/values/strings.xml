@@ -343,4 +343,31 @@
     <string name="new_version_available">New version available</string>
     <string name="translation_models">Translation Models</string>
     <string name="clear_translation_models">Clear translation models</string>
+
+
+    <!-- Lossless / Hi-Res -->
+    <string name="lossless_integration">Lossless Integration</string>
+    <string name="playback_source">Playback Source</string>
+    <string name="playback_source_yt">YouTube Music</string>
+    <string name="playback_source_flac">Hi-Res FLAC</string>
+    <string name="playback_source_desc">Choose between YouTube streams or Hi-Res lossless when available, with automatic fallback</string>
+    <string name="flac_streaming_quality">FLAC Streaming Quality</string>
+    <string name="flac_download_quality">FLAC Download Quality</string>
+    <string name="flac_quality_cd">CD Quality (16-bit/44.1kHz) - Format 6</string>
+    <string name="flac_quality_hi_res">Hi-Res (24-bit/up to 96kHz) - Format 7</string>
+    <string name="flac_quality_max">Max Quality (24-bit/up to 192kHz) - Format 27</string>
+    <string name="memory_cache_toggle">Memory cache for FLAC URLs</string>
+    <string name="memory_cache_toggle_desc">Cache resolved FLAC URLs in memory to reduce API calls and speed up playback</string>
+    <string name="select_flac_download_folder">FLAC Download Folder</string>
+    <string name="low_data_mode_title">Low data mode</string>
+    <string name="low_data_mode_description">When on metered connection, bypass Hi-Res and use YouTube streams to save data</string>
+    <string name="qobuz_credentials">Qobuz Credentials</string>
+    <string name="qobuz_app_id">Qobuz App ID</string>
+    <string name="qobuz_app_secret">Qobuz App Secret</string>
+    <string name="qobuz_token_pool">Qobuz Token Pool</string>
+    <string name="qobuz_token_pool_desc">Comma-separated list of token:country[:appId]. Leave empty to use YouTube only.</string>
+    <string name="flac_download_saved">FLAC saved to %s</string>
+    <string name="flac_download_failed">FLAC download failed</string>
+    <string name="flac_download_deleted">FLAC deleted: %s</string>
+    <string name="folder_persist_failed">Failed to persist folder permission</string>
 </resources>

@@ -5,6 +5,11 @@
 
 package com.nestmusic.music.ui.screens.settings
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -17,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -28,10 +34,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavController
 import com.nestmusic.music.BuildConfig
 import com.nestmusic.music.LocalPlayerAwareWindowInsets
@@ -68,6 +76,18 @@ import com.nestmusic.music.constants.SkipSilenceInstantKey
 import com.nestmusic.music.constants.SkipSilenceKey
 import com.nestmusic.music.constants.StopMusicOnTaskClearKey
 import com.nestmusic.music.constants.VarispeedKey
+import com.nestmusic.music.constants.PlaybackSource
+import com.nestmusic.music.constants.PlaybackSourceKey
+import com.nestmusic.music.constants.FlacQuality
+import com.nestmusic.music.constants.FlacStreamingQualityKey
+import com.nestmusic.music.constants.FlacDownloadQualityKey
+import com.nestmusic.music.constants.EnableLosslessKey
+import com.nestmusic.music.constants.QobuzAppIdKey
+import com.nestmusic.music.constants.QobuzAppSecretKey
+import com.nestmusic.music.constants.QobuzUserAuthTokenKey
+import com.nestmusic.music.constants.MemoryCacheToggleKey
+import com.nestmusic.music.constants.DownloadLocationUriKey
+import com.nestmusic.music.constants.LowDataModeKey
 import com.nestmusic.music.ui.component.DefaultDialog
 import com.nestmusic.music.ui.component.EnumDialog
 import com.nestmusic.music.ui.component.IconButton
@@ -95,10 +115,69 @@ import com.nestmusic.music.ui.utils.getLoudnessLevelLabel
 fun PlayerSettings(
     navController: NavController
 ) {
+    val context = LocalContext.current
+
     val (audioQuality, onAudioQualityChange) = rememberEnumPreference(
         AudioQualityKey,
         defaultValue = AudioQuality.AUTO
     )
+    val (playbackSource, onPlaybackSourceChange) = rememberEnumPreference(
+        PlaybackSourceKey,
+        defaultValue = PlaybackSource.YT_MUSIC
+    )
+    val (flacStreamingQuality, onFlacStreamingQualityChange) = rememberEnumPreference(
+        FlacStreamingQualityKey,
+        defaultValue = FlacQuality.CD
+    )
+    val (flacDownloadQuality, onFlacDownloadQualityChange) = rememberEnumPreference(
+        FlacDownloadQualityKey,
+        defaultValue = FlacQuality.HI_RES
+    )
+    val (enableLossless, onEnableLosslessChange) = rememberPreference(
+        EnableLosslessKey,
+        defaultValue = true
+    )
+    val (memoryCacheToggle, onMemoryCacheToggleChange) = rememberPreference(
+        MemoryCacheToggleKey,
+        defaultValue = true
+    )
+    val (lowDataMode, onLowDataModeChange) = rememberPreference(
+        LowDataModeKey,
+        defaultValue = true
+    )
+    val (downloadLocationUri, onDownloadLocationUriChange) = rememberPreference(
+        DownloadLocationUriKey,
+        defaultValue = ""
+    )
+    val (qobuzAppId, onQobuzAppIdChange) = rememberPreference(QobuzAppIdKey, "")
+    val (qobuzAppSecret, onQobuzAppSecretChange) = rememberPreference(QobuzAppSecretKey, "")
+    val (qobuzTokenPool, onQobuzTokenPoolChange) = rememberPreference(QobuzUserAuthTokenKey, "")
+
+    val flacFolderPath = remember(downloadLocationUri, context) {
+        if (downloadLocationUri.isBlank()) null else runCatching {
+            val uri = Uri.parse(downloadLocationUri)
+            val docFile = DocumentFile.fromTreeUri(context, uri)
+            docFile?.name?.takeIf { it.isNotBlank() } ?: uri.lastPathSegment?.substringAfterLast(":")?.takeIf { it.isNotBlank() } ?: downloadLocationUri
+        }.getOrNull() ?: downloadLocationUri
+    }
+
+    val folderPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree(),
+        onResult = { uri ->
+            uri?.let {
+                onDownloadLocationUriChange(it.toString())
+                try {
+                    context.contentResolver.takePersistableUriPermission(
+                        it,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                } catch (e: SecurityException) {
+                    Toast.makeText(context, context.getString(R.string.folder_persist_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    )
+
     val (crossfadeEnabled, onCrossfadeEnabledChange) = rememberPreference(
         CrossfadeEnabledKey,
         defaultValue = false
@@ -223,13 +302,12 @@ fun PlayerSettings(
         defaultValue = 30f
     )
 
-    var showAudioQualityDialog by remember {
-        mutableStateOf(false)
-    }
-
-    var showLoudnessLevelDialog by remember {
-        mutableStateOf(false)
-    }
+    var showAudioQualityDialog by remember { mutableStateOf(false) }
+    var showPlaybackSourceDialog by remember { mutableStateOf(false) }
+    var showFlacStreamingQualityDialog by remember { mutableStateOf(false) }
+    var showFlacDownloadQualityDialog by remember { mutableStateOf(false) }
+    var showLoudnessLevelDialog by remember { mutableStateOf(false) }
+    var showQobuzCredentialsDialog by remember { mutableStateOf(false) }
 
     if (showAudioQualityDialog) {
         EnumDialog(
@@ -251,6 +329,65 @@ fun PlayerSettings(
         )
     }
 
+    if (showPlaybackSourceDialog) {
+        EnumDialog(
+            onDismiss = { showPlaybackSourceDialog = false },
+            onSelect = {
+                onPlaybackSourceChange(it)
+                showPlaybackSourceDialog = false
+            },
+            title = stringResource(R.string.playback_source),
+            current = playbackSource,
+            values = PlaybackSource.values().toList(),
+            valueText = {
+                when (it) {
+                    PlaybackSource.YT_MUSIC -> stringResource(R.string.playback_source_yt)
+                    PlaybackSource.FLAC -> stringResource(R.string.playback_source_flac)
+                }
+            }
+        )
+    }
+
+    if (showFlacStreamingQualityDialog) {
+        EnumDialog(
+            onDismiss = { showFlacStreamingQualityDialog = false },
+            onSelect = {
+                onFlacStreamingQualityChange(it)
+                showFlacStreamingQualityDialog = false
+            },
+            title = stringResource(R.string.flac_streaming_quality),
+            current = flacStreamingQuality,
+            values = FlacQuality.values().toList(),
+            valueText = {
+                when (it) {
+                    FlacQuality.CD -> stringResource(R.string.flac_quality_cd)
+                    FlacQuality.HI_RES -> stringResource(R.string.flac_quality_hi_res)
+                    FlacQuality.MAX -> stringResource(R.string.flac_quality_max)
+                }
+            }
+        )
+    }
+
+    if (showFlacDownloadQualityDialog) {
+        EnumDialog(
+            onDismiss = { showFlacDownloadQualityDialog = false },
+            onSelect = {
+                onFlacDownloadQualityChange(it)
+                showFlacDownloadQualityDialog = false
+            },
+            title = stringResource(R.string.flac_download_quality),
+            current = flacDownloadQuality,
+            values = FlacQuality.values().toList(),
+            valueText = {
+                when (it) {
+                    FlacQuality.CD -> stringResource(R.string.flac_quality_cd)
+                    FlacQuality.HI_RES -> stringResource(R.string.flac_quality_hi_res)
+                    FlacQuality.MAX -> stringResource(R.string.flac_quality_max)
+                }
+            }
+        )
+    }
+
     if (showLoudnessLevelDialog) {
         EnumDialog(
             onDismiss = { showLoudnessLevelDialog = false },
@@ -262,6 +399,37 @@ fun PlayerSettings(
             current = loudnessLevel,
             values = LoudnessLevel.values().toList(),
             valueText = { getLoudnessLevelLabel(it) }
+        )
+    }
+
+    if (showQobuzCredentialsDialog) {
+        DefaultDialog(
+            onDismiss = { showQobuzCredentialsDialog = false },
+            title = { Text(stringResource(R.string.qobuz_credentials)) },
+            content = {
+                Column {
+                    OutlinedTextField(
+                        value = qobuzAppId,
+                        onValueChange = onQobuzAppIdChange,
+                        label = { Text(stringResource(R.string.qobuz_app_id)) },
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                    OutlinedTextField(
+                        value = qobuzAppSecret,
+                        onValueChange = onQobuzAppSecretChange,
+                        label = { Text(stringResource(R.string.qobuz_app_secret)) },
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                    OutlinedTextField(
+                        value = qobuzTokenPool,
+                        onValueChange = onQobuzTokenPoolChange,
+                        label = { Text(stringResource(R.string.qobuz_token_pool)) },
+                        supportingText = { Text(stringResource(R.string.qobuz_token_pool_desc)) },
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        minLines = 3
+                    )
+                }
+            }
         )
     }
 
@@ -282,6 +450,108 @@ fun PlayerSettings(
                 )
             )
         )
+
+        // Lossless section - new useful feature
+        Material3SettingsGroup(
+            title = stringResource(R.string.lossless_integration),
+            items = buildList {
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.graphic_eq),
+                    title = { Text(stringResource(R.string.playback_source)) },
+                    description = {
+                        Text(
+                            when (playbackSource) {
+                                PlaybackSource.YT_MUSIC -> stringResource(R.string.playback_source_yt)
+                                PlaybackSource.FLAC -> stringResource(R.string.playback_source_flac)
+                            }
+                        )
+                    },
+                    onClick = { showPlaybackSourceDialog = true }
+                ))
+                if (playbackSource == PlaybackSource.FLAC) {
+                    add(Material3SettingsItem(
+                        icon = painterResource(R.drawable.graphic_eq),
+                        title = { Text(stringResource(R.string.flac_streaming_quality)) },
+                        description = {
+                            Text(
+                                when (flacStreamingQuality) {
+                                    FlacQuality.CD -> stringResource(R.string.flac_quality_cd)
+                                    FlacQuality.HI_RES -> stringResource(R.string.flac_quality_hi_res)
+                                    FlacQuality.MAX -> stringResource(R.string.flac_quality_max)
+                                }
+                            )
+                        },
+                        onClick = { showFlacStreamingQualityDialog = true }
+                    ))
+                    add(Material3SettingsItem(
+                        icon = painterResource(R.drawable.download),
+                        title = { Text(stringResource(R.string.flac_download_quality)) },
+                        description = {
+                            Text(
+                                when (flacDownloadQuality) {
+                                    FlacQuality.CD -> stringResource(R.string.flac_quality_cd)
+                                    FlacQuality.HI_RES -> stringResource(R.string.flac_quality_hi_res)
+                                    FlacQuality.MAX -> stringResource(R.string.flac_quality_max)
+                                }
+                            )
+                        },
+                        onClick = { showFlacDownloadQualityDialog = true }
+                    ))
+                    add(Material3SettingsItem(
+                        icon = painterResource(R.drawable.cached),
+                        title = { Text(stringResource(R.string.memory_cache_toggle)) },
+                        description = { Text(stringResource(R.string.memory_cache_toggle_desc)) },
+                        trailingContent = {
+                            Switch(
+                                checked = memoryCacheToggle,
+                                onCheckedChange = onMemoryCacheToggleChange,
+                                thumbContent = {
+                                    Icon(
+                                        painter = painterResource(id = if (memoryCacheToggle) R.drawable.check else R.drawable.close),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(SwitchDefaults.IconSize)
+                                    )
+                                }
+                            )
+                        },
+                        onClick = { onMemoryCacheToggleChange(!memoryCacheToggle) }
+                    ))
+                    add(Material3SettingsItem(
+                        icon = painterResource(R.drawable.cloud),
+                        title = { Text(stringResource(R.string.select_flac_download_folder)) },
+                        description = { Text(flacFolderPath ?: stringResource(R.string.select_flac_download_folder)) },
+                        onClick = { folderPickerLauncher.launch(null) }
+                    ))
+                    add(Material3SettingsItem(
+                        icon = painterResource(R.drawable.key),
+                        title = { Text(stringResource(R.string.qobuz_credentials)) },
+                        description = { Text(if (qobuzTokenPool.isNotBlank()) "Configured (${qobuzTokenPool.split(",").size} tokens)" else stringResource(R.string.qobuz_token_pool_desc)) },
+                        onClick = { showQobuzCredentialsDialog = true }
+                    ))
+                    add(Material3SettingsItem(
+                        icon = painterResource(R.drawable.graphic_eq),
+                        title = { Text(stringResource(R.string.low_data_mode_title)) },
+                        description = { Text(stringResource(R.string.low_data_mode_description)) },
+                        trailingContent = {
+                            Switch(
+                                checked = lowDataMode,
+                                onCheckedChange = onLowDataModeChange,
+                                thumbContent = {
+                                    Icon(
+                                        painter = painterResource(id = if (lowDataMode) R.drawable.check else R.drawable.close),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(SwitchDefaults.IconSize)
+                                    )
+                                }
+                            )
+                        },
+                        onClick = { onLowDataModeChange(!lowDataMode) }
+                    ))
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(27.dp))
 
         Material3SettingsGroup(
             title = stringResource(R.string.player),
@@ -521,7 +791,6 @@ fun PlayerSettings(
                     },
                     onClick = { onAudioTrackPlaybackParamsChange(!audioTrackPlaybackParams) }
                 ))
-                // Only show Cast setting in GMS builds (not in F-Droid/FOSS)
                 if (BuildConfig.CAST_AVAILABLE) {
                     add(Material3SettingsItem(
                         icon = painterResource(R.drawable.cast),
@@ -593,7 +862,6 @@ fun PlayerSettings(
             SleepTimerCustomDaysKey,
             defaultValue = "0,1,2,3,4"
         )
-        // Per-day time ranges used in custom mode
         val (sleepTimerDayTimes, onSleepTimerDayTimesChange) = rememberPreference(
             SleepTimerDayTimesKey,
             defaultValue = ""

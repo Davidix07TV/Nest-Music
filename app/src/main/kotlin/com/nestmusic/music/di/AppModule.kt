@@ -208,4 +208,90 @@ object AppModule {
         @ApplicationContext context: Context,
         client: ListenTogetherClient,
     ): ListenTogetherManager = ListenTogetherManager(client, context)
+
+    // --- Lossless / Hi-Res stack ---
+    @Singleton
+    @Provides
+    fun provideFlacConfig(
+        @ApplicationContext context: Context
+    ): com.nestmusic.music.lossless.FlacConfig = com.nestmusic.music.lossless.FlacConfigImpl(context)
+
+    @Singleton
+    @Provides
+    fun provideFlacKvStore(
+        @ApplicationContext context: Context
+    ): com.nestmusic.music.lossless.FlacKvStore = com.nestmusic.music.lossless.FlacKvStoreImpl(context)
+
+    @Singleton
+    @Provides
+    fun provideQbdlxSigner(): com.nestmusic.music.lossless.qbdlx.QbdlxSigner =
+        com.nestmusic.music.lossless.qbdlx.QbdlxSigner()
+
+    @Singleton
+    @Provides
+    fun provideQbdlxPoolProvider(
+        config: com.nestmusic.music.lossless.FlacConfig
+    ): com.nestmusic.music.lossless.qbdlx.QbdlxPoolProvider =
+        com.nestmusic.music.lossless.qbdlx.QbdlxPoolProvider { config.qbdlxTokenPool() }
+
+    @Singleton
+    @Provides
+    fun provideQbdlxCredentialStore(
+        config: com.nestmusic.music.lossless.FlacConfig,
+        kvStore: com.nestmusic.music.lossless.FlacKvStore,
+        poolProvider: com.nestmusic.music.lossless.qbdlx.QbdlxPoolProvider
+    ): com.nestmusic.music.lossless.qbdlx.QbdlxCredentialStore =
+        com.nestmusic.music.lossless.qbdlx.QbdlxCredentialStore(config, kvStore, poolProvider)
+
+    @Singleton
+    @Provides
+    fun provideQbdlxApiClient(
+        config: com.nestmusic.music.lossless.FlacConfig,
+        signer: com.nestmusic.music.lossless.qbdlx.QbdlxSigner,
+        credentialStore: com.nestmusic.music.lossless.qbdlx.QbdlxCredentialStore
+    ): com.nestmusic.music.lossless.qbdlx.QbdlxApiClient {
+        val client = okhttp3.OkHttpClient.Builder()
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+        return com.nestmusic.music.lossless.qbdlx.QbdlxApiClient(config, client, signer, credentialStore)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRateLimiter(): com.nestmusic.music.lossless.ratelimit.AggregatorRateLimiter =
+        com.nestmusic.music.lossless.ratelimit.AggregatorRateLimiter()
+
+    @Singleton
+    @Provides
+    fun provideQbdlxQobuzSource(
+        apiClient: com.nestmusic.music.lossless.qbdlx.QbdlxApiClient,
+        credentialStore: com.nestmusic.music.lossless.qbdlx.QbdlxCredentialStore,
+        rateLimiter: com.nestmusic.music.lossless.ratelimit.AggregatorRateLimiter,
+        config: com.nestmusic.music.lossless.FlacConfig
+    ): com.nestmusic.music.lossless.qbdlx.QbdlxQobuzSource =
+        com.nestmusic.music.lossless.qbdlx.QbdlxQobuzSource(apiClient, credentialStore, rateLimiter, config)
+
+    @Singleton
+    @Provides
+    fun provideQbdlxStreamResolver(
+        source: com.nestmusic.music.lossless.qbdlx.QbdlxQobuzSource
+    ): com.nestmusic.music.lossless.streaming.QbdlxStreamResolver =
+        com.nestmusic.music.lossless.streaming.QbdlxStreamResolver(source)
+
+    @Singleton
+    @Provides
+    fun provideFlacStreamRegistry(
+        qbdlxResolver: com.nestmusic.music.lossless.streaming.QbdlxStreamResolver
+    ): com.nestmusic.music.lossless.streaming.FlacStreamRegistry =
+        com.nestmusic.music.lossless.streaming.FlacStreamRegistry(
+            qbdlx = { query, quality -> qbdlxResolver.resolve(query, quality) }
+        )
+
+    @Singleton
+    @Provides
+    fun provideLosslessStreamResolver(
+        registry: com.nestmusic.music.lossless.streaming.FlacStreamRegistry
+    ): com.nestmusic.music.lossless.FlacCoreLosslessStreamResolver =
+        com.nestmusic.music.lossless.FlacCoreLosslessStreamResolver(registry)
 }

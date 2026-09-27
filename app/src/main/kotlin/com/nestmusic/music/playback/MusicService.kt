@@ -208,6 +208,15 @@ import com.nestmusic.music.playback.queues.filterExplicit
 import com.nestmusic.music.playback.queues.filterVideoSongs
 import com.nestmusic.music.constants.LoudnessLevel
 import com.nestmusic.music.constants.LoudnessLevelKey
+import com.nestmusic.music.constants.PlaybackSource
+import com.nestmusic.music.constants.FlacQuality
+import com.nestmusic.music.constants.PlaybackSourceKey
+import com.nestmusic.music.constants.FlacStreamingQualityKey
+import com.nestmusic.music.constants.EnableLosslessKey
+import com.nestmusic.music.constants.MemoryCacheToggleKey
+import com.nestmusic.music.constants.LowDataModeKey
+import com.nestmusic.music.lossless.FlacCoreLosslessStreamResolver
+import com.nestmusic.music.lossless.model.FlacStreamUrl
 import com.nestmusic.music.utils.CoilBitmapLoader
 import com.nestmusic.music.utils.NetworkConnectivityObserver
 import com.nestmusic.music.utils.ScrobbleManager
@@ -398,6 +407,19 @@ class MusicService :
     @Inject
     @DownloadCache
     lateinit var downloadCache: Cache
+
+    @Inject
+    lateinit var losslessResolver: FlacCoreLosslessStreamResolver
+
+    // Lossless memory cache: mediaId + source -> FlacStreamUrl
+    private val losslessMemoryCache = object : LinkedHashMap<String, FlacStreamUrl>(32, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, FlacStreamUrl>): Boolean = size > 64
+    }
+    private val losslessCacheLock = Any()
+    @Volatile private var enableMemoryCache: Boolean = false
+    @Volatile private var currentPlaybackSource: PlaybackSource = PlaybackSource.YT_MUSIC
+    @Volatile private var flacStreamingQuality: FlacQuality = FlacQuality.CD
+    @Volatile private var isLowDataEnabled: Boolean = false
 
     lateinit var player: ExoPlayer
         private set
@@ -752,6 +774,18 @@ class MusicService :
             if (value == "VERY_HIGH") com.nestmusic.music.constants.AudioQuality.HIGH
             else com.nestmusic.music.constants.AudioQuality.entries.find { it.name == value }
         } ?: com.nestmusic.music.constants.AudioQuality.AUTO
+
+        currentPlaybackSource = startupPrefs!![PlaybackSourceKey]?.let { v ->
+            PlaybackSource.entries.find { it.name == v }
+        } ?: PlaybackSource.YT_MUSIC
+
+        flacStreamingQuality = startupPrefs!![FlacStreamingQualityKey]?.let { v ->
+            FlacQuality.entries.find { it.name == v }
+        } ?: FlacQuality.CD
+
+        enableMemoryCache = startupPrefs!![MemoryCacheToggleKey] ?: false
+        isLowDataEnabled = startupPrefs!![LowDataModeKey] ?: false
+
         playerVolume = MutableStateFlow((startupPrefs!![PlayerVolumeKey] ?: 1f).coerceIn(0f, 1f))
 
         initializeCast()
@@ -843,6 +877,40 @@ class MusicService :
                         player.play()
                     }
                 }
+        }
+
+        // Watch playback source / FLAC quality / memory cache / low data toggles
+        scope.launch {
+            dataStore.data.map { it[PlaybackSourceKey] ?: PlaybackSource.YT_MUSIC.name }
+                .distinctUntilChanged()
+                .collect { raw ->
+                    val newSrc = PlaybackSource.entries.find { it.name == raw } ?: PlaybackSource.YT_MUSIC
+                    if (currentPlaybackSource != newSrc) {
+                        Timber.tag(TAG).i("PLAYBACK SOURCE CHANGED: $currentPlaybackSource -> $newSrc")
+                        currentPlaybackSource = newSrc
+                        synchronized(losslessCacheLock) { losslessMemoryCache.clear() }
+                    }
+                }
+        }
+        scope.launch {
+            dataStore.data.map { it[FlacStreamingQualityKey] ?: FlacQuality.CD.name }
+                .distinctUntilChanged()
+                .collect { raw ->
+                    flacStreamingQuality = FlacQuality.entries.find { it.name == raw } ?: FlacQuality.CD
+                }
+        }
+        scope.launch {
+            dataStore.data.map { it[MemoryCacheToggleKey] ?: false }
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    enableMemoryCache = enabled
+                    if (!enabled) synchronized(losslessCacheLock) { losslessMemoryCache.clear() }
+                }
+        }
+        scope.launch {
+            dataStore.data.map { it[LowDataModeKey] ?: false }
+                .distinctUntilChanged()
+                .collect { enabled -> isLowDataEnabled = enabled }
         }
 
         combine(
@@ -3775,7 +3843,7 @@ class MusicService :
                     when {
                         dataSpec.length >= 0 -> dataSpec.length
                         contentLength != null -> (contentLength - dataSpec.position).coerceAtLeast(1)
-                        else -> CHUNK_LENGTH // contentLength unknown yet � fall back to old probe size
+                        else -> CHUNK_LENGTH
                     }
 
                 if (downloadCache.isCached(mediaId, dataSpec.position, requiredLength)) {
@@ -3800,7 +3868,121 @@ class MusicService :
             }
 
             val cacheGeneration = songUrlCache.generation(mediaId)
-            Timber.tag(TAG).i("FETCHING STREAM: $mediaId | quality=$audioQuality")
+
+            // --- Lossless path (Hi-Res FLAC) ---
+            val isMetered = try {
+                connectivityManager.isActiveNetworkMetered ||
+                    (connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) == true)
+            } catch (_: Exception) { false }
+
+            val shouldBypassFlac = isLowDataEnabled && isMetered
+            val playbackSource = currentPlaybackSource
+
+            if (!shouldBypassFlac && playbackSource == PlaybackSource.FLAC) {
+                val flacCacheKey = "${mediaId}_${playbackSource.name}_${flacStreamingQuality.name}"
+
+                // Check in-memory lossless cache
+                val cachedLossless = synchronized(losslessCacheLock) {
+                    if (enableMemoryCache) losslessMemoryCache[flacCacheKey] else null
+                }?.takeIf { it.expiresAtMs > System.currentTimeMillis() + 60_000L }
+
+                if (cachedLossless != null) {
+                    Timber.tag(TAG).i("FLAC CACHE HIT: $mediaId -> ${cachedLossless.origin}")
+                    try {
+                        val headers = mapOf(
+                            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                            "Referer" to "https://music.youtube.com/"
+                        )
+                        val flacFormat = FormatEntity(
+                            id = mediaId,
+                            itag = 0,
+                            mimeType = "audio/flac",
+                            codecs = cachedLossless.codec ?: "flac",
+                            bitrate = cachedLossless.bitrateKbps ?: 0,
+                            sampleRate = cachedLossless.sampleRateHz,
+                            contentLength = 0L,
+                            loudnessDb = null,
+                            perceptualLoudnessDb = null,
+                            playbackUrl = cachedLossless.url,
+                        )
+                        database.query { upsert(flacFormat) }
+                        currentStreamClient.value = "FLAC_${cachedLossless.origin.uppercase()} ${cachedLossless.bitsPerSample ?: 16}bit/${(cachedLossless.sampleRateHz ?: 44100)/1000}kHz"
+                        recoverSongDeduped(mediaId)
+                        return@Factory dataSpec
+                            .withUri(cachedLossless.url.toUri())
+                            .subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
+                            .withRequestHeaders(dataSpec.httpRequestHeaders + headers)
+                    } catch (e: Exception) {
+                        Timber.tag(TAG).w(e, "Failed to use cached FLAC for $mediaId")
+                    }
+                }
+
+                // Check offline / local cache presence to avoid unnecessary network
+                val isOffline = connectivityManager.activeNetwork == null
+                val hasLocalCache = runCatching {
+                    playerCache.getCachedSpans(mediaId).isNotEmpty() || downloadCache.getCachedSpans(mediaId).isNotEmpty()
+                }.getOrDefault(false)
+
+                if (!isOffline && !hasLocalCache) {
+                    try {
+                        val resolved = runBlocking(Dispatchers.IO) {
+                            val song = database.song(mediaId).first()
+                                ?: database.getSongById(mediaId)
+                                ?: run {
+                                    val entity = database.songEntity(mediaId)
+                                    if (entity != null) {
+                                        Song(song = entity, artists = emptyList(), album = null)
+                                    } else null
+                                }
+                            song?.let { losslessResolver.resolve(it, flacStreamingQuality) }
+                        }
+
+                        if (resolved != null && resolved.url.isNotBlank()) {
+                            Timber.tag(TAG).i("FLAC RESOLVED: $mediaId origin=${resolved.origin} ${resolved.bitsPerSample}bit/${resolved.sampleRateHz}Hz")
+                            if (enableMemoryCache) {
+                                synchronized(losslessCacheLock) { losslessMemoryCache[flacCacheKey] = resolved }
+                            }
+                            val headers = mutableMapOf<String, String>()
+                            if (resolved.origin in listOf("squid", "kennyy", "arcod", "qobuz", "qbdlx")) {
+                                headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+                                headers["Referer"] = "https://music.youtube.com/"
+                            }
+                            val flacFormat = FormatEntity(
+                                id = mediaId,
+                                itag = 0,
+                                mimeType = "audio/flac",
+                                codecs = resolved.codec ?: "flac",
+                                bitrate = resolved.bitrateKbps ?: 0,
+                                sampleRate = resolved.sampleRateHz,
+                                contentLength = 0L,
+                                loudnessDb = null,
+                                perceptualLoudnessDb = null,
+                                playbackUrl = resolved.url,
+                            )
+                            database.query { upsert(flacFormat) }
+                            currentStreamClient.value = "FLAC_${resolved.origin.uppercase()} ${resolved.bitsPerSample ?: 16}bit/${(resolved.sampleRateHz ?: 44100)/1000}kHz"
+                            recoverSongDeduped(mediaId)
+                            return@Factory dataSpec
+                                .withUri(resolved.url.toUri())
+                                .subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
+                                .withRequestHeaders(dataSpec.httpRequestHeaders + headers)
+                        } else {
+                            Timber.tag(TAG).w("FLAC resolver returned null for $mediaId, falling back to YouTube")
+                            synchronized(losslessCacheLock) { losslessMemoryCache.remove(flacCacheKey) }
+                        }
+                    } catch (e: kotlinx.coroutines.CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.tag(TAG).e(e, "FLAC resolve failed for $mediaId")
+                        synchronized(losslessCacheLock) { losslessMemoryCache.remove(flacCacheKey) }
+                    }
+                } else {
+                    Timber.tag(TAG).d("Bypass FLAC for $mediaId offline=$isOffline hasLocalCache=$hasLocalCache")
+                }
+            }
+
+            // --- YouTube fallback ---
+            Timber.tag(TAG).i("FETCHING STREAM: $mediaId | quality=$audioQuality | source=$playbackSource")
             val playbackData =
                 runBlocking(Dispatchers.IO) {
                     val song = database.songEntity(mediaId)
@@ -3815,48 +3997,32 @@ class MusicService :
                     )
                 }.getOrElse { throwable ->
                     when (throwable) {
-                        is PlaybackException -> {
-                            throw throwable
-                        }
-
-                        is java.net.ConnectException, is java.net.UnknownHostException -> {
-                            throw PlaybackException(
-                                getString(R.string.error_no_internet),
-                                throwable,
-                                PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
-                            )
-                        }
-
-                        is java.net.SocketTimeoutException -> {
-                            throw PlaybackException(
-                                getString(R.string.error_timeout),
-                                throwable,
-                                PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT,
-                            )
-                        }
-
-                        else -> {
-                            throw PlaybackException(
-                                getString(R.string.error_unknown),
-                                throwable,
-                                PlaybackException.ERROR_CODE_REMOTE_ERROR,
-                            )
-                        }
+                        is PlaybackException -> throw throwable
+                        is java.net.ConnectException, is java.net.UnknownHostException -> throw PlaybackException(
+                            getString(R.string.error_no_internet),
+                            throwable,
+                            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+                        )
+                        is java.net.SocketTimeoutException -> throw PlaybackException(
+                            getString(R.string.error_timeout),
+                            throwable,
+                            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT,
+                        )
+                        else -> throw PlaybackException(
+                            getString(R.string.error_unknown),
+                            throwable,
+                            PlaybackException.ERROR_CODE_REMOTE_ERROR,
+                        )
                     }
                 }
 
-            val nonNullPlayback =
-                requireNotNull(playbackData) {
-                    getString(R.string.error_unknown)
-                }
+            val nonNullPlayback = requireNotNull(playbackData) { getString(R.string.error_unknown) }
             run {
                 val format = nonNullPlayback.format
                 val loudnessDb = nonNullPlayback.audioConfig?.loudnessDb
                 val perceptualLoudnessDb = nonNullPlayback.audioConfig?.perceptualLoudnessDb
 
-                Timber
-                    .tag(TAG)
-                    .d("Storing format for $mediaId with loudnessDb: $loudnessDb, perceptualLoudnessDb: $perceptualLoudnessDb")
+                Timber.tag(TAG).d("Storing format for $mediaId with loudnessDb: $loudnessDb, perceptualLoudnessDb: $perceptualLoudnessDb")
                 if (loudnessDb == null && perceptualLoudnessDb == null) {
                     Timber.tag(TAG).w("No loudness data available from YouTube for video: $mediaId")
                 }
