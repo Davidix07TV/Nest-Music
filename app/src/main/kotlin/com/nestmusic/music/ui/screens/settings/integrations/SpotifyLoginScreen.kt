@@ -43,6 +43,15 @@ private val STATUS_URL =
 private val SP_DC_COOKIE = Regex("sp_dc=([^;]+)")
 
 /**
+ * Plain mobile Chrome user agent. The WebView default carries `; wv`, which
+ * Spotify's anti-bot challenge reads as an embedded browser and answers with a
+ * page that never renders; every known-good sp_dc harvester strips it.
+ */
+private const val MOBILE_CHROME_UA =
+    "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36"
+
+/**
  * In-app sign-in for Spotify: the user types their email and password on the
  * official page, and only the resulting `sp_dc` session cookie is kept — the
  * credentials themselves never reach the app.
@@ -94,10 +103,17 @@ fun SpotifyLoginScreen(navController: NavController) {
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
+                userAgentString = MOBILE_CHROME_UA
+                useWideViewPort = true
+                loadWithOverviewMode = true
                 setSupportZoom(true)
                 builtInZoomControls = true
                 displayZoomControls = false
             }
+            // reCAPTCHA during the login flow runs on cross-site resources; with
+            // third-party cookies blocked (the WebView default) it cannot build a
+            // session and the page stays stuck on a blank challenge.
+            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
             loadUrl("https://accounts.spotify.com/login")
         }
     }
