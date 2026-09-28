@@ -154,6 +154,25 @@ jobs:
       # The GitHub runners have no libfuse2 and appimagetool is itself an AppImage, so the
       # AppImage tooling is told to extract instead of mount. Without this the appimage step
       # dies with "dlopen(): error loading libfuse.so.2".
+      #
+      # tauri-bundler writes the AppImage launcher into its cache with mode 0770
+      # (write_and_make_executable, tauri-apps/tauri#16155) and linuxdeploy's gtk plugin
+      # renames it AppRun.wrapped. A normal FUSE mount shows the image's files as owned by
+      # the user, so 0770 works everywhere except a mount that keeps the stored root
+      # ownership — which is exactly what the AppImage catalog test does (firejail), where
+      # it dies with "AppRun.wrapped: Permission denied". The bundler only downloads the
+      # launcher when it is missing from the cache, so seed a 0755 copy first.
+      - name: Seed a world-executable AppRun launcher
+        run: |
+          set -e
+          arch="$(uname -m)"
+          dir="${XDG_CACHE_HOME:-$HOME/.cache}/tauri"
+          mkdir -p "$dir"
+          curl -fsSL -o "$dir/AppRun-$arch" \
+            "https://github.com/tauri-apps/binary-releases/releases/download/apprun-old/AppRun-$arch"
+          chmod 755 "$dir/AppRun-$arch"
+          ls -la "$dir/AppRun-$arch"
+
       - name: Build Tauri bundles (AppImage + deb)
         env:
           APPIMAGE_EXTRACT_AND_RUN: '1'
@@ -236,6 +255,20 @@ jobs:
             || { echo "::error::sidecar missing from the AppImage"; exit 1; }
           test -n "$(find squashfs-root -type f -name 'node')" \
             || { echo "::error::bundled node missing from the AppImage"; exit 1; }
+
+          # The catalog test mounts the image keeping the stored root ownership (firejail),
+          # so a file only the owner can run or read is "Permission denied" there even
+          # though it works under a normal FUSE mount — the failure that broke the catalog
+          # submission (tauri-apps/tauri#16155). Owner-only access = build failure.
+          BAD_EXEC=$(find squashfs-root \( -type f -o -type d \) -perm -0100 ! -perm -0001 -print)
+          BAD_READ=$(find squashfs-root \( -type f -o -type d \) -perm -0400 ! -perm -0004 -print)
+          if [ -n "$BAD_EXEC" ] || [ -n "$BAD_READ" ]; then
+            { echo "$BAD_EXEC"; echo "$BAD_READ"; } | sed '/^$/d' | sort -u \
+              | while IFS= read -r line; do
+                  echo "::error title=appimage permissions::$line is owner-only — the catalog test mounts as root and cannot run it"
+                done
+            exit 1
+          fi
           rm -rf squashfs-root
 
       - name: Upload bundles artifact
