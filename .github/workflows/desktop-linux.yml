@@ -261,20 +261,19 @@ jobs:
           test -n "$(find squashfs-root -type f -name 'node')" \
             || { echo "::error::bundled node missing from the AppImage"; exit 1; }
 
-          # One-line histogram of directory modes so a failure is diagnosable from annotations.
-          echo "::notice title=appimage dir modes::$(find squashfs-root -type d -printf '%m\n' | sort | uniq -c | tr '\n' ' ')"
-
           # The catalog test mounts the image keeping the stored root ownership (firejail),
-          # so a file only the owner can run or read is "Permission denied" there even
+          # so anything only the owner can run or read is "Permission denied" there even
           # though it works under a normal FUSE mount — the failure that broke the catalog
           # submission (tauri-apps/tauri#16155). Owner-only access = build failure.
-          BAD_EXEC=$(find squashfs-root \( -type f -o -type d \) -perm -0100 ! -perm -0001 -print)
-          BAD_READ=$(find squashfs-root \( -type f -o -type d \) -perm -0400 ! -perm -0004 -print)
-          if [ -n "$BAD_EXEC" ] || [ -n "$BAD_READ" ]; then
-            { echo "$BAD_EXEC"; echo "$BAD_READ"; } | sed '/^$/d' | sort -u \
-              | while IFS= read -r line; do
-                  echo "::error title=appimage permissions::$line is owner-only — the catalog test mounts as root and cannot run it"
-                done
+          # A single annotation carries the whole report: the API caps annotations per step,
+          # which silently truncated the previous per-path loop.
+          BAD=$(find squashfs-root \( -type f -o -type d \) \
+                  \( \( -perm -0100 ! -perm -0001 \) -o \( -perm -0400 ! -perm -0004 \) \) \
+                  -printf '%m %p\n' | sort)
+          if [ -n "$BAD" ]; then
+            HIST=$(find squashfs-root -type d -printf '%m\n' | sort | uniq -c | tr '\n' ' ')
+            MSG="dir modes: $HIST | owner-only paths: $(echo "$BAD" | tr '\n' ';')"
+            echo "::error title=appimage permissions::${MSG:0:60000}"
             exit 1
           fi
           rm -rf squashfs-root
