@@ -180,6 +180,11 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
           set -e
+          # Directories are created masked by the current umask and keep that
+          # mode inside the squashfs; a restrictive umask ships an image whose
+          # folders are owner-only (fatal for the root-owned catalog mount).
+          echo "::notice title=umask::$(umask)"
+          umask 0022
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ]; then
             # Signed build: also emit the .AppImage.sig the in-app updater verifies. Kept out
             # of tauri.linux.conf.json so a local `tauri build` never demands a signing key.
@@ -255,6 +260,9 @@ jobs:
             || { echo "::error::sidecar missing from the AppImage"; exit 1; }
           test -n "$(find squashfs-root -type f -name 'node')" \
             || { echo "::error::bundled node missing from the AppImage"; exit 1; }
+
+          # One-line histogram of directory modes so a failure is diagnosable from annotations.
+          echo "::notice title=appimage dir modes::$(find squashfs-root -type d -printf '%m\n' | sort | uniq -c | tr '\n' ' ')"
 
           # The catalog test mounts the image keeping the stored root ownership (firejail),
           # so a file only the owner can run or read is "Permission denied" there even
