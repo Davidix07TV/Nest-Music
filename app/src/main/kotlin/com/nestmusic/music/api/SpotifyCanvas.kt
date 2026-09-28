@@ -302,10 +302,19 @@ object SpotifyCanvas {
         val cookie = spDc.trim()
         if (cookie.isEmpty() || title.isBlank()) return null
         val cacheKey = "${title.lowercase()}|${artists.firstOrNull()?.lowercase().orEmpty()}"
-        canvasCache[cacheKey]?.let { return it }
+        return cachedUrl(cacheKey) { resolve(cookie, title, artists, durationMs) }
+    }
 
-        val url = resolve(cookie, title, artists, durationMs)
-        if (canvasCache.size >= 200) canvasCache.clear()
+    /**
+     * Memoizes a Canvas lookup under [cacheKey]. A stored `null` is a cached
+     * *miss*, so presence must be checked with `containsKey`: a `?.let` on the
+     * value would treat every miss as an absent entry and re-run the whole
+     * search/canvas exchange whenever a track without a Canvas comes around.
+     */
+    internal suspend fun cachedUrl(cacheKey: String, compute: suspend () -> String?): String? {
+        if (canvasCache.containsKey(cacheKey)) return canvasCache[cacheKey]
+        val url = compute()
+        if (canvasCache.size >= 200) canvasCache.clear() // crude bound; entries are tiny
         canvasCache[cacheKey] = url
         return url
     }

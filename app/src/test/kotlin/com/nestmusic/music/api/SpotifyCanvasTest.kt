@@ -5,6 +5,7 @@
 
 package com.nestmusic.music.api
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import org.junit.Assert.assertArrayEquals
@@ -121,5 +122,34 @@ class SpotifyCanvasTest {
             emptyList<Pair<String, Long>>(),
             SpotifyCanvas.parseSearchTrackCandidates(parse("""{"errors":[]}""")),
         )
+    }
+
+    // Result caching — misses are results too
+    @Test
+    fun `a cached miss is served from cache instead of resolving again`() = runBlocking {
+        var computes = 0
+        val first = SpotifyCanvas.cachedUrl("test-miss-key") { computes++; null }
+        val second = SpotifyCanvas.cachedUrl("test-miss-key") { computes++; null }
+        assertNull(first)
+        assertNull(second)
+        assertEquals("a stored null must be a cache hit", 1, computes)
+    }
+
+    @Test
+    fun `a cached hit is served from cache`() = runBlocking {
+        var computes = 0
+        val first = SpotifyCanvas.cachedUrl("test-hit-key") { computes++; "url" }
+        val second = SpotifyCanvas.cachedUrl("test-hit-key") { computes++; "other" }
+        assertEquals("url", first)
+        assertEquals("url", second)
+        assertEquals(1, computes)
+    }
+
+    @Test
+    fun `different keys resolve independently`() = runBlocking {
+        assertEquals("a", SpotifyCanvas.cachedUrl("test-key-a") { "a" })
+        assertEquals("b", SpotifyCanvas.cachedUrl("test-key-b") { "b" })
+        assertEquals("a", SpotifyCanvas.cachedUrl("test-key-a") { "changed" })
+        assertEquals("b", SpotifyCanvas.cachedUrl("test-key-b") { "changed" })
     }
 }
