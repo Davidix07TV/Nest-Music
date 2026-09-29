@@ -256,8 +256,7 @@ jobs:
 
           echo "── deb control ──"
           dpkg-deb -I out/*.deb
-          dpkg-deb -f out/*.deb Package Version Architecture Depends \
-            | while IFS= read -r line; do notice "deb control" "$line"; done
+          notice "deb control" "$(dpkg-deb -f out/*.deb Package Version Architecture Depends | joined)"
 
           echo "── deb contents (key files) ──"
           dpkg-deb -c out/*.deb | awk '{print $6}' \
