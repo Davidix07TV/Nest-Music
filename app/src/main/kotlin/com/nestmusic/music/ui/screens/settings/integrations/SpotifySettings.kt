@@ -5,6 +5,9 @@
 
 package com.nestmusic.music.ui.screens.settings.integrations
 
+import android.content.Intent
+import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -30,11 +33,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.api.SpotifyCanvas
 import com.nestmusic.music.R
 import com.nestmusic.music.constants.SpotifyCanvasEnabledKey
 import com.nestmusic.music.constants.SpotifySpDcKey
@@ -43,7 +49,11 @@ import com.nestmusic.music.ui.component.IconButton
 import com.nestmusic.music.ui.component.Material3SettingsGroup
 import com.nestmusic.music.ui.component.Material3SettingsItem
 import com.nestmusic.music.ui.utils.backToMain
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import com.nestmusic.music.utils.rememberPreference
+
+private const val SPOTIFY_LOGIN_URL = "https://accounts.spotify.com/login"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +69,9 @@ fun SpotifySettings(
         defaultValue = ""
     )
 
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     var showSpDcDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showSpDcDialog) {
@@ -70,8 +83,36 @@ fun SpotifySettings(
             buttons = {
                 TextButton(
                     onClick = {
-                        onSpDcChange(tempSpDc.trim())
+                        val candidate = tempSpDc.trim()
+                        if (candidate.isEmpty()) {
+                            Toast.makeText(
+                                context,
+                                R.string.spotify_sp_dc_empty,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                            return@TextButton
+                        }
+                        onSpDcChange(candidate)
                         showSpDcDialog = false
+                        // A cookie can save perfectly and still be dead: Canvas
+                        // then returns nothing for every song and nothing on
+                        // screen says why. Check it against the real token
+                        // exchange and report what Spotify actually said.
+                        scope.launch {
+                            val accepted = runCatching {
+                                SpotifyCanvas.exchangeToken(candidate)
+                            }.onFailure { Timber.tag("SpotifySettings").w(it, "cookie rejected") }
+                                .isSuccess
+                            Toast.makeText(
+                                context,
+                                if (accepted) {
+                                    R.string.spotify_sp_dc_ok
+                                } else {
+                                    R.string.spotify_sp_dc_rejected
+                                },
+                                Toast.LENGTH_LONG,
+                            ).show()
+                        }
                     }
                 ) {
                     Text(stringResource(R.string.save))
@@ -149,7 +190,18 @@ fun SpotifySettings(
                         title = { Text(stringResource(R.string.spotify_log_in)) },
                         description = { Text(stringResource(R.string.spotify_log_in_desc)) },
                         onClick = {
-                            navController.navigate("settings/integrations/spotify_login")
+                            // Not a WebView: accounts.spotify.com loads reCAPTCHA
+                            // Enterprise, which calls requestStorageAccess() — an
+                            // API the Android WebView cannot satisfy, so the page
+                            // always ends up blank (Console: "requestStorageAccess:
+                            // Permission denied"). The user's own browser can, so
+                            // sign in there and paste the cookie below.
+                            val intent = CustomTabsIntent.Builder().build().intent.apply {
+                                data = SPOTIFY_LOGIN_URL.toUri()
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            runCatching { context.startActivity(intent) }
+                                .onFailure { Timber.tag("SpotifySettings").w(it, "no browser") }
                         }
                     )
                 } else {

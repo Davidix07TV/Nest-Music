@@ -1201,11 +1201,13 @@
     <string name="spotify_canvas_title">Canvas videos</string>
     <string name="spotify_canvas_desc">Loop short videos in the player when a song has one</string>
     <string name="spotify_log_in">Log in to Spotify</string>
-    <string name="spotify_log_in_desc">Sign in with your email and password on Spotify\'s official page</string>
     <string name="spotify_logged_in">Connected to Spotify</string>
     <string name="spotify_log_out_desc">Tap to disconnect</string>
     <string name="spotify_sp_dc">Session cookie</string>
     <string name="spotify_sp_dc_set">Cookie saved</string>
     <string name="spotify_sp_dc_help">Paste the sp_dc cookie of open.spotify.com from your browser\'s cookies</string>
-    <string name="spotify_login_not_completed">Sign-in did not finish: no session cookie was found. Nothing was saved — you can paste one manually below instead.</string>
+    <string name="spotify_sp_dc_empty">Paste a cookie first</string>
+    <string name="spotify_sp_dc_ok">Cookie accepted by Spotify</string>
+    <string name="spotify_sp_dc_rejected">Spotify rejected this cookie. Copy it again from a session you just signed in to.</string>
+    <string name="spotify_log_in_desc">Sign in on Spotify\'s site in your browser, then paste the session cookie below</string>
 </resources>
