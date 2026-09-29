@@ -77,15 +77,12 @@ import coil3.request.ImageRequest
 import com.nestmusic.music.LocalListenTogetherManager
 import com.nestmusic.music.LocalPlayerConnection
 import com.nestmusic.music.R
-import com.nestmusic.music.api.SpotifyCanvas
 import com.nestmusic.music.constants.CropAlbumArtKey
 import com.nestmusic.music.constants.HidePlayerThumbnailKey
 import com.nestmusic.music.constants.PlayerBackgroundStyle
 import com.nestmusic.music.constants.PlayerBackgroundStyleKey
 import com.nestmusic.music.constants.PlayerHorizontalPadding
 import com.nestmusic.music.constants.SeekExtraSeconds
-import com.nestmusic.music.constants.SpotifyCanvasEnabledKey
-import com.nestmusic.music.constants.SpotifySpDcKey
 import com.nestmusic.music.constants.SwipeThumbnailKey
 import com.nestmusic.music.constants.ThumbnailCornerRadius
 import com.nestmusic.music.ui.theme.useNestUi
@@ -584,11 +581,6 @@ private fun ThumbnailItem(
                     artworkUri = artworkUriToUse,
                     cropArtwork = cropAlbumArt
                 )
-                CanvasOverlay(
-                    item = item,
-                    playerConnection = playerConnection,
-                    isCurrent = item.mediaId == currentMediaId,
-                )
             }
             
             // Cast button at top-right corner of thumbnail
@@ -673,76 +665,5 @@ private fun SeekEffectOverlay(
         modifier = modifier
             .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
             .padding(8.dp)
-    )
-}
-
-/**
- * Looping Canvas video layered over the artwork of the item that is
- * actually playing. Renders nothing until a url has been resolved and
- * swallows every lookup failure — Canvas is purely decorative.
- */
-@Composable
-private fun CanvasOverlay(
-    item: MediaItem,
-    playerConnection: com.nestmusic.music.playback.PlayerConnection,
-    isCurrent: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    if (!isCurrent) return
-    val canvasEnabled by rememberPreference(SpotifyCanvasEnabledKey, false)
-    val (spDc, _) = rememberPreference(SpotifySpDcKey, "")
-    if (!canvasEnabled || spDc.isBlank()) return
-
-    val title = item.mediaMetadata.title?.toString().orEmpty()
-    if (title.isBlank()) return
-    val artists = buildList {
-        item.mediaMetadata.artist?.toString()?.let { add(it) }
-        item.mediaMetadata.albumArtist?.toString()?.let { add(it) }
-    }.distinct()
-    val durationMs = item.mediaMetadata.durationMs ?: 0L
-    val mediaId = item.mediaId
-
-    var canvasUrl by remember(mediaId) { mutableStateOf<String?>(null) }
-    LaunchedEffect(mediaId, canvasEnabled, spDc) {
-        canvasUrl = null
-        canvasUrl = SpotifyCanvas.canvasUrlFor(spDc, title, artists, durationMs)
-    }
-    val url = canvasUrl ?: return
-    val isPlaying by playerConnection.isPlaying.collectAsState()
-    CanvasVideo(url = url, isPlaying = isPlaying, modifier = modifier.fillMaxSize())
-}
-
-/**
- * Muted, looping, cropped-to-fill player for one Canvas video. The video
- * follows the playback state and is released as soon as it leaves composition.
- */
-@Composable
-private fun CanvasVideo(
-    url: String,
-    isPlaying: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-    val exoPlayer = remember(url) {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(url))
-            repeatMode = Player.REPEAT_MODE_ALL
-            volume = 0f
-            playWhenReady = true
-            setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
-            prepare()
-        }
-    }
-    DisposableEffect(url) {
-        onDispose { exoPlayer.release() }
-    }
-    LaunchedEffect(isPlaying) {
-        exoPlayer.playWhenReady = isPlaying
-    }
-    AndroidView(
-        factory = { viewContext ->
-            SurfaceView(viewContext).also { exoPlayer.setVideoSurfaceView(it) }
-        },
-        modifier = modifier,
     )
 }
