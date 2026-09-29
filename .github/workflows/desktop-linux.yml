@@ -216,6 +216,43 @@ jobs:
         run: |
           set -e
           notice() { echo "::notice title=$1::$2"; }
+          # One annotation per fact, never per file. GitHub caps annotations per step and
+          # silently drops the overflow: that is what truncated the original per-path loop
+          # and what swallowed a first version of the mode histograms below.
+          joined() { tr '\n' ';' | cut -c1-4000; }
+          mode_hist() { find "$1" -type "$2" -printf '%m\n' | sort | uniq -c \
+                          | awk '{printf "%s x%s   ", $2, $1}'; }
+
+          # ── AppImage: unpack it twice, on purpose ────────────────────────────
+          # /tmp/sq is what the squashfs payload actually stores; squashfs-root is what
+          # `--appimage-extract` copies out of it. They are not the same tree — the
+          # extraction masks the stored modes, which is what made 659 clean directories
+          # read as 0700 and failed this build for days. The verdict below is computed on
+          # the stored modes and emitted first, so it cannot be dropped by the cap.
+          APPIMAGE=$(ls out/*.AppImage | head -1)
+          OFFSET=$("$APPIMAGE" --appimage-offset) \
+            || { echo "::error::cannot read the AppImage offset"; exit 1; }
+          APPIMAGE_EXTRACT_AND_RUN=1 sh -c './out/*.AppImage --appimage-extract' >/dev/null
+          test -d squashfs-root || { echo "::error::the AppImage produced no squashfs-root"; exit 1; }
+          rm -rf /tmp/sq
+          # umask 000 so unsquashfs' own file creation cannot mask the bits it restores.
+          ( umask 000; unsquashfs -d /tmp/sq -o "$OFFSET" "$APPIMAGE" >/dev/null ) \
+            || { echo "::error::unsquashfs could not read the payload"; exit 1; }
+          test -d /tmp/sq || { echo "::error::unsquashfs produced no tree"; exit 1; }
+
+          notice "appimage modes" \
+            "stored dirs[$(mode_hist /tmp/sq d)] stored files[$(mode_hist /tmp/sq f)] | extracted dirs[$(mode_hist squashfs-root d)] extracted files[$(mode_hist squashfs-root f)]"
+
+          # The catalog test mounts the image keeping the stored root ownership (firejail),
+          # so anything only the owner can run or read is "Permission denied" there even
+          # though it works under a normal FUSE mount. Owner-only access = build failure.
+          BAD=$(find /tmp/sq \( -type f -o -type d \) \
+                  \( \( -perm -0100 ! -perm -0001 \) -o \( -perm -0400 ! -perm -0004 \) \) \
+                  -printf '%m %y %p\n' | sort)
+          if [ -n "$BAD" ]; then
+            echo "::error title=appimage permissions::owner-only paths (stored): $(echo "$BAD" | joined)"
+            exit 1
+          fi
 
           echo "── deb control ──"
           dpkg-deb -I out/*.deb
@@ -226,14 +263,13 @@ jobs:
           dpkg-deb -c out/*.deb | awk '{print $6}' \
             | grep -E '/(nest-music|nest-music-server|node)$|potgen/server/build/main\.js$|\.desktop$' \
             | sort -u | tee /tmp/deb-layout.txt
-          while IFS= read -r line; do notice "deb layout" "$line"; done < /tmp/deb-layout.txt
+          notice "deb layout" "$(joined < /tmp/deb-layout.txt)"
 
           echo "── AppImage contents ──"
-          APPIMAGE_EXTRACT_AND_RUN=1 sh -c './out/*.AppImage --appimage-extract' >/dev/null
           find squashfs-root \( -name 'nest-music-server*' -o -name 'node' -o -name '*.desktop' \
                                -o -path '*potgen/server/build/main.js' \) -printf '%p\n' \
             | sort -u | tee /tmp/appimage-layout.txt
-          while IFS= read -r line; do notice "appimage layout" "$line"; done < /tmp/appimage-layout.txt
+          notice "appimage layout" "$(joined < /tmp/appimage-layout.txt)"
 
           # server.rs resolves node/potgen relative to the directory holding the sidecar, so
           # both being siblings is the invariant worth reporting.
@@ -253,8 +289,7 @@ jobs:
           # The deep-link scheme has to be registered for nest-music:// URLs to reach the app.
           DESKTOP=$(find squashfs-root -name '*.desktop' | head -1)
           if [ -n "$DESKTOP" ]; then
-            grep -E '^(Name|Exec|Icon|Categories|MimeType)=' "$DESKTOP" \
-              | while IFS= read -r line; do notice "desktop entry" "$line"; done
+            notice "desktop entry" "$(grep -E '^(Name|Exec|Icon|Categories|MimeType)=' "$DESKTOP" | joined)"
           else
             echo "::warning title=desktop entry::no .desktop file found in the AppImage"
           fi
@@ -264,41 +299,6 @@ jobs:
           test -n "$(find squashfs-root -type f -name 'node')" \
             || { echo "::error::bundled node missing from the AppImage"; exit 1; }
 
-          # Permissions are read from the squashfs payload itself, never from the tree
-          # `--appimage-extract` produces. That copy goes through the runtime's extraction
-          # path, and the two disagreed badly: the copy showed 659 directories at 0700
-          # while every file was fine, a signature no real bundler bug produces — the
-          # genuine one (tauri-apps/tauri#16155, AppRun.wrapped at 0770) is selective.
-          # umask 000 around unsquashfs removes any chance that its own file creation
-          # masks the bits it is supposed to restore, so what comes out is what is stored.
-          APPIMAGE=$(ls out/*.AppImage | head -1)
-          OFFSET=$("$APPIMAGE" --appimage-offset) \
-            || { echo "::error::cannot read the AppImage offset"; exit 1; }
-          echo "::notice title=appimage offset::$OFFSET"
-          rm -rf /tmp/sq
-          ( umask 000; unsquashfs -d /tmp/sq -o "$OFFSET" "$APPIMAGE" >/dev/null ) \
-            || { echo "::error::unsquashfs could not read the payload"; exit 1; }
-          test -d /tmp/sq \
-            || { echo "::error::unsquashfs produced no tree"; exit 1; }
-
-          mode_hist() { find "$1" -type "$2" -printf '%m\n' | sort | uniq -c | tr '\n' ' '; }
-          echo "::notice title=stored dir modes::$(mode_hist /tmp/sq d)"
-          echo "::notice title=stored file modes::$(mode_hist /tmp/sq f)"
-          echo "::notice title=extracted dir modes::$(mode_hist squashfs-root d)"
-
-          # The catalog test mounts the image keeping the stored root ownership (firejail),
-          # so anything only the owner can run or read is "Permission denied" there even
-          # though it works under a normal FUSE mount. Owner-only access = build failure.
-          # One annotation carries the whole report: the API caps annotations per step,
-          # which silently truncated the previous per-path loop.
-          BAD=$(find /tmp/sq \( -type f -o -type d \) \
-                  \( \( -perm -0100 ! -perm -0001 \) -o \( -perm -0400 ! -perm -0004 \) \) \
-                  -printf '%m %y %p\n' | sort)
-          if [ -n "$BAD" ]; then
-            MSG="owner-only paths (stored): $(echo "$BAD" | tr '\n' ';')"
-            echo "::error title=appimage permissions::${MSG:0:60000}"
-            exit 1
-          fi
           rm -rf squashfs-root /tmp/sq
 
       - name: Upload bundles artifact
