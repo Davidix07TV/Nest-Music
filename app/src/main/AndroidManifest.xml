@@ -191,6 +191,23 @@
         </activity-alias>
 
         <activity
+            android:name=".spotify.SpotifyOAuthActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="nestmusic" />
+                <data android:host="spotify" />
+                <data android:pathPrefix="/callback" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".discord.DiscordOAuthActivity"
             android:exported="true"
             android:launchMode="singleTask"

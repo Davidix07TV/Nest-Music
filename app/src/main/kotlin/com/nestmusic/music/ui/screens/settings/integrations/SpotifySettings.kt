@@ -41,7 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.nestmusic.music.LocalPlayerAwareWindowInsets
+import com.nestmusic.music.BuildConfig
 import com.nestmusic.music.api.SpotifyCanvas
+import com.nestmusic.music.constants.SpotifyAccessTokenKey
+import com.nestmusic.music.spotify.SpotifyAuth
+import com.nestmusic.music.spotify.SpotifyOAuthActivity
 import com.nestmusic.music.R
 import com.nestmusic.music.constants.SpotifyCanvasEnabledKey
 import com.nestmusic.music.constants.SpotifySpDcKey
@@ -54,7 +58,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.nestmusic.music.utils.rememberPreference
 
-private const val SPOTIFY_LOGIN_URL = "https://accounts.spotify.com/login"
+private const val TAG = "SpotifySettings"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,9 +73,68 @@ fun SpotifySettings(
         key = SpotifySpDcKey,
         defaultValue = ""
     )
+    val (accessToken, onAccessTokenChange) = rememberPreference(
+        key = SpotifyAccessTokenKey,
+        defaultValue = ""
+    )
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    /**
+     * Sign in with Spotify in the real browser and take the result back
+     * through the redirect. Nothing is read out of the tab: its cookie store
+     * belongs to the browser process and no API exposes it. What crosses back
+     * is the authorization code, exchanged here for a token we own.
+     */
+    fun signIn() {
+        val clientId = BuildConfig.SPOTIFY_CLIENT_ID
+        if (clientId.isBlank()) {
+            Toast.makeText(context, R.string.spotify_login_not_configured, Toast.LENGTH_LONG).show()
+            return
+        }
+        scope.launch {
+            val pkce = SpotifyAuth.generatePkcePair()
+            val state = SpotifyAuth.generateState()
+            SpotifyOAuthActivity.newDeferred()
+            val intent = CustomTabsIntent.Builder().build().intent.apply {
+                data = SpotifyAuth.authorizeUrl(clientId, state, pkce.challenge).toUri()
+                addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            val launched = runCatching { context.startActivity(intent) }
+            if (launched.isFailure) {
+                Timber.tag(TAG).w(launched.exceptionOrNull(), "signIn: no browser available")
+                Toast.makeText(context, R.string.spotify_login_no_browser, Toast.LENGTH_LONG).show()
+                return@launch
+            }
+
+            val callback = runCatching { SpotifyOAuthActivity.awaitCallback() }
+                .getOrElse {
+                    Timber.tag(TAG).d("signIn: no redirect came back")
+                    Toast.makeText(context, R.string.spotify_login_cancelled, Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+            if (callback.state != state) {
+                Toast.makeText(context, R.string.spotify_login_state_mismatch, Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            val code = callback.code
+            if (callback.error != null || code == null) {
+                Toast.makeText(context, R.string.spotify_login_denied, Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            runCatching { SpotifyAuth.exchangeCode(clientId, code, pkce.verifier) }
+                .onSuccess { token ->
+                    onAccessTokenChange(token.accessToken)
+                    Toast.makeText(context, R.string.spotify_login_ok, Toast.LENGTH_SHORT).show()
+                }
+                .onFailure { error ->
+                    Timber.tag(TAG).w(error, "signIn: token exchange failed")
+                    Toast.makeText(context, R.string.spotify_login_failed, Toast.LENGTH_LONG).show()
+                }
+        }
+    }
 
     var showSpDcDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -185,32 +248,19 @@ fun SpotifySettings(
         Material3SettingsGroup(
             title = stringResource(R.string.account),
             items = listOf(
-                if (spDc.isBlank()) {
+                if (accessToken.isBlank() && spDc.isBlank()) {
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.login),
                         title = { Text(stringResource(R.string.spotify_log_in)) },
                         description = { Text(stringResource(R.string.spotify_log_in_desc)) },
-                        onClick = {
-                            // Not a WebView: accounts.spotify.com loads reCAPTCHA
-                            // Enterprise, which calls requestStorageAccess() — an
-                            // API the Android WebView cannot satisfy, so the page
-                            // always ends up blank (Console: "requestStorageAccess:
-                            // Permission denied"). The user's own browser can, so
-                            // sign in there and paste the cookie below.
-                            val intent = CustomTabsIntent.Builder().build().intent.apply {
-                                data = SPOTIFY_LOGIN_URL.toUri()
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
-                            runCatching { context.startActivity(intent) }
-                                .onFailure { Timber.tag("SpotifySettings").w(it, "no browser") }
-                        }
+                        onClick = ::signIn
                     )
                 } else {
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.logout),
                         title = { Text(stringResource(R.string.spotify_logged_in)) },
                         description = { Text(stringResource(R.string.spotify_log_out_desc)) },
-                        onClick = { onSpDcChange("") }
+                        onClick = { onSpDcChange(""); onAccessTokenChange("") }
                     )
                 },
                 Material3SettingsItem(

@@ -1209,5 +1209,12 @@
     <string name="spotify_sp_dc_empty">Paste a cookie first</string>
     <string name="spotify_sp_dc_ok">Cookie accepted by Spotify</string>
     <string name="spotify_sp_dc_rejected">Spotify rejected this cookie. Copy it again from a session you just signed in to.</string>
-    <string name="spotify_log_in_desc">Sign in on Spotify\'s site in your browser, then paste the session cookie below</string>
+    <string name="spotify_log_in_desc">Sign in with Spotify in a browser tab — no cookie to copy, nothing to paste</string>
+    <string name="spotify_login_not_configured">In-app sign-in is not configured in this build: SPOTIFY_CLIENT_ID is missing.</string>
+    <string name="spotify_login_no_browser">No browser available to sign in with</string>
+    <string name="spotify_login_cancelled">Sign-in cancelled</string>
+    <string name="spotify_login_state_mismatch">Sign-in did not come back from Spotify — try again</string>
+    <string name="spotify_login_denied">Spotify refused the sign-in</string>
+    <string name="spotify_login_ok">Connected to Spotify</string>
+    <string name="spotify_login_failed">Could not finish the sign-in</string>
 </resources>
