@@ -137,11 +137,14 @@ fun SpotifyLoginScreen(navController: NavController) {
                         error: WebResourceError,
                     ) {
                         if (!errorRequest.isForMainFrame) return
+                        // WebResourceError is not a Throwable, so this cannot go
+                        // through Timber.e(Throwable, …) — description goes in the
+                        // message instead.
                         Timber.tag(TAG).e(
-                            error,
-                            "main frame failed to load: %s (%s)",
+                            "main frame failed to load: %s (%s, code %d)",
                             errorRequest.url,
                             error.description,
+                            error.errorCode,
                         )
                     }
 
