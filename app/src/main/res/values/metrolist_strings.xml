@@ -1207,4 +1207,5 @@
     <string name="spotify_sp_dc">Session cookie</string>
     <string name="spotify_sp_dc_set">Cookie saved</string>
     <string name="spotify_sp_dc_help">Paste the sp_dc cookie of open.spotify.com from your browser\'s cookies</string>
+    <string name="spotify_login_not_completed">Sign-in did not finish: no session cookie was found. Nothing was saved — you can paste one manually below instead.</string>
 </resources>

@@ -6,6 +6,7 @@
 package com.nestmusic.music.ui.screens.settings.integrations
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import android.webkit.ConsoleMessage
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
@@ -28,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -68,6 +70,7 @@ private val SESSION_HOSTS = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpotifyLoginScreen(navController: NavController) {
+    val context = LocalContext.current
     val (_, onSpDcChange) = rememberPreference(SpotifySpDcKey, defaultValue = "")
     var isCompletingLogin by remember { mutableStateOf(false) }
 
@@ -86,7 +89,12 @@ fun SpotifyLoginScreen(navController: NavController) {
 
     fun completeLogin(onClose: () -> Unit) {
         if (isCompletingLogin) return
-        captureSessionCookie()
+        // A sign-in that ends without a cookie used to return to the settings
+        // silently, with the same "Log in" row still showing and nothing to say
+        // why the credentials did not take. Say so.
+        if (!captureSessionCookie()) {
+            Toast.makeText(context, R.string.spotify_login_not_completed, Toast.LENGTH_LONG).show()
+        }
         isCompletingLogin = true
         onClose()
     }
