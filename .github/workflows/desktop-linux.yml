@@ -85,7 +85,8 @@ jobs:
             librsvg2-dev \
             libasound2-dev \
             libdbus-1-dev \
-            autoconf automake libtool
+            autoconf automake libtool \
+            squashfs-tools
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -180,9 +181,11 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
           set -e
-          # Directories are created masked by the current umask and keep that
-          # mode inside the squashfs; a restrictive umask ships an image whose
-          # folders are owner-only (fatal for the root-owned catalog mount).
+          # The umask is pinned so the build is reproducible, and printed so the
+          # log always shows what it was. It is NOT what governs the AppImage's
+          # directory modes: the 2026-09-28 run built at 0022 and still shipped
+          # 0700 folders, so that hypothesis is retired. "Inspect bundles" reads
+          # the modes actually stored in the payload instead.
           echo "::notice title=umask::$(umask)"
           umask 0022
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ]; then
@@ -261,22 +264,42 @@ jobs:
           test -n "$(find squashfs-root -type f -name 'node')" \
             || { echo "::error::bundled node missing from the AppImage"; exit 1; }
 
+          # Permissions are read from the squashfs payload itself, never from the tree
+          # `--appimage-extract` produces. That copy goes through the runtime's extraction
+          # path, and the two disagreed badly: the copy showed 659 directories at 0700
+          # while every file was fine, a signature no real bundler bug produces — the
+          # genuine one (tauri-apps/tauri#16155, AppRun.wrapped at 0770) is selective.
+          # umask 000 around unsquashfs removes any chance that its own file creation
+          # masks the bits it is supposed to restore, so what comes out is what is stored.
+          APPIMAGE=$(ls out/*.AppImage | head -1)
+          OFFSET=$("$APPIMAGE" --appimage-offset) \
+            || { echo "::error::cannot read the AppImage offset"; exit 1; }
+          echo "::notice title=appimage offset::$OFFSET"
+          rm -rf /tmp/sq
+          ( umask 000; unsquashfs -d /tmp/sq -o "$OFFSET" "$APPIMAGE" >/dev/null ) \
+            || { echo "::error::unsquashfs could not read the payload"; exit 1; }
+          test -d /tmp/sq \
+            || { echo "::error::unsquashfs produced no tree"; exit 1; }
+
+          mode_hist() { find "$1" -type "$2" -printf '%m\n' | sort | uniq -c | tr '\n' ' '; }
+          echo "::notice title=stored dir modes::$(mode_hist /tmp/sq d)"
+          echo "::notice title=stored file modes::$(mode_hist /tmp/sq f)"
+          echo "::notice title=extracted dir modes::$(mode_hist squashfs-root d)"
+
           # The catalog test mounts the image keeping the stored root ownership (firejail),
           # so anything only the owner can run or read is "Permission denied" there even
-          # though it works under a normal FUSE mount — the failure that broke the catalog
-          # submission (tauri-apps/tauri#16155). Owner-only access = build failure.
-          # A single annotation carries the whole report: the API caps annotations per step,
+          # though it works under a normal FUSE mount. Owner-only access = build failure.
+          # One annotation carries the whole report: the API caps annotations per step,
           # which silently truncated the previous per-path loop.
-          BAD=$(find squashfs-root \( -type f -o -type d \) \
+          BAD=$(find /tmp/sq \( -type f -o -type d \) \
                   \( \( -perm -0100 ! -perm -0001 \) -o \( -perm -0400 ! -perm -0004 \) \) \
-                  -printf '%m %p\n' | sort)
+                  -printf '%m %y %p\n' | sort)
           if [ -n "$BAD" ]; then
-            HIST=$(find squashfs-root -type d -printf '%m\n' | sort | uniq -c | tr '\n' ' ')
-            MSG="dir modes: $HIST | owner-only paths: $(echo "$BAD" | tr '\n' ';')"
+            MSG="owner-only paths (stored): $(echo "$BAD" | tr '\n' ';')"
             echo "::error title=appimage permissions::${MSG:0:60000}"
             exit 1
           fi
-          rm -rf squashfs-root
+          rm -rf squashfs-root /tmp/sq
 
       - name: Upload bundles artifact
         uses: actions/upload-artifact@v4
