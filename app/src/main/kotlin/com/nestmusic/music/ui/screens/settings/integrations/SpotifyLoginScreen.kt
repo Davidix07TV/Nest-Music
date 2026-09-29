@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.nestmusic.music.R
+import com.nestmusic.music.api.SpotifySession
 import com.nestmusic.music.constants.SpotifySpDcKey
 import com.nestmusic.music.ui.component.IconButton
 import com.nestmusic.music.ui.utils.backToMain
@@ -40,7 +41,15 @@ private const val TAG = "SpotifyLogin"
 private val STATUS_URL =
     Regex("^https://accounts\\.spotify\\.com/(?:[^/]+/)?status(?:\\?.*)?$")
 
-private val SP_DC_COOKIE = Regex("sp_dc=([^;]+)")
+/**
+ * Hosts whose cookie jar can carry the session, in the order they should be
+ * searched. The login jar is non-empty from the first page load, so the order
+ * only matters as a tie-break — every jar is inspected either way.
+ */
+private val SESSION_HOSTS = listOf(
+    "https://accounts.spotify.com",
+    "https://open.spotify.com",
+)
 
 /**
  * Plain mobile Chrome user agent. The WebView default carries `; wv`, which
@@ -64,15 +73,14 @@ fun SpotifyLoginScreen(navController: NavController) {
     val (_, onSpDcChange) = rememberPreference(SpotifySpDcKey, defaultValue = "")
     var isCompletingLogin by remember { mutableStateOf(false) }
 
-    /** Extracts sp_dc from the shared cookie jar; true when one was found. */
+    /** Extracts sp_dc from the shared cookie jars; true when one was found. */
     fun captureSessionCookie(): Boolean {
         val cookieManager = CookieManager.getInstance()
-        val cookie = listOf(
-            "https://accounts.spotify.com",
-            "https://open.spotify.com",
-        ).firstNotNullOfOrNull { url -> cookieManager.getCookie(url) } ?: return false
-        val spDc = SP_DC_COOKIE.find(cookie)?.groupValues?.getOrNull(1)?.trim()
-        if (spDc.isNullOrBlank()) return false
+        val spDc = SpotifySession.extractSpDc(SESSION_HOSTS.map { cookieManager.getCookie(it) })
+        if (spDc == null) {
+            Timber.tag(TAG).d("no sp_dc in any session jar yet")
+            return false
+        }
         Timber.tag(TAG).d("captured sp_dc session, length=%d", spDc.length)
         onSpDcChange(spDc)
         return true
