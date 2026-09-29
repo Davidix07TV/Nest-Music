@@ -125,8 +125,12 @@ object SpotifyAuth {
             append("&code_challenge=").append(enc(challenge))
         }
 
-    /** The outcome of the redirect back into the app. */
-    internal data class Callback(val code: String?, val state: String?, val error: String?)
+    /**
+     * The outcome of the redirect back into the app. Public because
+     * SpotifyOAuthActivity hands it out from a public function — the same
+     * reason DiscordAuth keeps its AuthCodeResult public.
+     */
+    data class Callback(val code: String?, val state: String?, val error: String?)
 
     /** Parses `nestmusic://spotify/callback?…` without touching Android. */
     internal fun parseCallback(uri: String): Callback = Callback(
