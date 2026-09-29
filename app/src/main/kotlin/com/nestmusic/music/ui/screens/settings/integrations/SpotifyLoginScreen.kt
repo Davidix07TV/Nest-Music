@@ -188,8 +188,10 @@ fun SpotifyLoginScreen(navController: NavController) {
                     userAgentString = SpotifySession.embeddedBrowserFreeUserAgent(
                         WebSettings.getDefaultUserAgent(webViewContext),
                     )
-                    useWideViewPort = true
-                    loadWithOverviewMode = true
+                    // No useWideViewPort / loadWithOverviewMode: they lay the page
+                    // out at a desktop width and scale it down, which the
+                    // viewport-driven login SPA does not survive, and LoginScreen
+                    // in this app does not set them either.
                     setSupportZoom(true)
                     builtInZoomControls = true
                     displayZoomControls = false
