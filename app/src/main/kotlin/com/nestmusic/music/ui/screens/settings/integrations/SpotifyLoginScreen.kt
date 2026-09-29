@@ -6,27 +6,31 @@
 package com.nestmusic.music.ui.screens.settings.integrations
 
 import android.annotation.SuppressLint
+import android.webkit.ConsoleMessage
 import android.webkit.CookieManager
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import com.nestmusic.music.LocalPlayerAwareWindowInsets
 import com.nestmusic.music.R
 import com.nestmusic.music.api.SpotifySession
 import com.nestmusic.music.constants.SpotifySpDcKey
@@ -36,6 +40,8 @@ import com.nestmusic.music.utils.rememberPreference
 import timber.log.Timber
 
 private const val TAG = "SpotifyLogin"
+
+private const val LOGIN_URL = "https://accounts.spotify.com/login"
 
 /** Where Spotify lands the browser after a successful sign-in. */
 private val STATUS_URL =
@@ -69,7 +75,6 @@ private const val MOBILE_CHROME_UA =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpotifyLoginScreen(navController: NavController) {
-    val context = LocalContext.current
     val (_, onSpDcChange) = rememberPreference(SpotifySpDcKey, defaultValue = "")
     var isCompletingLogin by remember { mutableStateOf(false) }
 
@@ -93,45 +98,95 @@ fun SpotifyLoginScreen(navController: NavController) {
         onClose()
     }
 
-    val webView = remember {
-        WebView(context).apply {
-            webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView, url: String?) {
-                    if (isCompletingLogin) return
-                    val isStatusPage = url != null && STATUS_URL.matches(url)
-                    val isPlayerPage = url?.startsWith("https://open.spotify.com/") == true
-                    if (isStatusPage || isPlayerPage) {
-                        if (captureSessionCookie()) {
-                            isCompletingLogin = true
-                            navController.navigateUp()
-                        }
-                    }
-                }
-            }
-            settings.apply {
-                javaScriptEnabled = true
-                domStorageEnabled = true
-                userAgentString = MOBILE_CHROME_UA
-                useWideViewPort = true
-                loadWithOverviewMode = true
-                setSupportZoom(true)
-                builtInZoomControls = true
-                displayZoomControls = false
-            }
-            // reCAPTCHA during the login flow runs on cross-site resources; with
-            // third-party cookies blocked (the WebView default) it cannot build a
-            // session and the page stays stuck on a blank challenge.
-            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
-            loadUrl("https://accounts.spotify.com/login")
-        }
-    }
-    DisposableEffect(Unit) {
-        onDispose { webView.destroy() }
-    }
+    // Built inside the AndroidView factory rather than in a remember{}: loadUrl()
+    // on a WebView that is not attached to a window yet can fetch the document
+    // and never paint a first frame, which shows up as a white page with no error
+    // anywhere. LoginScreen (the YouTube sign-in) already creates its WebView this
+    // way and renders, so this matches a pattern that already works in this app.
+    var webView: WebView? = null
 
     AndroidView(
-        factory = { webView },
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .windowInsetsPadding(LocalPlayerAwareWindowInsets.current)
+            .fillMaxSize(),
+        factory = { webViewContext ->
+            WebView(webViewContext).apply {
+                webView = this
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView, url: String?) {
+                        if (isCompletingLogin) return
+                        val isStatusPage = url != null && STATUS_URL.matches(url)
+                        val isPlayerPage = url?.startsWith("https://open.spotify.com/") == true
+                        Timber.tag(TAG).d("page finished: %s", url)
+                        if (isStatusPage || isPlayerPage) {
+                            if (captureSessionCookie()) {
+                                isCompletingLogin = true
+                                navController.navigateUp()
+                            }
+                        }
+                    }
+
+                    // A white page currently carries no signal at all: the login SPA
+                    // can fail in the network, over HTTP, or inside JS and all three
+                    // look identical on screen. Log the main-frame failures and the
+                    // console errors so the next report can name the real cause
+                    // instead of guessing at it.
+                    override fun onReceivedError(
+                        view: WebView,
+                        errorRequest: WebResourceRequest,
+                        error: WebResourceError,
+                    ) {
+                        if (!errorRequest.isForMainFrame) return
+                        Timber.tag(TAG).e(
+                            error,
+                            "main frame failed to load: %s (%s)",
+                            errorRequest.url,
+                            error.description,
+                        )
+                    }
+
+                    override fun onReceivedHttpError(
+                        view: WebView,
+                        errorRequest: WebResourceRequest,
+                        errorResponse: WebResourceResponse,
+                    ) {
+                        if (!errorRequest.isForMainFrame) return
+                        Timber.tag(TAG).e(
+                            "main frame returned HTTP %d: %s",
+                            errorResponse.statusCode,
+                            errorRequest.url,
+                        )
+                    }
+
+                    override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+                        if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
+                            Timber.tag(TAG).w(
+                                "console error: %s (%s:%d)",
+                                consoleMessage.message(),
+                                consoleMessage.sourceId(),
+                                consoleMessage.lineNumber(),
+                            )
+                        }
+                        return true
+                    }
+                }
+                settings.apply {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    userAgentString = MOBILE_CHROME_UA
+                    useWideViewPort = true
+                    loadWithOverviewMode = true
+                    setSupportZoom(true)
+                    builtInZoomControls = true
+                    displayZoomControls = false
+                }
+                // reCAPTCHA during the login flow runs on cross-site resources; with
+                // third-party cookies blocked (the WebView default) it cannot build a
+                // session and the page stays stuck on a blank challenge.
+                CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+                loadUrl(LOGIN_URL)
+            }
+        },
     )
 
     TopAppBar(
@@ -150,8 +205,8 @@ fun SpotifyLoginScreen(navController: NavController) {
     )
 
     BackHandler {
-        if (webView.canGoBack()) {
-            webView.goBack()
+        if (webView?.canGoBack() == true) {
+            webView?.goBack()
         } else {
             completeLogin(navController::navigateUp)
         }
