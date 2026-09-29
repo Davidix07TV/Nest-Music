@@ -8,6 +8,7 @@ package com.nestmusic.music.ui.screens.settings.integrations
 import android.annotation.SuppressLint
 import android.webkit.ConsoleMessage
 import android.webkit.CookieManager
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -160,7 +161,9 @@ fun SpotifyLoginScreen(navController: NavController) {
                             errorRequest.url,
                         )
                     }
-
+                }
+                // Console messages arrive on WebChromeClient, not WebViewClient.
+                webChromeClient = object : WebChromeClient() {
                     override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
                         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
                             Timber.tag(TAG).w(
