@@ -6,7 +6,9 @@
 package com.nestmusic.music.api
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SpotifySessionTest {
@@ -66,5 +68,55 @@ class SpotifySessionTest {
     @Test
     fun `does not match a cookie whose name merely ends in sp_dc`() {
         assertNull(SpotifySession.extractSpDc(listOf("xsp_dc=nope; notsp_dc=alsoNo")))
+    }
+
+    // ── user agent ──────────────────────────────────────────────────────
+
+    private val webViewAgent =
+        "Mozilla/5.0 (Linux; Android 14; Pixel 8 Build/UQ1A.240105.004; wv) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 " +
+            "Chrome/132.0.6844.115 Mobile Safari/537.36"
+
+    /** The two tokens that mark an embedded browser, both gone. */
+    @Test
+    fun `strips the embedded-browser markers from the real agent`() {
+        val cleaned = SpotifySession.embeddedBrowserFreeUserAgent(webViewAgent)
+        assertEquals(
+            "Mozilla/5.0 (Linux; Android 14; Pixel 8 Build/UQ1A.240105.004) " +
+                "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                "Chrome/132.0.6844.115 Mobile Safari/537.36",
+            cleaned,
+        )
+        assertFalse(cleaned.contains("; wv"))
+        assertFalse(cleaned.contains("Version/4.0"))
+    }
+
+    /**
+     * The point of deriving the agent instead of hardcoding one: the Chrome
+     * version on the device is whatever that device's System WebView is.
+     */
+    @Test
+    fun `keeps the engine's own Chrome version`() {
+        val older = SpotifySession.embeddedBrowserFreeUserAgent(
+            "Mozilla/5.0 (Linux; Android 10; SM-G981B; wv) AppleWebKit/537.36 " +
+                "(KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.198 Mobile Safari/537.36",
+        )
+        assertTrue(older.contains("Chrome/86.0.4240.198"))
+        assertFalse(older.contains("; wv"))
+    }
+
+    @Test
+    fun `leaves an agent with no markers untouched`() {
+        val plain = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36"
+        assertEquals(plain, SpotifySession.embeddedBrowserFreeUserAgent(plain))
+    }
+
+    @Test
+    fun `does not strip a model name that merely contains wv`() {
+        val agent = "Mozilla/5.0 (Linux; Android 12; wvpro Build/SP1A) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 " +
+            "Chrome/120.0.0.0 Mobile Safari/537.36"
+        assertTrue(SpotifySession.embeddedBrowserFreeUserAgent(agent).contains("wvpro"))
     }
 }

@@ -12,6 +12,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
@@ -57,15 +58,6 @@ private val SESSION_HOSTS = listOf(
     "https://accounts.spotify.com",
     "https://open.spotify.com",
 )
-
-/**
- * Plain mobile Chrome user agent. The WebView default carries `; wv`, which
- * Spotify's anti-bot challenge reads as an embedded browser and answers with a
- * page that never renders; every known-good sp_dc harvester strips it.
- */
-private const val MOBILE_CHROME_UA =
-    "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 " +
-        "(KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36"
 
 /**
  * In-app sign-in for Spotify: the user types their email and password on the
@@ -179,7 +171,15 @@ fun SpotifyLoginScreen(navController: NavController) {
                 settings.apply {
                     javaScriptEnabled = true
                     domStorageEnabled = true
-                    userAgentString = MOBILE_CHROME_UA
+                    // Take the engine's own user agent and drop only the two
+                    // tokens that say "embedded browser". Hardcoding a Chrome
+                    // version instead leaves the real Client Hints contradicting
+                    // the declared agent — the engine that actually renders the
+                    // page keeps sending its own version — and that mismatch is
+                    // what a bot detector compares.
+                    userAgentString = SpotifySession.embeddedBrowserFreeUserAgent(
+                        WebSettings.getDefaultUserAgent(webViewContext),
+                    )
                     useWideViewPort = true
                     loadWithOverviewMode = true
                     setSupportZoom(true)
