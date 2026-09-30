@@ -489,6 +489,12 @@
     <string name="add_to_playlist_desc">Add to a playlist</string>
     <string name="refetch_desc">Refresh metadata from YouTube Music</string>
     <string name="share_desc">Share a link to this item</string>
+    <string name="queue_actions">Queue actions</string>
+    <string name="search_queue">Search queue</string>
+    <string name="queue_search_hint">Search songs or artists</string>
+    <string name="queue_search_active">Search: %1$s</string>
+    <string name="queue_search_empty">No tracks match this search</string>
+    <string name="share_queue">Share queue</string>
     <string name="delete_desc">Permanently remove this item</string>
     <string name="advanced_desc">Adjust the song\'s tempo and pitch</string>
     <string name="equalizer_desc">Open the audio equalizer</string>

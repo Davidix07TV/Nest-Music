@@ -6,6 +6,7 @@
 package com.nestmusic.music.ui.player
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -46,13 +47,17 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -169,6 +174,9 @@ fun Queue(
     val menuState = LocalMenuState.current
     val sleepTimerDefaultSetTemplate = stringResource(R.string.sleep_timer_default_set)
     val bottomSheetPageState = LocalBottomSheetPageState.current
+    var queueSearchQuery by rememberSaveable { mutableStateOf("") }
+    var showQueueSearchDialog by rememberSaveable { mutableStateOf(false) }
+    var showQueueActionsMenu by remember { mutableStateOf(false) }
 
     // Listen Together state (reactive)
     val listenTogetherManager = LocalListenTogetherManager.current
@@ -662,10 +670,13 @@ fun Queue(
         val queueWindows by playerConnection.queueWindows.collectAsStateWithLifecycle()
         val automix by playerConnection.service.automixItems.collectAsStateWithLifecycle()
         val mutableQueueWindows = remember { mutableStateListOf<Timeline.Window>() }
-        val queueLength =
-            remember(queueWindows) {
-                queueWindows.sumOf { it.mediaItem.metadata!!.duration }
-            }
+        val visibleQueueWindows = mutableQueueWindows.filter { window ->
+            queueSearchQuery.isBlank() ||
+                window.mediaItem.metadata?.let { matchesQueueSearch(it, queueSearchQuery) } == true
+        }
+        val queueLength = visibleQueueWindows.sumOf {
+            (it.mediaItem.metadata?.duration ?: 0).coerceAtLeast(0).toLong()
+        }
 
         val coroutineScope = rememberCoroutineScope()
 
@@ -694,39 +705,45 @@ fun Queue(
                             ),
                         ).asPaddingValues(),
             ) { from, to ->
-                val currentDragInfo = dragInfo
-                dragInfo =
-                    if (currentDragInfo == null) {
-                        from.index to to.index
-                    } else {
-                        currentDragInfo.first to to.index
-                    }
+                if (queueSearchQuery.isBlank() && mutableQueueWindows.isNotEmpty()) {
+                    val currentDragInfo = dragInfo
+                    dragInfo =
+                        if (currentDragInfo == null) {
+                            from.index to to.index
+                        } else {
+                            currentDragInfo.first to to.index
+                        }
 
-                val safeFrom = (from.index - headerItems).coerceIn(0, mutableQueueWindows.lastIndex)
-                val safeTo = (to.index - headerItems).coerceIn(0, mutableQueueWindows.lastIndex)
+                    val safeFrom = (from.index - headerItems).coerceIn(0, mutableQueueWindows.lastIndex)
+                    val safeTo = (to.index - headerItems).coerceIn(0, mutableQueueWindows.lastIndex)
 
-                mutableQueueWindows.move(safeFrom, safeTo)
+                    mutableQueueWindows.move(safeFrom, safeTo)
+                }
             }
 
-        LaunchedEffect(reorderableState.isAnyItemDragging) {
-            if (!reorderableState.isAnyItemDragging) {
+        LaunchedEffect(reorderableState.isAnyItemDragging, queueSearchQuery) {
+            if (queueSearchQuery.isNotBlank()) {
+                dragInfo = null
+            } else if (!reorderableState.isAnyItemDragging) {
                 dragInfo?.let { (from, to) ->
-                    val safeFrom = (from - headerItems).coerceIn(0, queueWindows.lastIndex)
-                    val safeTo = (to - headerItems).coerceIn(0, queueWindows.lastIndex)
+                    if (queueWindows.isNotEmpty()) {
+                        val safeFrom = (from - headerItems).coerceIn(0, queueWindows.lastIndex)
+                        val safeTo = (to - headerItems).coerceIn(0, queueWindows.lastIndex)
 
-                    if (!playerConnection.player.shuffleModeEnabled) {
-                        playerConnection.player.moveMediaItem(safeFrom, safeTo)
-                    } else {
-                        playerConnection.player.setShuffleOrder(
-                            DefaultShuffleOrder(
-                                queueWindows
-                                    .map { it.firstPeriodIndex }
-                                    .toMutableList()
-                                    .move(safeFrom, safeTo)
-                                    .toIntArray(),
-                                System.currentTimeMillis(),
-                            ),
-                        )
+                        if (!playerConnection.player.shuffleModeEnabled) {
+                            playerConnection.player.moveMediaItem(safeFrom, safeTo)
+                        } else {
+                            playerConnection.player.setShuffleOrder(
+                                DefaultShuffleOrder(
+                                    queueWindows
+                                        .map { it.firstPeriodIndex }
+                                        .toMutableList()
+                                        .move(safeFrom, safeTo)
+                                        .toIntArray(),
+                                    System.currentTimeMillis(),
+                                ),
+                            )
+                        }
                     }
                     dragInfo = null
                 }
@@ -740,8 +757,8 @@ fun Queue(
             }
         }
 
-        LaunchedEffect(mutableQueueWindows, currentWindowIndex) {
-            if (currentWindowIndex != -1) {
+        LaunchedEffect(mutableQueueWindows, currentWindowIndex, queueSearchQuery) {
+            if (queueSearchQuery.isBlank() && currentWindowIndex != -1) {
                 lazyListState.scrollToItem(currentWindowIndex)
             }
         }
@@ -758,7 +775,7 @@ fun Queue(
                     WindowInsets.systemBars
                         .add(
                             WindowInsets(
-                                top = ListItemHeight + 8.dp,
+                                top = ListItemHeight + 8.dp + if (queueSearchQuery.isNotBlank()) 56.dp else 0.dp,
                                 bottom = ListItemHeight + 8.dp,
                             ),
                         ).asPaddingValues(),
@@ -774,7 +791,7 @@ fun Queue(
                 }
 
                 itemsIndexed(
-                    items = mutableQueueWindows,
+                    items = visibleQueueWindows,
                     key = { _, item -> item.uid.hashCode() },
                 ) { index, window ->
                     ReorderableItem(
@@ -875,7 +892,7 @@ fun Queue(
                                                         )
                                                     }
                                                 }
-                                                if (!locked && !isListenTogetherGuest) {
+                                                if (!locked && !isListenTogetherGuest && queueSearchQuery.isBlank()) {
                                                     IconButton(
                                                         onClick = { },
                                                         modifier = Modifier.draggableHandle(),
@@ -897,7 +914,7 @@ fun Queue(
                                                         if (inSelectMode) {
                                                             onCheckedChange(window.mediaItem.mediaId !in selection)
                                                         } else if (!isListenTogetherGuest) {
-                                                            if (index == currentWindowIndex) {
+                                                            if (isActive) {
                                                                 if (isCasting) {
                                                                     if (castIsPlaying) {
                                                                         castHandler?.pause()
@@ -933,8 +950,8 @@ fun Queue(
                                                 ),
                                     )
                                 }
-                                mutableQueueWindows.getOrNull(index + 1)?.let { nextWindow ->
-                                    if (mixMode) {
+                                visibleQueueWindows.getOrNull(index + 1)?.let { nextWindow ->
+                                    if (mixMode && queueSearchQuery.isBlank()) {
                                         TransitionPill(
                                             prevId = window.mediaItem.mediaId,
                                             nextId = nextWindow.mediaItem.mediaId,
@@ -966,7 +983,20 @@ fun Queue(
                     }
                 }
 
-                if (automix.isNotEmpty()) {
+                if (queueSearchQuery.isNotBlank() && visibleQueueWindows.isEmpty()) {
+                    item(key = "queue_search_empty") {
+                        Text(
+                            text = stringResource(R.string.queue_search_empty),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 32.dp, vertical = 40.dp),
+                        )
+                    }
+                }
+
+                if (queueSearchQuery.isBlank() && automix.isNotEmpty()) {
                     item(key = "automix_divider") {
                         HorizontalDivider(
                             modifier =
@@ -1108,6 +1138,65 @@ fun Queue(
                                 contentDescription = null,
                             )
                         }
+                        Box {
+                            IconButton(onClick = { showQueueActionsMenu = true }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.more_vert),
+                                    contentDescription = stringResource(R.string.queue_actions),
+                                    tint = if (queueSearchQuery.isNotBlank()) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        LocalContentColor.current
+                                    },
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showQueueActionsMenu,
+                                onDismissRequest = { showQueueActionsMenu = false },
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.search_queue)) },
+                                    leadingIcon = {
+                                        Icon(painterResource(R.drawable.search), contentDescription = null)
+                                    },
+                                    onClick = {
+                                        showQueueActionsMenu = false
+                                        showQueueSearchDialog = true
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    enabled = queueWindows.any { it.mediaItem.metadata != null },
+                                    text = { Text(stringResource(R.string.share_queue)) },
+                                    leadingIcon = {
+                                        Icon(painterResource(R.drawable.share), contentDescription = null)
+                                    },
+                                    onClick = {
+                                        showQueueActionsMenu = false
+                                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                            type = "text/plain"
+                                            putExtra(
+                                                Intent.EXTRA_SUBJECT,
+                                                queueTitle?.takeIf { it.isNotBlank() }
+                                                    ?: context.getString(R.string.queue),
+                                            )
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                buildQueueShareText(
+                                                    queueTitle,
+                                                    queueWindows.mapNotNull { it.mediaItem.metadata },
+                                                ),
+                                            )
+                                        }
+                                        context.startActivity(
+                                            Intent.createChooser(
+                                                shareIntent,
+                                                context.getString(R.string.share_queue),
+                                            ),
+                                        )
+                                    },
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -1119,8 +1208,8 @@ fun Queue(
                         text =
                             pluralStringResource(
                                 R.plurals.n_song,
-                                queueWindows.size,
-                                queueWindows.size,
+                                visibleQueueWindows.size,
+                                visibleQueueWindows.size,
                             ),
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -1129,6 +1218,40 @@ fun Queue(
                         text = makeTimeString(queueLength * 1000L),
                         style = MaterialTheme.typography.bodyMedium,
                     )
+                }
+            }
+
+            AnimatedVisibility(
+                visible = queueSearchQuery.isNotBlank(),
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically(),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .padding(start = 16.dp, end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.queue_search_active, queueSearchQuery),
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    IconButton(
+                        onClick = {
+                            queueSearchQuery = ""
+                            selection.clear()
+                            inSelectMode = false
+                        },
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.close),
+                            contentDescription = stringResource(R.string.clear),
+                        )
+                    }
                 }
             }
 
@@ -1167,13 +1290,13 @@ fun Queue(
                         modifier = Modifier.weight(1f),
                     )
                     Checkbox(
-                        checked = count == mutableQueueWindows.size && count > 0,
+                        checked = count == visibleQueueWindows.size && count > 0,
                         onCheckedChange = {
-                            if (count == mutableQueueWindows.size) {
+                            if (count == visibleQueueWindows.size) {
                                 selection.clear()
                             } else {
                                 selection.clear()
-                                mutableQueueWindows.forEach {
+                                visibleQueueWindows.forEach {
                                     selection.add(it.mediaItem.mediaId)
                                 }
                             }
@@ -1296,6 +1419,46 @@ fun Queue(
                                     .calculateBottomPadding(),
                     ).align(Alignment.BottomCenter),
         )
+
+        if (showQueueSearchDialog) {
+            AlertDialog(
+                onDismissRequest = { showQueueSearchDialog = false },
+                title = { Text(stringResource(R.string.search_queue)) },
+                text = {
+                    OutlinedTextField(
+                        value = queueSearchQuery,
+                        onValueChange = { query ->
+                            queueSearchQuery = query
+                            selection.clear()
+                            inSelectMode = false
+                        },
+                        singleLine = true,
+                        placeholder = { Text(stringResource(R.string.queue_search_hint)) },
+                        trailingIcon = {
+                            if (queueSearchQuery.isNotEmpty()) {
+                                IconButton(
+                                    onClick = {
+                                        queueSearchQuery = ""
+                                        selection.clear()
+                                        inSelectMode = false
+                                    },
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.close),
+                                        contentDescription = stringResource(R.string.clear),
+                                    )
+                                }
+                            }
+                        },
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { showQueueSearchDialog = false }) {
+                        Text(stringResource(R.string.close))
+                    }
+                },
+            )
+        }
     }
 }
 
