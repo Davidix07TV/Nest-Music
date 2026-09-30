@@ -48,7 +48,7 @@ val SETTINGS_SEARCH_ENTRIES: List<SettingsSearchEntry> = listOf(
     SettingsSearchEntry(R.string.storage, R.drawable.storage, "settings/storage"),
     SettingsSearchEntry(
         R.string.backup_restore, R.drawable.restore, "settings/backup_restore",
-        keywords = "export import csv spotify",
+        keywords = "export import csv",
     ),
     SettingsSearchEntry(
         R.string.updater, R.drawable.update, "settings/updater",
@@ -213,11 +213,6 @@ val SETTINGS_SEARCH_ENTRIES: List<SettingsSearchEntry> = listOf(
     SettingsSearchEntry(
         R.string.listenbrainz_integration, R.drawable.history, "settings/integrations/listenbrainz",
         parent = R.string.integrations, keywords = "scrobble listenbrainz",
-    ),
-    SettingsSearchEntry(
-        R.string.spotify_integration, R.drawable.graphic_eq, "settings/integrations/spotify",
-        parent = R.string.integrations,
-        keywords = "canvas video sp_dc cookie player login email password account sign",
     ),
     SettingsSearchEntry(
         R.string.listen_together, R.drawable.sync, "settings/integrations/listen_together",

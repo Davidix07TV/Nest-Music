@@ -64,7 +64,13 @@ jobs:
           fi
 
       - name: Build FOSS Release APK
-        run: ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease
+        # tee keeps the full output around for the step below: the job log is
+        # only readable through a host that is often unreachable from a local
+        # checkout, while annotations come back on the plain REST API.
+        run: |
+          set -o pipefail
+          ./gradlew --console=plain assembleFossRelease --warning-mode summary -x lint -x lintFossRelease 2>&1 \
+            | tee /tmp/gradle.log
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           NESTMUSIC_APPLICATION_ID: com.nestmusic.music
@@ -76,6 +82,18 @@ jobs:
           PULL_REQUEST: "false"
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
+
+      # A Gradle failure otherwise surfaces as a bare "exit code 1", which says
+      # nothing about the compiler error that caused it. One annotation per
+      # error line, like the release workflow already does.
+      - name: Surface build errors
+        if: failure()
+        run: |
+          set -e
+          # A workflow command ends at the first newline, so fold the matches.
+          ERRORS=$(grep -E '^e: |^\s*> Task .* FAILED|Caused by:' /tmp/gradle.log \
+                    | head -15 | tr '\n' ';' || true)
+          echo "::error title=build::${ERRORS:-no error line matched, see the job log}"
 
       - name: Upload APK
         uses: actions/upload-artifact@v6

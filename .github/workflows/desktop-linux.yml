@@ -85,7 +85,8 @@ jobs:
             librsvg2-dev \
             libasound2-dev \
             libdbus-1-dev \
-            autoconf automake libtool
+            autoconf automake libtool \
+            squashfs-tools
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -154,6 +155,25 @@ jobs:
       # The GitHub runners have no libfuse2 and appimagetool is itself an AppImage, so the
       # AppImage tooling is told to extract instead of mount. Without this the appimage step
       # dies with "dlopen(): error loading libfuse.so.2".
+      #
+      # tauri-bundler writes the AppImage launcher into its cache with mode 0770
+      # (write_and_make_executable, tauri-apps/tauri#16155) and linuxdeploy's gtk plugin
+      # renames it AppRun.wrapped. A normal FUSE mount shows the image's files as owned by
+      # the user, so 0770 works everywhere except a mount that keeps the stored root
+      # ownership — which is exactly what the AppImage catalog test does (firejail), where
+      # it dies with "AppRun.wrapped: Permission denied". The bundler only downloads the
+      # launcher when it is missing from the cache, so seed a 0755 copy first.
+      - name: Seed a world-executable AppRun launcher
+        run: |
+          set -e
+          arch="$(uname -m)"
+          dir="${XDG_CACHE_HOME:-$HOME/.cache}/tauri"
+          mkdir -p "$dir"
+          curl -fsSL -o "$dir/AppRun-$arch" \
+            "https://github.com/tauri-apps/binary-releases/releases/download/apprun-old/AppRun-$arch"
+          chmod 755 "$dir/AppRun-$arch"
+          ls -la "$dir/AppRun-$arch"
+
       - name: Build Tauri bundles (AppImage + deb)
         env:
           APPIMAGE_EXTRACT_AND_RUN: '1'
@@ -161,6 +181,13 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
           set -e
+          # The umask is pinned so the build is reproducible, and printed so the
+          # log always shows what it was. It is NOT what governs the AppImage's
+          # directory modes: the 2026-09-28 run built at 0022 and still shipped
+          # 0700 folders, so that hypothesis is retired. "Inspect bundles" reads
+          # the modes actually stored in the payload instead.
+          echo "::notice title=umask::$(umask)"
+          umask 0022
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ]; then
             # Signed build: also emit the .AppImage.sig the in-app updater verifies. Kept out
             # of tauri.linux.conf.json so a local `tauri build` never demands a signing key.
@@ -189,24 +216,59 @@ jobs:
         run: |
           set -e
           notice() { echo "::notice title=$1::$2"; }
+          # One annotation per fact, never per file. GitHub caps annotations per step and
+          # silently drops the overflow: that is what truncated the original per-path loop
+          # and what swallowed a first version of the mode histograms below.
+          joined() { tr '\n' ';' | cut -c1-4000; }
+          mode_hist() { find "$1" -type "$2" -printf '%m\n' | sort | uniq -c \
+                          | awk '{printf "%s x%s   ", $2, $1}'; }
+
+          # ── AppImage: unpack it twice, on purpose ────────────────────────────
+          # /tmp/sq is what the squashfs payload actually stores; squashfs-root is what
+          # `--appimage-extract` copies out of it. They are not the same tree — the
+          # extraction masks the stored modes, which is what made 659 clean directories
+          # read as 0700 and failed this build for days. The verdict below is computed on
+          # the stored modes and emitted first, so it cannot be dropped by the cap.
+          APPIMAGE=$(ls out/*.AppImage | head -1)
+          OFFSET=$("$APPIMAGE" --appimage-offset) \
+            || { echo "::error::cannot read the AppImage offset"; exit 1; }
+          APPIMAGE_EXTRACT_AND_RUN=1 sh -c './out/*.AppImage --appimage-extract' >/dev/null
+          test -d squashfs-root || { echo "::error::the AppImage produced no squashfs-root"; exit 1; }
+          rm -rf /tmp/sq
+          # umask 000 so unsquashfs' own file creation cannot mask the bits it restores.
+          ( umask 000; unsquashfs -d /tmp/sq -o "$OFFSET" "$APPIMAGE" >/dev/null ) \
+            || { echo "::error::unsquashfs could not read the payload"; exit 1; }
+          test -d /tmp/sq || { echo "::error::unsquashfs produced no tree"; exit 1; }
+
+          notice "appimage modes" \
+            "stored dirs[$(mode_hist /tmp/sq d)] stored files[$(mode_hist /tmp/sq f)] | extracted dirs[$(mode_hist squashfs-root d)] extracted files[$(mode_hist squashfs-root f)]"
+
+          # The catalog test mounts the image keeping the stored root ownership (firejail),
+          # so anything only the owner can run or read is "Permission denied" there even
+          # though it works under a normal FUSE mount. Owner-only access = build failure.
+          BAD=$(find /tmp/sq \( -type f -o -type d \) \
+                  \( \( -perm -0100 ! -perm -0001 \) -o \( -perm -0400 ! -perm -0004 \) \) \
+                  -printf '%m %y %p\n' | sort)
+          if [ -n "$BAD" ]; then
+            echo "::error title=appimage permissions::owner-only paths (stored): $(echo "$BAD" | joined)"
+            exit 1
+          fi
 
           echo "── deb control ──"
           dpkg-deb -I out/*.deb
-          dpkg-deb -f out/*.deb Package Version Architecture Depends \
-            | while IFS= read -r line; do notice "deb control" "$line"; done
+          notice "deb control" "$(dpkg-deb -f out/*.deb Package Version Architecture Depends | joined)"
 
           echo "── deb contents (key files) ──"
           dpkg-deb -c out/*.deb | awk '{print $6}' \
             | grep -E '/(nest-music|nest-music-server|node)$|potgen/server/build/main\.js$|\.desktop$' \
             | sort -u | tee /tmp/deb-layout.txt
-          while IFS= read -r line; do notice "deb layout" "$line"; done < /tmp/deb-layout.txt
+          notice "deb layout" "$(joined < /tmp/deb-layout.txt)"
 
           echo "── AppImage contents ──"
-          APPIMAGE_EXTRACT_AND_RUN=1 sh -c './out/*.AppImage --appimage-extract' >/dev/null
           find squashfs-root \( -name 'nest-music-server*' -o -name 'node' -o -name '*.desktop' \
                                -o -path '*potgen/server/build/main.js' \) -printf '%p\n' \
             | sort -u | tee /tmp/appimage-layout.txt
-          while IFS= read -r line; do notice "appimage layout" "$line"; done < /tmp/appimage-layout.txt
+          notice "appimage layout" "$(joined < /tmp/appimage-layout.txt)"
 
           # server.rs resolves node/potgen relative to the directory holding the sidecar, so
           # both being siblings is the invariant worth reporting.
@@ -226,8 +288,7 @@ jobs:
           # The deep-link scheme has to be registered for nest-music:// URLs to reach the app.
           DESKTOP=$(find squashfs-root -name '*.desktop' | head -1)
           if [ -n "$DESKTOP" ]; then
-            grep -E '^(Name|Exec|Icon|Categories|MimeType)=' "$DESKTOP" \
-              | while IFS= read -r line; do notice "desktop entry" "$line"; done
+            notice "desktop entry" "$(grep -E '^(Name|Exec|Icon|Categories|MimeType)=' "$DESKTOP" | joined)"
           else
             echo "::warning title=desktop entry::no .desktop file found in the AppImage"
           fi
@@ -236,7 +297,8 @@ jobs:
             || { echo "::error::sidecar missing from the AppImage"; exit 1; }
           test -n "$(find squashfs-root -type f -name 'node')" \
             || { echo "::error::bundled node missing from the AppImage"; exit 1; }
-          rm -rf squashfs-root
+
+          rm -rf squashfs-root /tmp/sq
 
       - name: Upload bundles artifact
         uses: actions/upload-artifact@v4
