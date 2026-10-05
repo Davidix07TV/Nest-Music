@@ -284,6 +284,9 @@ object ComposeToImage {
                 val logoPaint =
                     Paint().apply {
                         isAntiAlias = true
+                        // The mark is a monochrome silhouette: paint it with the card background
+                        // so it stays visible on the circle, which uses the secondary colour.
+                        colorFilter = PorterDuffColorFilter(bgColor, PorterDuff.Mode.SRC_IN)
                     }
 
                 // Center logo in box
