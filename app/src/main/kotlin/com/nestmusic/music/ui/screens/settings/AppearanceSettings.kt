@@ -9,6 +9,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -64,6 +65,8 @@ import com.nestmusic.music.constants.DensityScaleKey
 import com.nestmusic.music.constants.DynamicThemeKey
 import com.nestmusic.music.constants.EnableDynamicIconKey
 import com.nestmusic.music.constants.EnableHighRefreshRateKey
+import com.nestmusic.music.constants.LauncherIcon
+import com.nestmusic.music.constants.LauncherIconKey
 import com.nestmusic.music.constants.EnableLandscapeScalingKey
 import com.nestmusic.music.constants.ExperimentalLyricsKey
 import com.nestmusic.music.constants.GridItemSize
@@ -141,9 +144,22 @@ fun AppearanceSettings(
             EnableDynamicIconKey,
             defaultValue = true,
         )
+    val (launcherIcon, onLauncherIconChange) =
+        rememberEnumPreference(
+            LauncherIconKey,
+            defaultValue = LauncherIcon.SUNSET,
+        )
+    val launcherIconResource = when (launcherIcon) {
+        LauncherIcon.SUNSET -> R.drawable.app_logo
+        LauncherIcon.NIGHT -> R.mipmap.ic_launcher_night
+        LauncherIcon.AURORA -> R.mipmap.ic_launcher_aurora
+    }
+    var showLauncherIconDialog by rememberSaveable { mutableStateOf(false) }
+
     val iconContext = LocalContext.current
     val onEnableDynamicIconChange: (Boolean) -> Unit = { newValue ->
         onEnableDynamicIconPrefChange(newValue)
+        onLauncherIconChange(LauncherIcon.SUNSET)
         IconUtils.setIcon(iconContext, newValue)
     }
     val (enableHighRefreshRate, onEnableHighRefreshRateChange) =
@@ -367,6 +383,34 @@ fun AppearanceSettings(
 
     var showLyricsPositionDialog by rememberSaveable {
         mutableStateOf(false)
+    }
+
+    if (showLauncherIconDialog) {
+        EnumDialog(
+            onDismiss = { showLauncherIconDialog = false },
+            onSelect = { icon ->
+                onLauncherIconChange(icon)
+                IconUtils.setLauncherIcon(iconContext, icon, enableDynamicIcon)
+                showLauncherIconDialog = false
+            },
+            title = stringResource(R.string.launcher_icon),
+            current = launcherIcon,
+            values = LauncherIcon.entries.toList(),
+            valueText = { icon ->
+                when (icon) {
+                    LauncherIcon.SUNSET -> stringResource(R.string.launcher_icon_sunset)
+                    LauncherIcon.NIGHT -> stringResource(R.string.launcher_icon_night)
+                    LauncherIcon.AURORA -> stringResource(R.string.launcher_icon_aurora)
+                }
+            },
+            valueDescription = { icon ->
+                when (icon) {
+                    LauncherIcon.SUNSET -> stringResource(R.string.launcher_icon_sunset_desc)
+                    LauncherIcon.NIGHT -> stringResource(R.string.launcher_icon_night_desc)
+                    LauncherIcon.AURORA -> stringResource(R.string.launcher_icon_aurora_desc)
+                }
+            },
+        )
     }
 
     if (showLyricsPositionDialog) {
@@ -1086,28 +1130,44 @@ fun AppearanceSettings(
                     }
                     add(
                         Material3SettingsItem(
-                            icon = painterResource(R.drawable.palette),
-                            title = { Text(stringResource(R.string.enable_dynamic_icon)) },
-                            description = { Text(stringResource(R.string.enable_dynamic_icon_desc)) },
-                            trailingContent = {
-                                Switch(
-                                    checked = enableDynamicIcon,
-                                    onCheckedChange = onEnableDynamicIconChange,
-                                    thumbContent = {
-                                        Icon(
-                                            painter =
-                                                painterResource(
-                                                    id = if (enableDynamicIcon) R.drawable.check else R.drawable.close,
-                                                ),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(SwitchDefaults.IconSize),
-                                        )
-                                    },
+                            leadingContent = {
+                                Image(
+                                    painter = painterResource(launcherIconResource),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)),
                                 )
                             },
-                            onClick = { onEnableDynamicIconChange(!enableDynamicIcon) },
+                            title = { Text(stringResource(R.string.launcher_icon)) },
+                            description = { Text(stringResource(R.string.launcher_icon_desc)) },
+                            onClick = { showLauncherIconDialog = true },
                         ),
                     )
+                    if (launcherIcon == LauncherIcon.SUNSET) {
+                        add(
+                            Material3SettingsItem(
+                                icon = painterResource(R.drawable.palette),
+                                title = { Text(stringResource(R.string.enable_dynamic_icon)) },
+                                description = { Text(stringResource(R.string.enable_dynamic_icon_desc)) },
+                                trailingContent = {
+                                    Switch(
+                                        checked = enableDynamicIcon,
+                                        onCheckedChange = onEnableDynamicIconChange,
+                                        thumbContent = {
+                                            Icon(
+                                                painter =
+                                                    painterResource(
+                                                        id = if (enableDynamicIcon) R.drawable.check else R.drawable.close,
+                                                    ),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                                            )
+                                        },
+                                    )
+                                },
+                                onClick = { onEnableDynamicIconChange(!enableDynamicIcon) },
+                            ),
+                        )
+                    }
                     add(
                         Material3SettingsItem(
                             icon = painterResource(R.drawable.palette),
