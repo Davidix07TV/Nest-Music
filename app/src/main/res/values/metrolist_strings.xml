@@ -1133,7 +1133,15 @@
 
     <!-- Stream sources -->
     <string name="enable_dynamic_icon">Dynamic icon colors</string>
-    <string name="enable_dynamic_icon_desc">Use dynamic theme colors for the app icon. When disabled, the icon uses solid colors.</string>
+    <string name="enable_dynamic_icon_desc">Use dynamic theme colors for the default app icon. When disabled, it uses solid colors.</string>
+    <string name="launcher_icon">App icon</string>
+    <string name="launcher_icon_desc">Choose the icon shown on your home screen</string>
+    <string name="launcher_icon_sunset">Sunset</string>
+    <string name="launcher_icon_sunset_desc">The original Nest Music logo</string>
+    <string name="launcher_icon_night">Night</string>
+    <string name="launcher_icon_night_desc">A deep-blue night sky reflected on the sea</string>
+    <string name="launcher_icon_aurora">Aurora</string>
+    <string name="launcher_icon_aurora_desc">Northern lights over the ocean</string>
     <string name="stream_sources">Stream sources</string>
     <string name="stream_source_order">Stream order</string>
     <string name="stream_source_web_clients">Web clients</string>

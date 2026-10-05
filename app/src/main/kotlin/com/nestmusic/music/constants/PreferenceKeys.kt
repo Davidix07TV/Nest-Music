@@ -176,6 +176,13 @@ val StreamSourceWebCreatorKey = booleanPreferencesKey("streamSourceWebCreator")
 val StreamSourceAndroidCreatorKey = booleanPreferencesKey("streamSourceAndroidCreator")
 
 val EnableDynamicIconKey = booleanPreferencesKey("enableDynamicIcon")
+val LauncherIconKey = stringPreferencesKey("launcherIcon")
+
+enum class LauncherIcon {
+    SUNSET,
+    NIGHT,
+    AURORA,
+}
 
 val EnableDiscordRPCKey = booleanPreferencesKey("discordRPCEnable")
 val DiscordInfoDismissedKey = booleanPreferencesKey("discordInfoDismissed")
