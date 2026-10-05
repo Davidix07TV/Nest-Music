@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -405,6 +406,7 @@ fun LyricsImageCard(
                         Image(
                             painter = painterResource(id = R.drawable.small_icon),
                             contentDescription = null,
+                            colorFilter = ColorFilter.tint(backgroundSolidColor),
                             modifier = Modifier
                                 .size(38.dp)
                         )
