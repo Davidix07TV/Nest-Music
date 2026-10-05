@@ -151,8 +151,8 @@ fun AppearanceSettings(
         )
     val launcherIconResource = when (launcherIcon) {
         LauncherIcon.SUNSET -> R.drawable.app_logo
-        LauncherIcon.NIGHT -> R.mipmap.ic_launcher_night
-        LauncherIcon.AURORA -> R.mipmap.ic_launcher_aurora
+        LauncherIcon.NIGHT -> R.drawable.ic_launcher_night_background
+        LauncherIcon.AURORA -> R.drawable.ic_launcher_aurora_background
     }
     var showLauncherIconDialog by rememberSaveable { mutableStateOf(false) }
 
