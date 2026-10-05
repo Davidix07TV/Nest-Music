@@ -1,0 +1,40 @@
+name: Temporary patch recovery
+
+on:
+  push:
+    branches:
+      - "arena/01a10d25-nest-music"
+    paths:
+      - ".github/workflows/temporary-patch-recovery.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download the user-provided patch
+        run: |
+          set -euo pipefail
+          mkdir -p recovery
+          curl --fail --location --retry 5 \
+            https://github.com/user-attachments/files/33071229/nest-music-fix.txt \
+            --output recovery/nest-music-fix.txt
+          test "$(wc -c < recovery/nest-music-fix.txt)" -gt 1000
+          test "$(wc -c < recovery/nest-music-fix.txt)" -lt 5000000
+          grep -q '^diff --git ' recovery/nest-music-fix.txt
+
+      - name: Return the patch to the session branch
+        run: |
+          set -euo pipefail
+          rm .github/workflows/temporary-patch-recovery.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add recovery/nest-music-fix.txt .github/workflows/temporary-patch-recovery.yml
+          git commit -m "chore: recover uploaded patch"
+          git push
