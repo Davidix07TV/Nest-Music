@@ -55,10 +55,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -132,6 +134,7 @@ fun ListenTogetherScreen(
     var savedUsername by rememberPreference(ListenTogetherUsernameKey, "")
     var roomCodeInput by rememberSaveable { mutableStateOf("") }
     var usernameInput by rememberSaveable { mutableStateOf(savedUsername) }
+    var isJoinMode by rememberSaveable { mutableStateOf(false) }
 
     var isCreatingRoom by rememberSaveable { mutableStateOf(false) }
     var isJoiningRoom by rememberSaveable { mutableStateOf(false) }
@@ -140,13 +143,20 @@ fun ListenTogetherScreen(
     var selectedUserForMenu by rememberSaveable { mutableStateOf<String?>(null) }
     var selectedUsername by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val waitingForApprovalText = stringResource(R.string.waiting_for_approval)
+    val joiningProgressText = stringResource(R.string.listen_together_joining_progress)
     val invalidRoomCodeText = stringResource(R.string.invalid_room_code)
     val joinRequestDeniedText = stringResource(R.string.join_request_denied)
 
     LaunchedEffect(savedUsername) {
         if (usernameInput.isBlank() && savedUsername.isNotBlank()) {
             usernameInput = savedUsername
+        }
+    }
+
+    LaunchedEffect(connectionState) {
+        if (connectionState == ConnectionState.DISCONNECTED || connectionState == ConnectionState.ERROR) {
+            isCreatingRoom = false
+            isJoiningRoom = false
         }
     }
 
@@ -163,6 +173,18 @@ fun ListenTogetherScreen(
                         }
                     isJoiningRoom = false
                     isCreatingRoom = false
+                }
+
+                is ListenTogetherEvent.ConnectionError -> {
+                    isJoiningRoom = false
+                    isCreatingRoom = false
+                    if (!listenTogetherManager.isInRoom) joinErrorMessage = event.error
+                }
+
+                is ListenTogetherEvent.ServerError -> {
+                    isJoiningRoom = false
+                    isCreatingRoom = false
+                    if (!listenTogetherManager.isInRoom) joinErrorMessage = event.message
                 }
 
                 is ListenTogetherEvent.JoinApproved -> {
@@ -255,14 +277,17 @@ fun ListenTogetherScreen(
             HeaderSection(isInRoom = isInRoom)
         }
 
-        // Connection status card
-        item {
-            ConnectionStatusCard(
-                connectionState = connectionState,
-                onConnect = { listenTogetherManager.connect() },
-                onDisconnect = { listenTogetherManager.disconnect() },
-                onReconnect = { listenTogetherManager.forceReconnect() },
-            )
+        // Room actions connect automatically; only show manual connection controls when a
+        // connection is already being attempted or a room session needs recovery.
+        if (isInRoom || connectionState != ConnectionState.DISCONNECTED) {
+            item {
+                ConnectionStatusCard(
+                    connectionState = connectionState,
+                    onConnect = { listenTogetherManager.connect() },
+                    onDisconnect = { listenTogetherManager.disconnect() },
+                    onReconnect = { listenTogetherManager.forceReconnect() },
+                )
+            }
         }
 
         if (connectionState == ConnectionState.CONNECTED && !isInRoom) {
@@ -359,10 +384,16 @@ fun ListenTogetherScreen(
                     onUsernameChange = { usernameInput = it },
                     roomCodeInput = roomCodeInput,
                     onRoomCodeChange = { roomCodeInput = it },
+                    isJoinMode = isJoinMode,
+                    onJoinModeChange = {
+                        isJoinMode = it
+                        joinErrorMessage = null
+                    },
                     savedUsername = savedUsername,
+                    isCreatingRoom = isCreatingRoom,
                     isJoiningRoom = isJoiningRoom,
                     joinErrorMessage = joinErrorMessage,
-                    waitingForApprovalText = waitingForApprovalText,
+                    joiningProgressText = joiningProgressText,
                     bringIntoViewRequester = bringIntoViewRequester,
                     onCreateRoom = {
                         val username = usernameInput.takeIf { it.isNotBlank() } ?: savedUsername
@@ -373,7 +404,6 @@ fun ListenTogetherScreen(
                             isCreatingRoom = true
                             isJoiningRoom = false
                             joinErrorMessage = null
-                            listenTogetherManager.connect()
                             listenTogetherManager.createRoom(finalUsername)
                         } else {
                             Toast.makeText(context, R.string.error_username_empty, Toast.LENGTH_SHORT).show()
@@ -393,7 +423,6 @@ fun ListenTogetherScreen(
                             isJoiningRoom = true
                             isCreatingRoom = false
                             joinErrorMessage = null
-                            listenTogetherManager.connect()
                             listenTogetherManager.joinRoom(roomCodeInput, finalUsername)
                         } else {
                             Toast.makeText(context, R.string.error_username_empty, Toast.LENGTH_SHORT).show()
@@ -1055,10 +1084,13 @@ private fun JoinCreateRoomSection(
     onUsernameChange: (String) -> Unit,
     roomCodeInput: String,
     onRoomCodeChange: (String) -> Unit,
+    isJoinMode: Boolean,
+    onJoinModeChange: (Boolean) -> Unit,
     savedUsername: String,
+    isCreatingRoom: Boolean,
     isJoiningRoom: Boolean,
     joinErrorMessage: String?,
-    waitingForApprovalText: String,
+    joiningProgressText: String,
     bringIntoViewRequester: BringIntoViewRequester,
     onCreateRoom: () -> Unit,
     onJoinRoom: () -> Unit,
@@ -1080,6 +1112,42 @@ private fun JoinCreateRoomSection(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                SegmentedButton(
+                    selected = !isJoinMode,
+                    onClick = { onJoinModeChange(false) },
+                    enabled = !isCreatingRoom && !isJoiningRoom,
+                    shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                    label = { Text(stringResource(R.string.listen_together_host_mode)) },
+                )
+                SegmentedButton(
+                    selected = isJoinMode,
+                    onClick = { onJoinModeChange(true) },
+                    enabled = !isCreatingRoom && !isJoiningRoom,
+                    shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                    label = { Text(stringResource(R.string.listen_together_join_mode)) },
+                )
+            }
+
+            Text(
+                text = stringResource(
+                    if (isJoinMode) {
+                        R.string.listen_together_join_mode_description
+                    } else {
+                        R.string.listen_together_host_mode_description
+                    },
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = stringResource(R.string.listen_together_connect_automatically),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+
             // Username input
             OutlinedTextField(
                 value = usernameInput,
@@ -1100,6 +1168,7 @@ private fun JoinCreateRoomSection(
                         }
                     }
                 },
+                enabled = !isCreatingRoom && !isJoiningRoom,
                 singleLine = true,
                 shape = RoundedCornerShape(16.dp),
                 colors =
@@ -1115,45 +1184,50 @@ private fun JoinCreateRoomSection(
                         .onFocusChanged { if (it.isFocused) onFieldFocused() },
             )
 
-            // Room code input
-            OutlinedTextField(
-                value = roomCodeInput,
-                onValueChange = { if (it.length <= 8) onRoomCodeChange(it.uppercase()) },
-                label = { Text(stringResource(R.string.room_code)) },
-                placeholder = { Text(stringResource(R.string.enter_room_code)) },
-                leadingIcon = {
-                    Icon(
-                        painterResource(R.drawable.group),
-                        null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                },
-                trailingIcon = {
-                    if (roomCodeInput.isNotBlank()) {
-                        MaterialIconButton(onClick = { onRoomCodeChange("") }) {
-                            Icon(painterResource(R.drawable.close), null)
+            // A room code is only needed when joining; pasted whitespace or separators are ignored.
+            if (isJoinMode) {
+                OutlinedTextField(
+                    value = roomCodeInput,
+                    onValueChange = { value ->
+                        onRoomCodeChange(value.filter { it.isLetterOrDigit() }.take(8).uppercase())
+                    },
+                    label = { Text(stringResource(R.string.room_code)) },
+                    placeholder = { Text(stringResource(R.string.enter_room_code)) },
+                    leadingIcon = {
+                        Icon(
+                            painterResource(R.drawable.group),
+                            null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingIcon = {
+                        if (roomCodeInput.isNotBlank()) {
+                            MaterialIconButton(onClick = { onRoomCodeChange("") }) {
+                                Icon(painterResource(R.drawable.close), null)
+                            }
                         }
-                    }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(16.dp),
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    ),
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .bringIntoViewRequester(bringIntoViewRequester)
-                        .onFocusChanged { if (it.isFocused) onFieldFocused() },
-            )
+                    },
+                    enabled = !isCreatingRoom && !isJoiningRoom,
+                    singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                        ),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .bringIntoViewRequester(bringIntoViewRequester)
+                            .onFocusChanged { if (it.isFocused) onFieldFocused() },
+                )
+            }
 
-            // Waiting for approval indicator
+            // Request progress indicator
             AnimatedVisibility(
-                visible = isJoiningRoom,
+                visible = isCreatingRoom || isJoiningRoom,
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut() + slideOutVertically(),
             ) {
@@ -1177,7 +1251,7 @@ private fun JoinCreateRoomSection(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = waitingForApprovalText,
+                            text = if (isCreatingRoom) stringResource(R.string.creating_room) else joiningProgressText,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Medium,
@@ -1224,52 +1298,39 @@ private fun JoinCreateRoomSection(
                 }
             }
 
-            // Action buttons
+            // The selected mode determines one clear action; the join action requires a full code.
             val hasUsername = usernameInput.trim().isNotBlank() || savedUsername.isNotBlank()
             val hasRoomCode = roomCodeInput.length == 8
+            val isBusy = isCreatingRoom || isJoiningRoom
 
-            // Create Room button - visible when username is provided
-            AnimatedVisibility(visible = hasUsername && !hasRoomCode) {
-                Button(
-                    onClick = onCreateRoom,
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = hasUsername,
-                    shape = RoundedCornerShape(16.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
+            Button(
+                onClick = if (isJoinMode) onJoinRoom else onCreateRoom,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = hasUsername && (!isJoinMode || hasRoomCode) && !isBusy,
+                shape = RoundedCornerShape(16.dp),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor =
+                            if (isJoinMode) {
+                                MaterialTheme.colorScheme.tertiary
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            },
+                    ),
+            ) {
+                Icon(
+                    painter = painterResource(if (isJoinMode) R.drawable.login else R.drawable.add),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text =
+                        stringResource(
+                            if (isJoinMode) R.string.listen_together_join_room else R.string.listen_together_create_room,
                         ),
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.add),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.create_room), fontWeight = FontWeight.SemiBold)
-                }
-            }
-
-            // Join Room button - visible when username and room code are provided
-            AnimatedVisibility(visible = hasUsername && hasRoomCode) {
-                Button(
-                    onClick = onJoinRoom,
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = hasUsername && hasRoomCode,
-                    shape = RoundedCornerShape(16.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                        ),
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.login),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.join_room), fontWeight = FontWeight.SemiBold)
-                }
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
         }
     }
