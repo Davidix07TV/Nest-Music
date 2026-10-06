@@ -1,301 +1,104 @@
----v13.6.3
+# Nest Music changelog
 
-This is a hotfix release to fix borked lyrics and media controller. We apologize for the inconvenience.  
+This file contains Nest Music release notes consumed by the Android release workflow. The desktop
+client's detailed release history is maintained separately in
+[`desktop/CHANGELOG.md`](desktop/CHANGELOG.md). Each `---v<version>` line starts a release-note
+block. Upstream Metrolist releases are not included; Nest Music's history here starts at v1.0.0.
 
-~ MetrolistGroup
+---v1.0.9
+# v1.0.9 — Sunset, Night and Aurora (2026-10-05)
 
----v13.6.2
-# THE FUTURE OF METROLIST
-Metrolist KMP is almost ready. We are ironing out the remaining bugs and preparing for release, but it is still at least a couple of weeks away.
+### Added
+- Added Night and Aurora launcher icons alongside the default Sunset icon. Choose one under
+  **Settings → Appearance → App icon**.
+- Replaced remaining Metrolist marks with Nest Music branding in notifications, lyric share cards,
+  widgets, and Wrapped.
 
-# Major changes
-- Fixed playback issues caused by changes that also broke official apps (@nyxiereal)
-- Fixed playlist sync duplication and out-of-memory crashes (@kairosci)
-- Improved automatic player configuration updates for future YouTube changes (@mostafaalagamy @nyxiereal)
+### Unchanged
+- Playback, queues, library, downloads, lyrics, Listen Together, and AI playlist behavior.
 
-## Notable new features
-- Added handling for KMP updates and migrations (@nyxiereal)
+---v1.0.8
+# v1.0.8 — Queue search and sharing (2026-09-30)
 
-## Other improvements
-- Improved Android Auto voice search matching and radio queue generation (@FireLion137)
-- Added an Android Auto search limit and optimized local searches to prevent out-of-memory crashes (@FireLion137)
-- Fixed podcast playback errors (@kairosci)
-- Fixed crossfade timing at non-default playback speeds (@kairosci)
-- Fixed the app lingering in the background after it was closed (@kairosci)
-- Fixed sleep timer dialog layouts and menus containing long translated text (@kairosci)
-- Fixed the persistent shuffle setting not working (@SimoneFelici)
-- Dimmed the repeat button when repeat is disabled (@arpitagarwal1301)
-- Rounded the corners of exported lyrics images (@arpitagarwal1301)
-- Updated dependencies (@nyxiereal)
+### Added
+- Search the current queue by song title or artist, with the filtered track count and total play
+  time.
+- Share the full queue as a numbered list with artist names and YouTube Music links.
 
-## New Contributors
-* @SimoneFelici made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/4102
-* @arpitagarwal1301 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/4178
+---v1.0.7
+# v1.0.7 (2026-09-30)
 
-**Full Changelog**: https://github.com/MetrolistGroup/Metrolist/compare/v13.6.1...v13.6.2
+### Fixed
+- Removed remaining Metrolist leftovers and fixed the release workflow's push trigger.
 
----v13.6.1
-# THE FUTURE OF METROLIST
-The new Kotlin Multiplatform version of Metrolist is now in a good state, and we are aiming to release it within the next month. Until then, the current app will remain in maintenance mode and receive bug fixes and minor improvements.
+---v1.0.6-lossless
+# v1.0.6-lossless — Android prerelease (2026-09-27)
 
-# Major changes
-- Improved playback reliability and recovery from YouTube player failures (@alltechdev @JASK625 @kairosci @mostafaalagamy @nyxiereal)
-- Fixed black screens, startup crashes, and playback freezes (@kairosci @mostafaalagamy @nyxiereal)
-- Improved Listen Together synchronization (@nyxiereal)
+### Added
+- Added optional Qobuz-backed lossless FLAC streaming and downloads, with CD, Hi-Res, and Max
+  quality options.
+- Added automatic fallback to YouTube Music when a matching FLAC stream is unavailable.
 
-## Notable new features
-- Added refreshed branding and an optional dynamic app icon (@mostafaalagamy)
-- Added predictive back support and improved landscape scaling (@HansHolz09 @kairosci)
+---v1.0.5
+# v1.0.5 — Sunset interface (2026-09-24)
 
-## Other improvements
-- Fixed login, logout, and backup restoration issues (@mostafaalagamy @kairosci @nyxiereal)
-- Fixed incorrect artist names, song durations, podcast metadata, and missing artwork (@alltechdev @kairosci @mostafaalagamy @nyxiereal)
-- Fixed Android Auto freezes and playback delays (@kairosci)
-- Fixed foreground service ANRs and multiple other crashes (@kairosci @mostafaalagamy)
-- Fixed sleep timer crashes and restored saved defaults (@johannesbrauer @mostafaalagamy)
-- Improved library sync performance and YouTube player compatibility (@mostafaalagamy @nyxiereal)
+### Added
+- Introduced the Sunset interface, inspired by the Nest Music logo, with a refreshed home screen,
+  floating navigation dock, and updated player styling.
+- Kept the original Material interface available as **Classic**; choose either look at first launch
+  or under **Settings → Appearance → Interface**.
 
-## New Contributors
-* @HansHolz09 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3837
+---v1.0.4
+# v1.0.4 — AI playlists and recurring Wrapped (2026-09-19)
 
-**Full Changelog**: https://github.com/MetrolistGroup/Metrolist/compare/v13.6.0...v13.6.1
+### Added
+- Create playlists from natural-language prompts, preview the generated tracks, and save them to
+  the library.
+- Wrapped now calculates stats for the current year and can be replayed from
+  **Settings → Content → View Wrapped**.
+- Added dedicated yearly playlist artwork through 2030 and released Linux desktop packages
+  (AppImage and .deb).
 
----v13.5.0
-# MAINTENANCE MODE
-Metrolist is currently in maintenance mode. This means we will only be fixing bugs and making minor improvements. Please do not submit PRs for new features or major changes, as they will not be accepted.
+### Changed
+- Completed the Nest Music branding and polished typography, dialogs, and navigation.
 
-# Major changes
-- Rewrote the Discord RPC integration again (@adrielGGmotion @nyxiereal)
-- Fixed random playback issues and pauses (@DanielSchmerber @isotjs)
-- Fixed liked songs, playlists, albums, search results, etc. not displaying properly (@adrielGGmotion @nyxiereal)
+---v1.0.3
+# v1.0.3 — Mix transitions (2026-09-07)
 
-## Notable new features
-- Added a toggle for automatic radio queue generation (@FireLion137)
-- Added automatic tablet UI scaling (@kairosci)
-- Toggle from repeat(1) to repeat(all) after song change (@sunjeetkajla)
+### Added
+- Added per-track-pair Mix transitions for queues and playlists, with an editor, waveform controls,
+  adjustable duration, and Auto, Fade, Rise, and Blend presets.
+- Added transition controls for volume curves, EQ swapping, and high-pass/low-pass filters. BPM is
+  shown when available in track metadata.
 
-## Other improvements
-- Fixe covers not loading sometimes (@Arjuanto)
-- Artist names are now split properly, and are now clickable (@kairosci)
-- Fixed multiple crashes (@kairosci @nyxiereal)
-- Improved audio normalization (@kairosci)
-- Fixed search results not being combined properly (@kairosci)
-- Fixed 'High quality' option not choosing the highest quality option (@kairosci)
-- Fixed history sync not working (@kairosci)
+---v1.0.2
+# v1.0.2 — Official branding and stability fixes (2026-08-26)
 
-## New Contributors
-- @DanielSchmerber made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3777
-- @Arjuanto made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3780
+### Added
+- Introduced the Nest Music sunset logo and icons, a customized About screen, and an updater
+  targeting the official Nest Music repository.
+- Added permanent CI signing for release builds and published a Windows desktop build.
 
----v13.4.3
-# MAINTENANCE MODE
-Metrolist is currently in maintenance mode. This means we will only be fixing bugs and making minor improvements. Please do not submit PRs for new features or major changes, as they will not be accepted.
+### Fixed
+- Fixed the crash in **Settings → About** and corrected the Protobuf imports used by Listen Together.
 
-# Major changes
-- Rewrote the Discord RPC integration (@adrielGGmotion)
-- Improved the look of playlist screens (@adrielGGmotion)
-- Added a new playlist widget (@David-2765 @AntonioDionisio05)
+---v1.0.1
+# v1.0.1 — Universal release (2026-08-18)
 
-## Notable new features
-- Added proper apple music lyrics support (@adrielGGmotion)
-- Added a normalization level selector (@Jeff0945)
-- Added the ability to hide monthly/weekly most playlists (@isotjs)
+### Added
+- Introduced a universal Android APK with YouTube Music library synchronization and time-synced
+  lyrics.
 
-## Other improvements
-- Improve overall performance and stability (@adrielGGmotion @nyxiereal)
-- Fixed devnagari lyrics not being displayed properly (@cloud-zip)
-- Improve lyrics fetching speed (@nyxiereal)
-- Fixed crashes and some memory leaks (@nyxiereal)
-- Fixed images being low resolution for some users (@adrielGGmotion)
-- Handle playlist paging properly (@kairosci)
-- Multiple smaller improvements by @kairosci <3
+### Changed
+- Improved background audio handling, session stability, and API response performance.
 
-## New Contributors
-- @Jeff0945 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3358
+### Known issue
+- Opening **Settings → About** could crash the app; fixed in v1.0.2.
 
----v13.4.2
-# MAINTENANCE MODE
-Metrolist is currently in maintenance mode. This means we will only be fixing bugs and making minor improvements. Please do not submit PRs for new features or major changes, as they will not be accepted.
+---v1.0.0
+# v1.0.0 — First Nest Music release (2026-08-15)
 
-# Major changes
-- Fixed random crashes and some memory leaks (@nyxiereal)
-- Fixed issues with uploading songs to YouTube (@kairosci)
-- Fixed playback for uploaded songs (@punkscience)
-
-## Notable new features
-- EQ screen redesign and guided AutoEQ profile import (@ndellagrotte)
-- Automatically create database backups before updates (@nyxiereal)
-
-## Other improvements
-- Improved support for Android Auto (@cmeka)
-- Brought back the copy lyrics button for experimental lyrics (@nyxiereal)
-- Fixed the re-sync button for experimental lyrics (@nyxiereal)
-- Fixed listen together not working (@nyxiereal)
-- Added back support for choosing an account upon login (@nyxiereal)
-- Implemented concurrent fetching, fix lyrics fetch ordering, and optimize LyricsPlus server selection (@ibratabian17)
-- Corrected the play-next shuffle order (@johannesbrauer)
-- Improved the Android Auto icon (@ThatOneCalculator)
-
-## New Contributors
-- @ndellagrotte made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3487
-- @cmeka made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3534
-- @punkscience made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3517
-
----v13.4.1
-# MAINTENANCE MODE
-Metrolist is currently in maintenance mode. This means we will only be fixing bugs and making minor improvements. Please do not submit PRs for new features or major changes, as they will not be accepted.
-
-# Major changes
-- Fixed cached songs showing up in the downloads playlist (@nyxiereal)
-- Fixed multiple playback issues and prepared for YouTube's player changes (@mostafaalagamy @nyxiereal)
-
-## Notable new features
-- Added the ability to paste URLs to the search to play them directly (@nyxiereal)
-- Added a search bar to the Library screen (@isotjs)
-- Added a setting to bind pitch and speed together (@sasha-melech)
-- Added support for Gemini voice playback (@FireLion137)
-- Added an option choose the highest possible audio quality (@nyxiereal @kairosci)
-- Added a button to create a playlist from the Library screen (@SunjeetKajla)
-
-## Other improvements
-- Moved the resync button to the lyrics menu (@nyxiereal)
-- Properly reset player on IO errors (@kairosci)
-- Multiple improvements to lyrics fetching and parsing (@kairosci @nyxiereal @ibratabian17)
-- Made autoplay disablable from the settings (@kairosci)
-- Fixed foreground/background service crashes (@kairosci)
-- Fixed Play next not working (@johannesbrauer)
-- Properly handle database updates on download removal (@kairosci)
-- Use lyricsplus caching to lower server load (@binimum)
-- Performance optimizations (@stopper2408)
-- Prefetch lyrics for the next song if currently viewing lyrics (@nyxiereal)
-- Fixed multiple issues with Listen Together (@nyxiereal)
-- Fixed multiple issues with the experimental lyrics (@nyxiereal)
-- Fixed pause music on task clear not working (@nyxiereal)
-
-## New Contributors
-* @ibratabian17 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3474
-* @sasha-melech made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3301
-* @FireLion137 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3500
-* @binimum made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3493
-* @stopper2408 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3506
-* @SunjeetKajla made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3505
-
-**Full Changelog**: https://github.com/MetrolistGroup/Metrolist/compare/v13.4.0...v13.4.1
----v13.4.0
-# MAINTENANCE MODE
-Metrolist is currently in maintenance mode. This means we will only be fixing bugs and making minor improvements. Please do not submit PRs for new features or major changes, as they will not be accepted.
-
-No, this is not an April Fools joke, even though this update is being released on April 1st.
-
-We are working on something big for the future of Metrolist - this is not the end of the project.
-
-# Major changes
-- Multiple playback fixes and reliability improvements (@alltechdev)
-- Revamped the entire Lyrics engine, improving lyric accuracy and usability (@adrielGGmotion)
-- Fixed multiple crash issues (@kairosci, @nyxiereal)
-- Multiple improvements to Android Auto support (@andker87)
-- Fixed multiple grammar and text inconsistency issues in the project (@TheRebo)
-
-## Notable new features
-- Added support for treating cached songs as offline songs (@kairosci)
-- Added music alarm scheduling (@0xarchit)
-- Added miniplayer styles (@johannesbrauer)
-- Added a button to copy all song lyrics to the clipboard (@kairosci)
-- Added a time transfer feature to move listening time between songs in the stats page (@finley-webber)
-- Added customization support for the AI prompt used for translations (@nyxiereal)
-- Added a notification-based music recognition for the QS tile shortcut (@isotjs)
-
-## Other improvements
-- Fixed incorrect artist order for multi-artist songs (@AntonioDionisio05)
-- Fixed playtime in the stats page not being fully visible (@David-2765)
-- Improved radio to start seamlessly when initiated from the currently playing track (@luigiwwmf)
-- Improved the UI for tablets (@adrielGGmotion)
-- Improved the About Screen layout (@adrielGGmotion)
-- Fixed ghost adds on playlists (@johannesbrauer)
-- Improved search focus and navigation behavior (@saivijaychandan)
-- Added album navigation on song title click regardless of play source (@gergesh)
-- Prevented UI state reset when switching apps (@mostafaalagamy)
-- Restored the Daily Discover title in the Home screen (@mostafaalagamy)
-- Fixed listen together audio choppiness (@nyxiereal)
-- Redesigned romanization and account settings (@omardotdev)
-- Improved the design of the sleep timer dialog (@johannesbrauer)
-- Redesigned some components to use Material 3 Expressive (@johannesbrauer)
-- Fixed links in the README (@Lolen10 @nyxiereal)
-
-## New Contributors
-* @AntonioDionisio05 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3255
-* @David-2765 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3271
-* @luigiwwmf made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3293
-* @gergesh made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3300
-* @Lolen10 made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3328
-
-**Full Changelog**: https://github.com/MetrolistGroup/Metrolist/compare/v13.3.0...v13.3.1
----v13.3.0
-# Major changes
-- Implemented song upload and delete functionality (@alltechdev)
-- Multiple playback fixes and reliability improvements (@alltechdev, @mostafaalagamy)
-- Fixed proguard rules causing issues with Reproducible Builds (@nyxiereal)
-- Fixed proguard rules removing Listen Together protobuf classes (@mostafaalagamy)
-- Added a playlist export option to the playlist context menu (@nyxiereal)
-
-## Notable new features
-- Added a Play all action for the stats page (@isotjs)
-- Added a quick settings tile for recognizing music (@nyxiereal)
-- Added automatic sleep timer options and integrated fade-out volume handling (@isotjs)
-- Added a profile search filter (@alltechdev)
-- Added channel subscriptions for podcasts and artists (@alltechdev)
-
-## Other improvements
-- Fixed cached images not clearing properly and cached covers not showing when offline (@nyxiereal)
-- Removed useless and stale strings from the codebase (@nyxiereal)
-- Refined the song details view (@omardotdev)
-- Added support for Mistral AI models (@nyxiereal)
-- Redesigned the lastfm integration settings (@omardotdev)
-- Fixed importing csv files crashing the app (@nyxiereal)
-- Prevent guest playback while in listen together (@nyxiereal)
-- Fixed podcasts not working for logged-out users (@alltechdev)
-- Updated dependencies (@nyxiereal)
-
-## New Contributors
-* @isotjs made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/3090
-
-**Full Changelog**: https://github.com/MetrolistGroup/Metrolist/compare/v13.2.1...v13.3.0
----v13.2.1
->[!WARNING]
->Listen Together doesn't work in v13.2.1! Use v13.2.0 if you need it.
-
-## Hot Fixes
-- Fix interface lag issue
-- Fix navigate local playlists pinned in speed dial
-- Removed "cache songs only after playback has started" option
-
-**Full Changelog**: https://github.com/MetrolistGroup/Metrolist/compare/v13.2.0...v13.2.1
----v13.2.0
-# Major changes
-- Fixed playback breaking due to YouTube's February 2026 n-transform changes (@alltechdev)
-- Added full podcast library support (@mostafaalagamy & @alltechdev)
-- Redesigned loading, Changelog, and About screens (@adrielGGmotion)
-- Improved app startup time via parallelized home screen loading (@mostafaalagamy)
-
-## Notable new features
-- Added an option to cache songs only after playback has started (@kairosci)
-- Added a music recognizer home screen widget (@mostafaalagamy)
-- Rewrote music recognizer in pure Kotlin, removing NDK dependency and reducing APK size (@mostafaalagamy)
-- Overhauled lyrics: added LyricsPlus provider, AI lyric fixes, untranslation support, and provider priority settings (@nyxiereal)
-- Changed listen together to use protobuf, lowering latency and improving reliability (@nyxiereal)
-- Added auto-approve setting for listen together song requests (@nyxiereal)
-- Added an option to persist the sleep timer default value (@johannesbrauer)
-- Added a dialog on logout to keep or clear library data (@alltechdev)
-
-## Other improvements
-- Fixed backup restore causing playback errors due to stale auth credentials (@alltechdev)
-- The CSV import dialog is now scrollable (@kairosci)
-- Fixed Android 15 foreground service crashes (@kairosci)
-- Fixed a crash on the About screen on some devices (@mostafaalagamy)
-- Fixed home screen playlist navigation routing to wrong screen (@mostafaalagamy)
-- Fixed crash when creating local playlists (@mostafaalagamy)
-
-## New Contributors
-* @johannesbrauer made their first contribution in https://github.com/MetrolistGroup/Metrolist/pull/2991
-
-**Full Changelog**: https://github.com/MetrolistGroup/Metrolist/compare/v13.1.1...v13.2.0
+- Published the first universal Android build under the Nest Music name, with a redesigned
+  interface, refreshed visual identity, and stability improvements.
+- Nest Music is based on the open-source Metrolist project; see the repository's credits and license
+  for attribution.

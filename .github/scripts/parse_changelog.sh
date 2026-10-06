@@ -8,9 +8,9 @@
 #   ./parse_changelog.sh <version> [changelog_file]
 #
 # Examples:
-#   ./parse_changelog.sh 13.2.1
-#   ./parse_changelog.sh v13.2.1 changelog.md
-#   ./parse_changelog.sh 13.2.1 /path/to/changelog.md
+#   ./parse_changelog.sh 1.0.9
+#   ./parse_changelog.sh v1.0.9 changelog.md
+#   ./parse_changelog.sh 1.0.9 /path/to/changelog.md
 #
 # Exit codes:
 #   0 — Version found; content written to stdout
