@@ -228,7 +228,6 @@ class ListenTogetherClient
     ) {
         companion object {
             private const val TAG = "ListenTogether"
-            private val DEFAULT_SERVER_URL = ListenTogetherServers.defaultServerUrl
             private const val MAX_RECONNECT_ATTEMPTS = 15 // Increased from 5 to 15
             private const val INITIAL_RECONNECT_DELAY_MS = 1000L // Start at 1 second
             private const val MAX_RECONNECT_DELAY_MS = 120000L // Cap at 2 minutes
@@ -506,12 +505,13 @@ class ListenTogetherClient
         }
 
         /**
-         * Migrate old server URL to new one if needed
+         * Persist the normalized server URL, dropping retired defaults so the user is asked for a
+         * server instead of silently reconnecting to one that no longer ships with the app.
          */
         private fun migrateServerUrl() {
             try {
-                val configuredUrl = context.dataStore.get(ListenTogetherServerUrlKey, DEFAULT_SERVER_URL)
-                val normalizedUrl = normalizeServerUrl(configuredUrl)
+                val configuredUrl = context.dataStore.get(ListenTogetherServerUrlKey, ListenTogetherServers.defaultServerUrl)
+                val normalizedUrl = ListenTogetherServers.normalize(configuredUrl)
 
                 if (normalizedUrl != configuredUrl) {
                     log(LogLevel.INFO, "Migrating server URL", "Old: $configuredUrl -> New: $normalizedUrl")
@@ -621,19 +621,12 @@ class ListenTogetherClient
                 .pingInterval(60, TimeUnit.SECONDS) // Match server ping interval
                 .build()
 
-        private fun normalizeServerUrl(url: String): String {
-            val trimmed = url.trim()
-            if (trimmed.isEmpty()) return DEFAULT_SERVER_URL
-            return if (trimmed.contains("metroserver.meowery.eu", ignoreCase = true)) {
-                DEFAULT_SERVER_URL
-            } else {
-                trimmed
-            }
-        }
-
-        private fun getServerUrl(): String {
-            val configuredUrl = context.dataStore.get(ListenTogetherServerUrlKey, DEFAULT_SERVER_URL)
-            return normalizeServerUrl(configuredUrl)
+        /**
+         * Null when no server has been configured yet.
+         */
+        private fun getServerUrl(): String? {
+            val configuredUrl = context.dataStore.get(ListenTogetherServerUrlKey, ListenTogetherServers.defaultServerUrl)
+            return ListenTogetherServers.normalize(configuredUrl).ifBlank { null }
         }
 
         /**
@@ -680,15 +673,31 @@ class ListenTogetherClient
                 return
             }
 
+            val serverUrl = getServerUrl()
+            if (serverUrl == null) {
+                // Nothing to connect to yet. Report the settings hint instead of letting OkHttp fail
+                // on an empty URL, and drop any queued action that could never be executed.
+                log(LogLevel.ERROR, "No Listen Together server configured")
+                emitEvent(
+                    ListenTogetherEvent.ServerError(
+                        "not_configured",
+                        context.getString(R.string.listen_together_not_configured),
+                    ),
+                )
+                pendingAction = null
+                _connectionState.value = ConnectionState.DISCONNECTED
+                return
+            }
+
             _connectionState.value = ConnectionState.CONNECTING
             serverClock.reset()
             evaluateBackgroundDisconnectPolicy("connect")
-            log(LogLevel.INFO, "Connecting to server", getServerUrl())
+            log(LogLevel.INFO, "Connecting to server", serverUrl)
 
             val request =
                 Request
                     .Builder()
-                    .url(getServerUrl())
+                    .url(serverUrl)
                     .header("User-Agent", context.packageName)
                     .build()
 
