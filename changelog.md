@@ -1,9 +1,7 @@
 # Nest Music changelog
 
-This file contains Nest Music release notes consumed by the Android release workflow. The desktop
-client's detailed release history is maintained separately in
-[`desktop/CHANGELOG.md`](desktop/CHANGELOG.md). Each `---v<version>` line starts a release-note
-block. Upstream Metrolist releases are not included; Nest Music's history here starts at v1.0.0.
+This file contains Nest Music release notes consumed by the Android release workflow. Each `---v<version>` line starts a release-note
+block. Nest Music's history here starts at v1.0.0.
 
 ---v1.0.9
 # v1.0.9 — Sunset, Night and Aurora (2026-10-05)
