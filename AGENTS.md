@@ -155,5 +155,5 @@ have a Mac, otherwise state that iOS was not verified.
 - `.aislop/config.yml` defines an external quality gate (format/lint/security/AI-slop) that only
   scores the JS/Python tree under `desktop/`; Kotlin and Swift are reported as "not scoreable".
   It is not wired into `.github/workflows/`.
-- `changelog.md` is inherited from Metrolist and describes upstream releases; don't treat it as the
-  changelog of this fork.
+- `changelog.md` records Nest Music releases in the `---v<version>` format consumed by the Android
+  release workflow. The desktop client's detailed release history is in `desktop/CHANGELOG.md`.
