@@ -716,6 +716,12 @@
     <string name="listen_together_create_room">Create room</string>
     <string name="listen_together_create_room_desc">Create a room and share the code with your friends</string>
     <string name="listen_together_join_room">Join room</string>
+    <string name="listen_together_host_mode">Host a room</string>
+    <string name="listen_together_join_mode">Join with code</string>
+    <string name="listen_together_host_mode_description">Create a room and share its 8-character code. You control playback; guests follow along and can suggest songs for you to approve.</string>
+    <string name="listen_together_join_mode_description">Enter the host\'s 8-character code. They may need to approve you; your playback follows theirs. Suggest songs from a track\'s menu.</string>
+    <string name="listen_together_connect_automatically">Connection starts automatically when you create or join—no separate Connect step is needed.</string>
+    <string name="listen_together_joining_progress">Connecting to the room and requesting to join…</string>
     <string name="listen_together_room_code">Room code</string>
     <string name="listen_together_you_are_host">You are the host</string>
     <string name="listen_together_you_are_guest">You are a guest</string>
