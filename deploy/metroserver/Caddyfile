@@ -1,0 +1,6 @@
+# LT_DOMAIN comes from .env (see .env.example).
+# Caddy fetches and renews the certificate for it automatically, which is what
+# makes wss://<LT_DOMAIN>/ws work in the clients.
+{$LT_DOMAIN} {
+	reverse_proxy metroserver:8080
+}
