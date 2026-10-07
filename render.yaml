@@ -1,0 +1,44 @@
+# Render Blueprint — deploys ONLY the Listen Together backend (metroserver).
+# It does not touch, build or deploy the Android/desktop app.
+#
+# How to use: Render Dashboard > New > Blueprint > pick this repository > Apply.
+# Free instance, no credit card required.
+#
+# autoDeploy is off on purpose: every deploy restarts the server and drops the
+# rooms open at that moment, so a commit to the app must not restart it. Deploy
+# manually when you actually want an update (or bump the pinned commit in
+# deploy/metroserver/Dockerfile first).
+#
+# Free instances sleep after ~15 minutes without traffic, so the first
+# connection after a quiet spell waits 30-60s for the cold start. Nest Music
+# retries by itself, so the room opens on a later attempt.
+
+services:
+  - type: web
+    name: nest-music-listen-together
+    runtime: docker
+    plan: free
+    # EU region. If your workspace cannot create free instances here, change it
+    # to oregon/ohio/virginia/singapore and re-apply — a failed creation leaves
+    # nothing behind, but an existing service can never change region.
+    region: frankfurt
+    dockerfilePath: ./deploy/metroserver/Dockerfile
+    dockerContext: ./deploy/metroserver
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      # Render routes traffic to PORT; the server binds to it on all interfaces.
+      - key: PORT
+        value: "10000"
+      # The policy that lets Nest Music host rooms (deploy/metroserver/ua_policy.json).
+      - key: UA_POLICY_FILE
+        value: /etc/metroserver/ua_policy.json
+      # Free instances have no persistent disk: this survives restarts of the
+      # process, not redeploys. Only restart-recovery state and the per-client
+      # connection counters live here, so losing it is harmless.
+      - key: DATABASE_FILE
+        value: /data/metroserver.db
+      # Enables the /uas connected-client report. Render generates the value;
+      # read it back from the dashboard Environment tab.
+      - key: UA_ADMIN_TOKEN
+        generateValue: true

@@ -2,7 +2,9 @@
 # See README.md in this directory for the full walkthrough.
 services:
   metroserver:
-    image: ghcr.io/metrolistgroup/metroserver:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
       PORT: "8080"
