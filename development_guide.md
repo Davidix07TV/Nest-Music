@@ -49,6 +49,10 @@ Build variants: `foss` (default — updater, no Cast), `gms` (updater + Google C
 (F-Droid compliant: no updater, no Cast). Add `-x lint -x lintFossRelease` to skip lint, which is
 what CI does.
 
+Releases publish both `nest-music-<version>.apk` (foss) and `nest-music-<version>-izzy.apk` (the
+F-Droid build). To build and sign them without publishing anything, run the release workflow by
+hand with `dry_run: true` (Actions → Android release → Run workflow).
+
 ### GitHub Secrets Configuration
 
 This project uses GitHub Secrets to securely store API keys for building releases:

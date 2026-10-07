@@ -86,6 +86,11 @@ Flavors: `foss` (default — in-app updater, no Cast), `gms` (updater + Google C
 (F-Droid compliant: no updater, no Cast). Task names are `assemble<Flavor><BuildType>` and
 `test<Flavor><BuildType>UnitTest`.
 
+Release CI attaches two APKs: `nest-music-<version>.apk` (foss, with the in-app updater) and
+`nest-music-<version>-izzy.apk` (the build served by the F-Droid repositories). The in-app updater
+only ever offers the FOSS asset — that rule lives in `ReleaseAssetNaming` and `selectDownloadUrl`
+under `app/src/main/kotlin/com/nestmusic/music/utils/`, with tests in `app/src/test/`.
+
 Desktop and iOS have their own prerequisites — see
 [`desktop/README.md`](desktop/README.md) and [`codemagic.yaml`](codemagic.yaml).
 

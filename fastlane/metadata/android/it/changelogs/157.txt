@@ -1,0 +1,3 @@
+- Listen Together ora usa di default il server di Nest Music, tenuto attivo da un workflow: la prima connessione non aspetta piu' l'avvio a freddo.
+- Risolto: le notifiche di aggiornamento sono tornate. L'app confrontava la versione letta dal titolo della release, quindi le versioni nuove risultavano 0.0.0 e l'avviso non compariva.
+- Un altro server Listen Together resta configurabile in Impostazioni > Listen Together > Server URL.

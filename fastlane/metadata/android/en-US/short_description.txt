@@ -1,1 +1,1 @@
-Material 3 YouTube Music client for Android
+Ad-free YouTube Music player with offline mode and lyrics
