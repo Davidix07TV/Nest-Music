@@ -20,10 +20,7 @@ name: Android release
 
 on:
   push:
-    # TEMPORARY: the extra branch only serves to validate the izzy build from this work
-    # branch (workflow_dispatch needs actions:write, which the automation token lacks).
-    # It is removed again before the pull request is merged.
-    branches: ["master", "arena/344ddab9-nest-music"]
+    branches: ["master"]
     paths-ignore:
       - "README.md"
       - "fastlane/**"
