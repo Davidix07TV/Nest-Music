@@ -213,6 +213,34 @@ jobs:
           echo "path=$TARGET" >> "$GITHUB_OUTPUT"
           ls -la "$OUTPUT_DIR/out/"
 
+      # Evidence for the F-Droid side: which key signed the APK that reviewers will install.
+      # fdroiddata pins it later through AllowedAPKSigningKeys, so it must be the release key and
+      # must not change between releases. Informational only — it never fails the release.
+      - name: Verify the signed izzy APK
+        if: steps.izzy_build.outcome == 'success'
+        continue-on-error: true
+        env:
+          IZZY_APK: ${{ steps.izzy_apk.outputs.path }}
+        run: |
+          set -uo pipefail
+          {
+            echo "### izzy APK: \`$(basename "$IZZY_APK")\`"
+            echo ""
+            echo "- size: $(stat -c%s "$IZZY_APK") bytes"
+          } >> "$GITHUB_STEP_SUMMARY"
+          APKSIGNER=$(ls "${ANDROID_HOME:-/usr/local/lib/android/sdk}"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)
+          if [ -n "$APKSIGNER" ]; then
+            "$APKSIGNER" verify --print-certs "$IZZY_APK" >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+            "$APKSIGNER" verify --print-certs "$IZZY_APK" 2>&1 | grep -i "SHA-256" || true
+          else
+            echo "apksigner not found — certificate not printed" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          if unzip -p "$IZZY_APK" 'classes*.dex' 2>/dev/null | grep -qa "com/google/android/gms/cast"; then
+            echo "::warning::the izzy APK references com.google.android.gms.cast — check the flavor sources"
+          else
+            echo "No Cast SDK reference inside the izzy APK" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v6
         with:
