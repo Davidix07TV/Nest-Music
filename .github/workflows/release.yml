@@ -20,7 +20,10 @@ name: Android release
 
 on:
   push:
-    branches: ["master"]
+    # TEMPORARY: the extra branch only serves to validate the izzy build from this work
+    # branch (workflow_dispatch needs actions:write, which the automation token lacks).
+    # It is removed again before the pull request is merged.
+    branches: ["master", "arena/344ddab9-nest-music"]
     paths-ignore:
       - "README.md"
       - "fastlane/**"
@@ -218,7 +221,8 @@ jobs:
           if-no-files-found: error
 
       - name: Publish release
-        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+        # Never publish from a work branch: only master (or a non-dry-run dispatch on master).
+        if: ${{ github.ref == 'refs/heads/master' && !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         env:
           # A PAT (RELEASE_TOKEN) makes the tag push wake the desktop bundle
           # workflows; fall back to the built-in token so publishing still
