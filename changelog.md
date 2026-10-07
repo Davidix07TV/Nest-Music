@@ -3,6 +3,23 @@
 This file contains Nest Music release notes consumed by the Android release workflow. Each `---v<version>` line starts a release-note
 block. Nest Music's history here starts at v1.0.0.
 
+---v1.0.10
+# v1.0.10 — Listen Together on our own server (2026-10-07)
+
+### Added
+- Listen Together now ships with Nest Music's own server
+  (`wss://nest-music-listen-together.onrender.com/ws`) as the default, so a room can be hosted
+  without configuring anything first. Any other server can still be set under
+  **Settings → Listen Together → Server URL**.
+
+### Fixed
+- Update notifications are back. The app read the version out of the release *title*, which is
+  free-form ("🎵 Nest Music v1.0.9 - …"), so every release was compared as 0.0.0 and the prompt
+  never appeared. The version now comes from the release tag, and release titles start with the
+  version.
+- The Listen Together server no longer needs to wake up from Render's idle state before the first
+  connection: a workflow pings its `/health` endpoint every 10 minutes.
+
 ---v1.0.9
 # v1.0.9 — Sunset, Night and Aurora (2026-10-05)
 
