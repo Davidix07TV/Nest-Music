@@ -3,6 +3,18 @@
 This file contains Nest Music release notes consumed by the Android release workflow. Each `---v<version>` line starts a release-note
 block. Nest Music's history here starts at v1.0.0.
 
+---v1.0.11
+# v1.0.11 — F-Droid ready (2026-10-07)
+
+### Fixed
+- The built-in updater can no longer offer you the F-Droid build. That APK ships without the
+  updater, so installing it from an update prompt would have switched update notifications off
+  without saying anything; updates for the standard release now always point at the standard APK.
+
+### Changed
+- Every release now ships two APKs: the usual one and `nest-music-<version>-izzy.apk`, the build the
+  F-Droid repositories serve (no self-updater, no Cast).
+
 ---v1.0.10
 # v1.0.10 — Listen Together on our own server (2026-10-07)
 
