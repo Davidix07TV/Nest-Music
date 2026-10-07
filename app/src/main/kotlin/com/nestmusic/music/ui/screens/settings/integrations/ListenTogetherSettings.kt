@@ -117,6 +117,9 @@ fun ListenTogetherSettings(
 
     val servers = remember { ListenTogetherServers.servers }
     var serverUrl by rememberPreference(ListenTogetherServerUrlKey, ListenTogetherServers.defaultServerUrl)
+    // Retired defaults are stored as-is for users who configured them in an older build, but they
+    // must not be presented as the current server.
+    val effectiveServerUrl = remember(serverUrl) { ListenTogetherServers.normalize(serverUrl) }
     var username by rememberPreference(ListenTogetherUsernameKey, "")
     var autoApprovalJoins by rememberPreference(ListenTogetherAutoApprovalKey, false)
     var autoApproveSuggestions by rememberPreference(ListenTogetherAutoApproveSuggestionsKey, false)
@@ -171,7 +174,7 @@ fun ListenTogetherSettings(
     if (showServerUrlDialog) {
         ServerChooserDialog(
             servers = servers,
-            currentUrl = serverUrl,
+            currentUrl = effectiveServerUrl,
             onSelect = { server ->
                 serverUrl = server.url
                 showServerUrlDialog = false
@@ -363,7 +366,7 @@ fun ListenTogetherSettings(
         )
 
         // Settings section using IntegrationCard
-        val selectedServer = remember(serverUrl) { ListenTogetherServers.findByUrl(serverUrl) }
+        val selectedServer = remember(effectiveServerUrl) { ListenTogetherServers.findByUrl(effectiveServerUrl) }
 
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             IntegrationCard(
@@ -396,7 +399,7 @@ fun ListenTogetherSettings(
                                 Text(
                                     selectedServer?.let { server ->
                                         "${server.name} - ${server.location}"
-                                    } ?: serverUrl,
+                                    } ?: effectiveServerUrl.ifBlank { stringResource(R.string.not_set) },
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )

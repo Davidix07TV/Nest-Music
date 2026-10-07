@@ -1,0 +1,39 @@
+# Self-hosted Metroserver stack for Nest Music.
+# See README.md in this directory for the full walkthrough.
+services:
+  metroserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+      DATABASE_FILE: /data/metroserver.db
+      UA_POLICY_FILE: /etc/metroserver/ua_policy.json
+      # Optional: set a token to expose the /uas connected-client report.
+      # UA_ADMIN_TOKEN: "replace-me"
+    volumes:
+      - ./ua_policy.json:/etc/metroserver/ua_policy.json:ro
+      - metroserver-data:/data
+
+  # Terminates TLS so clients can use wss:// without manual certificates.
+  # Caddy handles the WebSocket upgrade for /ws automatically.
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - metroserver
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      LT_DOMAIN: ${LT_DOMAIN:?set LT_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  metroserver-data:
+  caddy-data:
+  caddy-config:
