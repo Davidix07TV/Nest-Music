@@ -29,7 +29,7 @@ generated code).
 | `desktop/` | Tauri desktop client + Flask sidecar. See `desktop/README.md` and `desktop/CLAUDE.md`. |
 | `ios/` | SwiftUI client + `NestMusicTests`. |
 | `codemagic.yaml`, `fastlane/` | iOS CI + store metadata. |
-| `.github/workflows/` | `build.yml` (APKs), `build_pr.yml`, `pr-checks.yml` (JVM unit tests + ownership warnings), `build_quick.yml` (manual), `desktop-{windows,linux}.yml`, `release.yml`. |
+| `.github/workflows/` | `build.yml` (APKs), `build_pr.yml`, `pr-checks.yml` (JVM unit tests + ownership warnings), `build_quick.yml` (manual), `desktop-{windows,linux}.yml`, `keep-warm.yml` (pings the Listen Together server every 10 minutes), `release.yml`. |
 | `development_guide.md` | Local setup walkthrough. Keep it in sync when setup steps change. |
 
 ## Rules for working on the project
@@ -64,9 +64,8 @@ generated code).
    history, force-push a shared branch, delete branches, or touch tags without an explicit
    instruction from a human. Work belongs on the session branch; PRs target `master`.
 3. **Never bump the version.** `versionCode` / `versionName` in `app/build.gradle.kts` are released
-   by the maintainers, and `release.yml` reacts to changes in that file. Note that `release.yml`
-   listens on `main` while the default branch is `master`, so that automation does not fire on
-   normal `master` pushes — do not "fix" this by editing versions yourself.
+   by the maintainers, and `release.yml` reacts to changes in that file. `release.yml` listens on
+   `master`, so a version bump publishes a release on the next push — do not edit versions yourself.
 4. Do not commit generated or local artifacts: `app/src/main/java/` protobuf output, keystores
    (`app/persistent-debug.keystore`, `app/keystore/`), `local.properties`, `build/`, `*.apk`,
    `desktop/src-tauri/binaries/`, caches under `desktop/python-backend/`.
