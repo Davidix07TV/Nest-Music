@@ -84,20 +84,8 @@ object Updater {
             val downloadUrl = asset.getString("browser_download_url")
             val size = asset.getLong("size")
             
-            // Parse architecture and variant from filename
-            val (arch, variant) = when {
-                name.contains("gms", ignoreCase = true) || name.contains("Google-Cast", ignoreCase = true) -> "universal" to "gms"
-                name.contains("foss", ignoreCase = true) -> "universal" to "foss"
-                name.startsWith("app-") && name.endsWith("-release.apk") -> {
-                    val arch = name.removePrefix("app-").removeSuffix("-release.apk")
-                    arch to "foss"
-                }
-                name.startsWith("app-") && name.endsWith("-with-Google-Cast.apk") -> {
-                    val arch = name.removePrefix("app-").removeSuffix("-with-Google-Cast.apk")
-                    arch to "gms"
-                }
-                else -> "universal" to "foss"
-            }
+            // Parse architecture and variant from the filename (see ReleaseAssetNaming).
+            val (arch, variant) = ReleaseAssetNaming.classify(name)
             
             assets.add(ReleaseAsset(name, downloadUrl, size, arch, variant))
         }
@@ -200,11 +188,8 @@ object Updater {
      */
     fun getDownloadUrlForCurrentVariant(releaseInfo: ReleaseInfo): String? {
         val (currentArch, currentVariant) = getCurrentAppVariant()
-        
-        return releaseInfo.assets
-            .find { it.architecture == currentArch && it.variant == currentVariant }
-            ?.downloadUrl
-            ?: releaseInfo.assets.firstOrNull()?.downloadUrl
+
+        return selectDownloadUrl(releaseInfo.assets, currentArch, currentVariant)
     }
 
     /**
@@ -258,3 +243,16 @@ object Updater {
      */
     fun getCachedLatestRelease(): ReleaseInfo? = cachedReleaseInfo
 }
+
+/**
+ * Picks the asset to download for [architecture]/[variant], never falling back to an F-Droid
+ * (izzy) APK: those builds ship without the in-app updater, so handing one to a FOSS/GMS install
+ * would replace a self-updating app with one that silently never updates again.
+ */
+internal fun selectDownloadUrl(
+    assets: List<ReleaseAsset>,
+    architecture: String,
+    variant: String
+): String? =
+    assets.find { it.architecture == architecture && it.variant == variant }?.downloadUrl
+        ?: assets.firstOrNull { it.variant != ReleaseAssetNaming.VARIANT_IZZY }?.downloadUrl
