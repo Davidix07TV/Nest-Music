@@ -1,0 +1,53 @@
+name: Fetch screenshots (temporary)
+
+# Temporary helper: the sandbox that prepares the F-Droid metadata can only
+# reach github.com, so it cannot download issue image attachments (they live on
+# S3). This workflow runs on a GitHub runner, fetches the attachments of
+# issue #44 and commits them to the current branch for local processing.
+#
+# It only runs when the pushed commit message contains "[fetch-screenshots]",
+# and is deleted once the screenshots are part of the fastlane metadata.
+
+on:
+  push:
+    branches:
+      - arena/344ddab9-nest-music
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    if: contains(github.event.head_commit.message, '[fetch-screenshots]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download issue attachments
+        run: |
+          set -euo pipefail
+          mkdir -p screenshots-tmp
+          i=1
+          for url in \
+            https://github.com/user-attachments/assets/26fb50f4-4e2e-48e6-aabc-a01311b80d76 \
+            https://github.com/user-attachments/assets/4b4b0de8-2a70-48f7-a21d-9191e9c45d1f \
+            https://github.com/user-attachments/assets/b36cfc57-2796-4341-bf5f-a3e8cdf5e388 \
+            https://github.com/user-attachments/assets/0e7cfed0-6a1c-486f-84ab-9d8a7db15040 \
+            https://github.com/user-attachments/assets/a942788c-d975-4cda-9f1a-f2c92c9e0dc4 \
+            https://github.com/user-attachments/assets/ac069ae8-a413-4700-ac80-8727d1feb6e5 ; do
+            curl -sSL --fail -o "screenshots-tmp/raw-$i.png" "$url"
+            echo "raw-$i.png: $(stat -c%s "screenshots-tmp/raw-$i.png") bytes"
+            i=$((i+1))
+          done
+          ls -la screenshots-tmp
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add screenshots-tmp
+          git commit -m "chore: stage F-Droid screenshots from issue #44"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
