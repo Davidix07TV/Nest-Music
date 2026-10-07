@@ -6,6 +6,10 @@
 # already works. Bump METROSERVER_COMMIT deliberately to take upstream fixes.
 #
 # Used by: Render (see README.md in this directory) and docker-compose.yml.
+# The build context is the *repository root*, not this directory, so the policy can be copied
+# through its path from the root (deploy/metroserver/ua_policy.json):
+#
+#     docker build -f deploy/metroserver/Dockerfile -t nest-music-metroserver .
 
 FROM golang:1.25.6-alpine AS builder
 
@@ -21,6 +25,8 @@ RUN git clone --quiet https://github.com/MetrolistGroup/metroserver.git . \
     && git submodule update --init --recursive --quiet
 RUN go mod download
 RUN bash scripts/generate_proto.sh
+# /out must exist before go build writes the binary, or the build dies with
+# "open /out/metroserver: no such file or directory".
 RUN mkdir -p /out && CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-w -s" -o /out/metroserver ./cmd/metroserver
 
 # ---------------------------------------------------------------------------
@@ -33,7 +39,8 @@ RUN apk add --no-cache ca-certificates \
     && chown metro:metro /data /app
 
 COPY --from=builder /out/metroserver /usr/local/bin/metroserver
-COPY --chown=metro:metro ua_policy.json /etc/metroserver/ua_policy.json
+# Path relative to the build context, which is the repository root (see ../../render.yaml).
+COPY --chown=metro:metro deploy/metroserver/ua_policy.json /etc/metroserver/ua_policy.json
 
 # Same working directory as upstream: a relative write lands somewhere writable
 # instead of the image root.

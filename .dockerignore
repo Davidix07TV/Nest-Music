@@ -1,0 +1,37 @@
+# Build context for deploy/metroserver/Dockerfile.
+#
+# Render and docker-compose build that Dockerfile with the *repository root* as context, so the
+# policy can be copied as deploy/metroserver/ua_policy.json. The image needs nothing else from the
+# repository — the server source is cloned inside the builder — so everything below is left out to
+# keep the context small and the upload fast.
+
+# Git
+.git
+.github
+.gitattributes
+.gitignore
+.gitmodules
+
+# Android / Gradle
+*.apk
+*.aab
+*.ap_
+*.keystore
+.gradle
+.kotlin
+**/build
+**/out
+app/keystore
+local.properties
+
+# Other platforms, docs and store metadata
+desktop
+ios
+docs
+assets
+fastlane
+
+# Tooling noise
+.idea
+*.iml
+*.log

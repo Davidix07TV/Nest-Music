@@ -16,17 +16,20 @@ host_not_allowed: Only allowlisted clients can host rooms
 The one public instance (`wss://metroserverx.meowery.eu/ws`) is run by Metrolist's maintainer, and
 the request for a list of alternative instances is
 [still open](https://github.com/MetrolistGroup/metroserver/issues/4). Self-hosting is how Nest
-Music gets a server that accepts it.
+Music gets a server that accepts it: Nest Music now runs its own instance on Render
+(`wss://nest-music-listen-together.onrender.com/ws`), and that is the default in new builds.
 
 ## What is in here
 
 | File | Purpose |
 | --- | --- |
-| `Dockerfile` | Builds metroserver from upstream source **pinned to a commit**, with this directory's policy baked in. No dependency on their container registry. |
+| `Dockerfile` | Builds metroserver from upstream source **pinned to a commit**, with this directory's policy baked in. No dependency on their container registry. Built with the repository root as context. |
 | `ua_policy.json` | Allows `com.nestmusic.music` (and `.debug`) to host, with no block/rickroll rules. |
 | `docker-compose.yml` | VPS path: metroserver plus Caddy for automatic TLS. |
 | `Caddyfile`, `.env.example` | Used by the compose stack. |
 | `../../render.yaml` | Render Blueprint (Render only reads it from the repository root). |
+| `../../.dockerignore` | Keeps the repository root small as a build context (`.git`, `ios`, `desktop`, `**/build`, …). |
+| `../../.github/workflows/keep-warm.yml` | Pings `/health` every 10 minutes so the free Render instance does not sleep. |
 
 Matching in the policy is a case-insensitive *substring*, so the single `com.nestmusic.music` entry
 also covers the `.debug` package and any future suffix. Metrolist and N-Zik keep working: their
@@ -44,7 +47,8 @@ spell wakes the server and the room opens on a later attempt.
 3. **Apply** and wait for the first build (a few minutes: it clones and compiles metroserver).
 4. The endpoint is `wss://nest-music-listen-together.onrender.com/ws` — or whatever name Render
    assigns if that one is taken. The `/ws` path matters.
-5. Paste that URL in the app: **Settings → Listen Together → Server URL**.
+5. That URL is already the default in Nest Music, so nothing else is needed. If Render assigned a
+   different name, paste it in the app: **Settings → Listen Together → Server URL**.
 
 `autoDeploy` is off: pushing a commit to the app does not restart the server, because a restart
 drops the rooms that are open at that moment. To deploy an update on purpose, use **Manual Deploy**
@@ -74,10 +78,19 @@ The endpoint is then `wss://<LT_DOMAIN>/ws`.
 In Nest Music: **Settings → Listen Together → Server URL**, then paste the `wss://…/ws` address.
 This works on any build, no rebuild needed.
 
-To ship that server as the app's *default* instead, add it to the `ServersJson` list in
-`app/src/main/kotlin/com/nestmusic/music/listentogether/ListenTogetherServers.kt` — the first entry
-is the default. The list is empty today on purpose, so no build points at a server it does not
-control.
+Nest Music's own instance is already the first entry of the `ServersJson` list in
+`app/src/main/kotlin/com/nestmusic/music/listentogether/ListenTogetherServers.kt`, and the first
+entry is the default for a fresh install. To ship a different server as the default, put it first in
+that list.
+
+## Keeping the free instance awake
+
+`https://nest-music-listen-together.onrender.com/health` is pinged every 10 minutes by
+`.github/workflows/keep-warm.yml`, which keeps the free instance from spinning down between plays
+(GitHub Actions minutes are free on public repositories, and ~730 hours/month still fit Render's
+750-hour free allowance). Scheduled workflows only run from the default branch and GitHub may delay
+them by a few minutes, so an occasional cold start is still possible — Nest Music retries the
+connection by itself.
 
 ## Operating notes
 
