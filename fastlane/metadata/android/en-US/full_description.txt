@@ -1,23 +1,46 @@
-Material 3 YouTube Music client for Android
+Nest Music is an unofficial, open-source client for YouTube Music: an ad-free music player with a Material 3 interface, offline downloads and synced lyrics.
 
-Features:
+About this fork
 
-- Play any song or video from YT Music
-- Background playback 
-- Personalized quick picks 
-- Library management 
-- Download and cache songs for offline playback
-- Search for songs, albums, artists, videos and playlists
-- Live lyrics 
-- YouTube Music account login support
-- Syncing of songs, artists, albums and playlists, from and to your account
-- Skip silence 
-- Import playlists 
-- Audio normalization 
-- Adjust tempo/pitch 
-- Local playlist management
-- Reorder songs in playlist or queue 
-- Light - Dark - black - Dynamic theme
+Nest Music is a fork of Metrolist (https://github.com/MetrolistGroup/Metrolist), which is itself a fork of InnerTune (https://github.com/z-huang/InnerTune). All credit for the original work goes to their authors. This project rebrands and extends it with its own features. It is not affiliated with, endorsed by or sponsored by Google or YouTube.
+
+Streaming and playback
+
+- Play any song or video from YouTube Music, without ads
+- Background playback with a media notification
+- Skip silence, crossfade and gapless playback
 - Sleep timer
-- Material 3 
-- etc.
+- Audio normalisation, tempo and pitch control
+- Equalizer with AutoEQ profile support
+
+Library and offline
+
+- Download and cache songs for offline listening
+- Manage your library: songs, albums, artists, playlists and history
+- Import, export and reorder playlists, plus queue management
+- YouTube Music account login with sync in both directions
+
+Lyrics and discovery
+
+- Live synced lyrics with word-by-word highlighting (LRCLIB, Kugou, Better Lyrics, Paxsenix)
+- AI lyrics translation and AI playlist generation from a text prompt
+- Music recognition (Shazam integration)
+- Personalised quick picks and search for songs, albums, artists, videos and playlists
+
+Social and integrations
+
+- Listen Together: real-time listening rooms, with this project's own server as the default
+- Discord rich presence
+- Home screen widgets and Android Auto support
+
+Interface
+
+- Light, dark, black and dynamic themes, with 19 preset colour palettes
+- Built with Jetpack Compose and Material 3
+
+Requirements
+
+- Android 8.0 or newer
+- An internet connection; a VPN or proxy is required in regions where YouTube Music is not available
+
+Nest Music is free software, released under the GNU General Public License v3.0. Source code, issues and translations: https://github.com/Davidix07TV/Nest-Music
