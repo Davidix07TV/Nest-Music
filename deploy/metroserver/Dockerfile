@@ -21,7 +21,7 @@ RUN git clone --quiet https://github.com/MetrolistGroup/metroserver.git . \
     && git submodule update --init --recursive --quiet
 RUN go mod download
 RUN bash scripts/generate_proto.sh
-RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-w -s" -o /out/metroserver ./cmd/metroserver
+RUN mkdir -p /out && CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-w -s" -o /out/metroserver ./cmd/metroserver
 
 # ---------------------------------------------------------------------------
 
