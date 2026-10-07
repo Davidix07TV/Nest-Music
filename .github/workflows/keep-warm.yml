@@ -1,0 +1,48 @@
+name: Keep Listen Together awake
+
+# Render's free plan spins the service down after ~15 minutes without traffic and the next
+# connection then waits 30-60 seconds for the cold start. A GET on /health every 10 minutes keeps
+# the instance running, so Listen Together rooms open immediately.
+#
+# - GitHub schedules cron jobs in UTC and runs them only from the default branch. Under load a run
+#   can be delayed by a few minutes, so a rare cold start is still possible; the app retries.
+# - GitHub Actions minutes are free for public repositories, and keeping one free Render instance
+#   awake around the clock (~730 h/month) still fits the 750 h/month of the free plan.
+# - GitHub disables scheduled workflows after 60 days without repository activity; the workflow
+#   shows up in the Actions tab and can be re-enabled (or run manually) from there.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: keep-warm
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    name: Ping /health
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Wake the server and check its health
+        run: |
+          set -euo pipefail
+          URL="https://nest-music-listen-together.onrender.com/health"
+
+          for attempt in 1 2 3 4; do
+            # --max-time covers the cold start (30-60s, up to ~2 min on a slow boot).
+            if curl --fail --silent --show-error --max-time 120 "$URL" > /dev/null; then
+              echo "Server awake and healthy (attempt $attempt)"
+              exit 0
+            fi
+            echo "Attempt $attempt failed, retrying in 15s"
+            sleep 15
+          done
+
+          echo "::error::nest-music-listen-together.onrender.com/health did not answer"
+          exit 1

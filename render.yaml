@@ -23,7 +23,9 @@ services:
     # nothing behind, but an existing service can never change region.
     region: frankfurt
     dockerfilePath: ./deploy/metroserver/Dockerfile
-    dockerContext: ./deploy/metroserver
+    # Root of the repository, consistent with dockerfilePath: the Dockerfile copies
+    # deploy/metroserver/ua_policy.json, and .dockerignore at the root keeps the context small.
+    dockerContext: .
     healthCheckPath: /health
     autoDeploy: false
     envVars:

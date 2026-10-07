@@ -3,8 +3,9 @@
 services:
   metroserver:
     build:
-      context: .
-      dockerfile: Dockerfile
+      # Repository root, so the Dockerfile can copy deploy/metroserver/ua_policy.json.
+      context: ../..
+      dockerfile: deploy/metroserver/Dockerfile
     restart: unless-stopped
     environment:
       PORT: "8080"

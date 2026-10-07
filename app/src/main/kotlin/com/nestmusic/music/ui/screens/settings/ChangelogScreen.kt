@@ -150,6 +150,12 @@ fun ChangelogScreen(
 
 @Composable
 fun ReleaseItem(release: ReleaseInfo) {
+    // Release titles are free-form ("🎵 Nest Music v1.0.9 - Sunset, Night and Aurora"): show one
+    // only when it says more than the tag already in the chip.
+    val title = release.title.takeIf {
+        it.isNotBlank() && it.removePrefix("v") != release.tagName.removePrefix("v")
+    }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -172,6 +178,16 @@ fun ReleaseItem(release: ReleaseInfo) {
                 text = release.releaseDate.split("T").firstOrNull() ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        if (title != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.fillMaxWidth()
             )
         }
 

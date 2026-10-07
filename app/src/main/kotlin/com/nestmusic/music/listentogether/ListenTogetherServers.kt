@@ -19,16 +19,26 @@ data class ListenTogetherServer(
 /**
  * Servers offered in the Listen Together settings.
  *
- * The list is deliberately empty: Nest Music ships no built-in backend, so the user points the app
- * at a server they trust (Settings > Listen Together > Server URL). Running one is documented in
- * `deploy/metroserver/`.
+ * The first entry is the default, so a fresh install can host a room without any setup: it is
+ * Nest Music's own metroserver, deployed from `deploy/metroserver/` with a User-Agent policy that
+ * allows `com.nestmusic.music` to host. The user can still point the app at another server under
+ * Settings > Listen Together > Server URL, and self-hosting is documented in `deploy/metroserver/`.
  *
- * Do not re-add a third-party server here without checking its User-Agent policy first. Servers
- * can gate hosting by client: the upstream default only allowlists Metrolist and N-Zik, and the
- * policy example sorts everything else into an advert or rickroll tier.
+ * Do not add a third-party server here without checking its User-Agent policy first. Servers can
+ * gate hosting by client: the upstream default only allowlists Metrolist and N-Zik, and the policy
+ * example sorts everything else into an advert or rickroll tier.
  */
 object ListenTogetherServers {
-    private const val ServersJson = "[]"
+    private const val ServersJson = """
+        [
+          {
+            "name": "Nest Music",
+            "url": "wss://nest-music-listen-together.onrender.com/ws",
+            "location": "Frankfurt",
+            "operator": "Nest Music"
+          }
+        ]
+    """
 
     /**
      * Hosts that used to ship as a built-in default. A URL pointing at any of them is treated as
@@ -53,7 +63,8 @@ object ListenTogetherServers {
     }
 
     /**
-     * Empty when no server ships with the app. Callers treat blank as "not configured".
+     * URL of the first entry in the list, i.e. the server a fresh install starts with. Callers
+     * treat blank as "not configured".
      */
     val defaultServerUrl: String
         get() = servers.firstOrNull()?.url.orEmpty()

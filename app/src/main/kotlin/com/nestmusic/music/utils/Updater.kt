@@ -16,7 +16,10 @@ import org.json.JSONObject
 
 data class ReleaseInfo(
     val tagName: String,
+    /** Version used for every comparison and for "latest version" labels, e.g. "1.0.10". */
     val versionName: String,
+    /** Release name as published on GitHub; free-form, good only for display. */
+    val title: String,
     val description: String,
     val releaseDate: String,
     val assets: List<ReleaseAsset>
@@ -46,21 +49,7 @@ object Updater {
      * Compares two version strings.
      * Returns: 1 if v1 > v2, -1 if v1 < v2, 0 if equal
      */
-    fun compareVersions(v1: String, v2: String): Int {
-        val v1Parts = v1.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
-        val v2Parts = v2.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
-        val maxLength = maxOf(v1Parts.size, v2Parts.size)
-        
-        for (i in 0 until maxLength) {
-            val part1 = v1Parts.getOrNull(i) ?: 0
-            val part2 = v2Parts.getOrNull(i) ?: 0
-            when {
-                part1 > part2 -> return 1
-                part1 < part2 -> return -1
-            }
-        }
-        return 0
-    }
+    fun compareVersions(v1: String, v2: String): Int = ReleaseVersion.compare(v1, v2)
 
     /**
      * Checks if the latest version is newer than the current version.
@@ -117,6 +106,27 @@ object Updater {
     }
 
     /**
+     * Builds a [ReleaseInfo] from one GitHub release object.
+     *
+     * The version is taken from `tag_name` ("v1.0.10" -> "1.0.10"). The `name` field is a free-form
+     * title ("🎵 Nest Music v1.0.9 - Sunset, Night and Aurora") and reading the version out of it
+     * turned every release into 0.0.0, so the update prompt never showed up.
+     */
+    private fun parseRelease(release: JSONObject): ReleaseInfo {
+        val tagName = release.optString("tag_name").takeIf { it.isNotBlank() && it != "null" }.orEmpty()
+        val title = release.optString("name").takeIf { it.isNotBlank() && it != "null" }.orEmpty()
+
+        return ReleaseInfo(
+            tagName = tagName,
+            versionName = ReleaseVersion.fromRelease(tagName, title),
+            title = title,
+            description = release.optString("body"),
+            releaseDate = release.optString("published_at"),
+            assets = parseAssets(release.optJSONArray("assets") ?: JSONArray())
+        )
+    }
+
+    /**
      * Fetch latest release from GitHub API
      */
     suspend fun getLatestRelease(forceRefresh: Boolean = false): Result<ReleaseInfo> =
@@ -131,13 +141,7 @@ object Updater {
                     .bodyAsText()
                 val json = JSONObject(response)
                 
-                val releaseInfo = ReleaseInfo(
-                    tagName = json.getString("tag_name"),
-                    versionName = json.optString("name").takeIf { it.isNotBlank() } ?: json.getString("tag_name"),
-                    description = json.optString("body"),
-                    releaseDate = json.optString("published_at"),
-                    assets = parseAssets(json.optJSONArray("assets") ?: JSONArray())
-                )
+                val releaseInfo = parseRelease(json)
                 
                 cachedReleaseInfo = releaseInfo
                 lastCheckTime = System.currentTimeMillis()
@@ -170,14 +174,7 @@ object Updater {
                     }
                     
                     for (i in 0 until json.length()) {
-                        val releaseObj = json.getJSONObject(i)
-                        releases.add(ReleaseInfo(
-                            tagName = releaseObj.getString("tag_name"),
-                            versionName = releaseObj.optString("name").takeIf { it.isNotBlank() } ?: releaseObj.getString("tag_name"),
-                            description = releaseObj.optString("body"),
-                            releaseDate = releaseObj.optString("published_at"),
-                            assets = parseAssets(releaseObj.optJSONArray("assets") ?: JSONArray())
-                        ))
+                        releases.add(parseRelease(json.getJSONObject(i)))
                     }
                     
                     page++
