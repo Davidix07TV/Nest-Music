@@ -5,6 +5,11 @@ name: Android release
 #   2. names it nest-music-<versionName>.apk (version read from app/build.gradle.kts),
 #   3. attaches it to the v<versionName> release and flags that release as Latest.
 #
+# The release title is exactly the version name: the in-app updater compares releases, and every
+# client older than the one that reads tag_name parses the title with a naive "split on dots",
+# where "1.0.10 - anything" would read as 1.0.0 and never offer the update. Put the description in
+# changelog.md instead.
+#
 # Creating the tag also wakes the desktop bundle workflows (they trigger on
 # v* tag pushes and upload their AppImage/deb to the same release).
 
@@ -167,7 +172,13 @@ jobs:
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             # Same version published again: refresh the APK in place and keep
-            # (or restore) the release flags.
+            # (or restore) the release flags. The title is left alone — it may
+            # have been written by hand.
+            EXISTING_NAME=$(gh release view "$TAG" --json name --jq '.name')
+            case "$EXISTING_NAME" in
+              "$VERSION"*) ;;
+              *) echo "::warning::release $TAG is titled '$EXISTING_NAME' — it must start with $VERSION or older clients read it as 0.0.0 and never offer the update" ;;
+            esac
             gh release upload "$TAG" "$APK" --clobber
             gh release edit "$TAG" $RELEASE_FLAGS
             echo "Updated release $TAG with a fresh APK"
@@ -189,8 +200,13 @@ jobs:
               echo ""
               cat release-notes.md
             } > final-notes.md
+            # The title must start with the version — and for clients released before the updater
+            # learned to read tag_name it has to *be* the version: those builds parse the title with
+            # a plain "split on dots, toIntOrNull" ("1.0.10" -> 1.0.10) and anything else
+            # ("1.0.10 - something") reads as 1.0.0, which silently hides the update prompt.
+            # Descriptive naming belongs in the release notes (changelog.md).
             gh release create "$TAG" "$APK" \
-              --title "Nest Music v$VERSION" \
+              --title "$VERSION" \
               --notes-file final-notes.md \
               --target "$GITHUB_SHA" \
               $RELEASE_FLAGS
