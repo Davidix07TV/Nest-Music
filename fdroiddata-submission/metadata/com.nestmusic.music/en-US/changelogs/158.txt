@@ -1,0 +1,2 @@
+- Fixed: the built-in updater can no longer offer you the F-Droid build. That APK ships without the updater, so choosing it would have turned update notifications off.
+- Releases now carry two APKs: the standard one and nest-music-<version>-izzy.apk, the build the F-Droid repositories serve.
