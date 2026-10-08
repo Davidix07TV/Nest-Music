@@ -1,0 +1,3 @@
+- Listen Together now uses Nest Music's own server by default, and a workflow keeps it awake so the first connection no longer waits for a cold start.
+- Fixed: update notifications are back. The app compared versions read from the release title, so newer releases looked like 0.0.0 and the prompt never appeared.
+- Any other Listen Together server can still be set under Settings > Listen Together > Server URL.

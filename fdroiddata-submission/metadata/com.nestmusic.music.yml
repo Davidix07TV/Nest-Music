@@ -1,0 +1,25 @@
+Categories:
+  - Multimedia
+AntiFeatures:
+  - NonFreeNet
+License: GPL-3.0-only
+AutoName: Nest Music
+SourceCode: https://github.com/Davidix07TV/Nest-Music
+IssueTracker: https://github.com/Davidix07TV/Nest-Music/issues
+
+RepoType: git
+Repo: https://github.com/Davidix07TV/Nest-Music
+
+Builds:
+  - versionName: 1.0.11
+    versionCode: 158
+    commit: 04a422bb9f4fd9ee7096c76274cff43694714452
+    subdir: .
+    submodules: true
+    gradle:
+      - izzy
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.11
+CurrentVersionCode: 158
