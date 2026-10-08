@@ -29,7 +29,7 @@ generated code).
 | `desktop/` | Tauri desktop client + Flask sidecar. See `desktop/README.md` and `desktop/CLAUDE.md`. |
 | `ios/` | SwiftUI client + `NestMusicTests`. |
 | `codemagic.yaml`, `fastlane/` | iOS CI + store metadata. |
-| `.github/workflows/` | `build.yml` (APKs), `build_pr.yml`, `pr-checks.yml` (JVM unit tests + ownership warnings), `build_quick.yml` (manual), `desktop-{windows,linux}.yml`, `keep-warm.yml` (pings the Listen Together server every 10 minutes), `release.yml` (FOSS + izzy APKs). |
+| `.github/workflows/` | `build.yml` (APKs), `build_pr.yml`, `pr-checks.yml` (JVM unit tests + ownership warnings), `build_quick.yml` (manual), `desktop-{windows,linux}.yml`, `keep-warm.yml` (pings the Listen Together server every 10 minutes), `release.yml` (FOSS APK). |
 | `development_guide.md` | Local setup walkthrough. Keep it in sync when setup steps change. |
 
 ## Rules for working on the project
@@ -104,12 +104,13 @@ will not compile.
 - Flavors: `foss` (default — in-app updater, no Cast), `gms` (updater + Google Cast), `izzy`
   (F-Droid compliant: no updater, no Cast). Task names are
   `assemble<Variant><BuildType>` / `test<Variant><BuildType>UnitTest`.
-- Release APKs (`release.yml`, one run per push to master): `nest-music-<version>.apk` is the FOSS
-  build with the in-app updater, `nest-music-<version>-izzy.apk` is the F-Droid build, which is
-  what the F-Droid repositories (IzzyOnDroid, f-droid.org) serve. Renaming either asset means
-  updating `ReleaseAssetNaming` too — the in-app updater picks its download from asset names and
-  must never offer the izzy APK, which ships without the updater. `workflow_dispatch` with
-  `dry_run: true` builds and signs both APKs without touching the release.
+- Release APK (`release.yml`, one run per push to master): `nest-music-<version>.apk` is the FOSS
+  build with the in-app updater. The izzy APK is no longer built or published (the IzzyOnDroid
+  listing was declined); the flavour is still defined, so `assembleIzzyRelease` keeps working by
+  hand. The in-app updater picks its download from asset names via `ReleaseAssetNaming` and must
+  never offer an izzy APK — those builds have no updater of their own, and releases up to v1.0.11
+  still carry one. `workflow_dispatch` with `dry_run: true` builds and signs the APK without
+  touching the release.
 - Debug APK: `app/build/outputs/apk/foss/debug/app-foss-debug.apk` (release:
   `app/build/outputs/apk/<flavor>/release/`). ABI filters are `arm64-v8a` and `armeabi-v7a`, and
   `ARCHITECTURE` is reported as `universal`; there is no separate per-ABI APK anymore.

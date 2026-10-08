@@ -1,11 +1,13 @@
 name: Android release
 
 # Publishes the Android app on every push to master:
-#   1. builds and signs two APKs: the FOSS one (in-app updater) and the F-Droid/izzy one
-#      (no updater, no Cast — this is what IzzyOnDroid and F-Droid serve),
-#   2. names them nest-music-<versionName>.apk and nest-music-<versionName>-izzy.apk
-#      (version read from app/build.gradle.kts),
-#   3. attaches both to the v<versionName> release and flags that release as Latest.
+#   1. builds and signs the FOSS APK (in-app updater),
+#   2. names it nest-music-<versionName>.apk (version read from app/build.gradle.kts),
+#   3. attaches it to the v<versionName> release and flags that release as Latest.
+#
+# The izzy APK (F-Droid flavour: no updater, no Cast) is no longer built or published: the
+# IzzyOnDroid listing was declined and no repository consumes it. The flavour itself is still
+# defined in app/build.gradle.kts, so `./gradlew :app:assembleIzzyRelease` keeps working by hand.
 #
 # The release title is exactly the version name: the in-app updater compares releases, and every
 # client older than the one that reads tag_name parses the title with a naive "split on dots",
@@ -15,8 +17,8 @@ name: Android release
 # Creating the tag also wakes the desktop bundle workflows (they trigger on
 # v* tag pushes and upload their AppImage/deb to the same release).
 #
-# workflow_dispatch accepts dry_run: builds and signs both APKs, uploads them as workflow
-# artifacts and stops before touching the release (used to validate the Izzy build).
+# workflow_dispatch accepts dry_run: builds and signs the APK, uploads it as a workflow
+# artifact and stops before touching the release.
 
 on:
   push:
@@ -155,89 +157,6 @@ jobs:
           echo "path=$TARGET" >> "$GITHUB_OUTPUT"
           ls -la "$OUTPUT_DIR/out/"
 
-      # Not fatal on purpose: if the izzy build breaks, the FOSS release must still go out and the
-      # F-Droid repositories simply stay one version behind until it is fixed. The run is annotated
-      # and the summary marks the asset as missing.
-      - name: Build Release APK (izzy, for F-Droid repositories)
-        id: izzy_build
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          ./gradlew --console=plain assembleIzzyRelease --warning-mode summary 2>&1 | tee gradle-izzy-build.log || status=$?
-          if [ "${status:-0}" -ne 0 ]; then
-            echo "::error::assembleIzzyRelease failed — error lines:"
-            { grep -E "^e: |^FAILURE:|What went wrong|^Caused by:|^> " gradle-izzy-build.log || tail -30 gradle-izzy-build.log; } | tail -60 | sed 's/^/::error::/'
-            exit "$status"
-          fi
-        env:
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          NESTMUSIC_APPLICATION_ID: com.nestmusic.music
-          NESTMUSIC_APP_NAME: Nest Music
-          NESTMUSIC_DEBUG_KEYSTORE_PATH: pr-debug.keystore
-          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'android' }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'androiddebugkey' }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'android' }}
-          PULL_REQUEST: "false"
-          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
-          LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
-
-      - name: Sign izzy APK
-        if: steps.izzy_build.outcome == 'success'
-        uses: ilharp/sign-android-release@v2.0.0
-        with:
-          releaseDir: app/build/outputs/apk/izzy/release/
-          signingKey: ${{ secrets.KEYSTORE }}
-          keyAlias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-          buildToolsVersion: 35.0.0
-
-      - name: Rename izzy APK to nest-music-<version>-izzy.apk
-        id: izzy_apk
-        if: steps.izzy_build.outcome == 'success'
-        run: |
-          set -euo pipefail
-          OUTPUT_DIR="app/build/outputs/apk/izzy/release"
-          mkdir -p "$OUTPUT_DIR/out"
-          SIGNED_APK=$(find "$OUTPUT_DIR" -maxdepth 1 \( -name "*-signed.apk" -o -name "*-unsigned-signed.apk" \) | head -1)
-          if [ -z "$SIGNED_APK" ]; then
-            echo "::error::No signed izzy APK found in $OUTPUT_DIR"
-            ls -la "$OUTPUT_DIR" || true
-            exit 1
-          fi
-          TARGET="$OUTPUT_DIR/out/nest-music-${{ steps.version.outputs.version }}-izzy.apk"
-          mv "$SIGNED_APK" "$TARGET"
-          echo "path=$TARGET" >> "$GITHUB_OUTPUT"
-          ls -la "$OUTPUT_DIR/out/"
-
-      # Evidence for the F-Droid side: which key signed the APK that reviewers will install.
-      # fdroiddata pins it later through AllowedAPKSigningKeys, so it must be the release key and
-      # must not change between releases. Informational only — it never fails the release.
-      - name: Verify the signed izzy APK
-        if: steps.izzy_build.outcome == 'success'
-        continue-on-error: true
-        env:
-          IZZY_APK: ${{ steps.izzy_apk.outputs.path }}
-        run: |
-          set -uo pipefail
-          {
-            echo "### izzy APK: \`$(basename "$IZZY_APK")\`"
-            echo ""
-            echo "- size: $(stat -c%s "$IZZY_APK") bytes"
-          } >> "$GITHUB_STEP_SUMMARY"
-          APKSIGNER=$(ls "${ANDROID_HOME:-/usr/local/lib/android/sdk}"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)
-          if [ -n "$APKSIGNER" ]; then
-            "$APKSIGNER" verify --print-certs "$IZZY_APK" >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
-            "$APKSIGNER" verify --print-certs "$IZZY_APK" 2>&1 | grep -i "SHA-256" || true
-          else
-            echo "apksigner not found — certificate not printed" | tee -a "$GITHUB_STEP_SUMMARY"
-          fi
-          if unzip -p "$IZZY_APK" 'classes*.dex' 2>/dev/null | grep -qa "com/google/android/gms/cast"; then
-            echo "::warning::the izzy APK references com.google.android.gms.cast — check the flavor sources"
-          else
-            echo "No Cast SDK reference inside the izzy APK" | tee -a "$GITHUB_STEP_SUMMARY"
-          fi
-
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v6
         with:
@@ -256,17 +175,9 @@ jobs:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
           VERSION: ${{ steps.version.outputs.version }}
           APK: ${{ steps.apk.outputs.path }}
-          IZZY_APK: ${{ steps.izzy_apk.outputs.path }}
         run: |
           set -euo pipefail
           TAG="v$VERSION"
-          # The izzy APK is optional: the release still ships when that build failed.
-          ASSETS=("$APK")
-          if [ -n "${IZZY_APK:-}" ]; then
-            ASSETS+=("$IZZY_APK")
-          else
-            echo "::warning::no izzy APK in this run — the F-Droid repositories will not get this version"
-          fi
           # Prerelease versions (e.g. 1.0.7-beta) stay out of the Latest slot.
           case "$VERSION" in
             *-*) RELEASE_FLAGS="--prerelease --latest=false" ;;
@@ -282,9 +193,9 @@ jobs:
               "$VERSION"*) ;;
               *) echo "::warning::release $TAG is titled '$EXISTING_NAME' — it must start with $VERSION or older clients read it as 0.0.0 and never offer the update" ;;
             esac
-            gh release upload "$TAG" "${ASSETS[@]}" --clobber
+            gh release upload "$TAG" "$APK" --clobber
             gh release edit "$TAG" $RELEASE_FLAGS
-            echo "Updated release $TAG with fresh FOSS and izzy APKs"
+            echo "Updated release $TAG with a fresh APK"
           else
             # First push for this version: notes from the changelog, git log as fallback.
             if bash .github/scripts/parse_changelog.sh "$VERSION" changelog.md > release-notes.md 2>/dev/null; then
@@ -308,7 +219,7 @@ jobs:
             # a plain "split on dots, toIntOrNull" ("1.0.10" -> 1.0.10) and anything else
             # ("1.0.10 - something") reads as 1.0.0, which silently hides the update prompt.
             # Descriptive naming belongs in the release notes (changelog.md).
-            gh release create "$TAG" "${ASSETS[@]}" \
+            gh release create "$TAG" "$APK" \
               --title "$VERSION" \
               --notes-file final-notes.md \
               --target "$GITHUB_SHA" \
@@ -322,11 +233,6 @@ jobs:
             echo "## Android release"
             echo "- **Version**: ${{ steps.version.outputs.version }} (code ${{ steps.version.outputs.version_code }})"
             echo "- **APK (FOSS, in-app updater)**: nest-music-${{ steps.version.outputs.version }}.apk"
-            if [ "${{ steps.izzy_build.outcome }}" = "success" ]; then
-              echo "- **APK (izzy, F-Droid repositories)**: nest-music-${{ steps.version.outputs.version }}-izzy.apk"
-            else
-              echo "- **APK (izzy, F-Droid repositories)**: NOT BUILT (see the izzy build step)"
-            fi
             if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
               echo "- **Dry run**: the release was not touched, APKs are in the workflow artifacts"
             else
