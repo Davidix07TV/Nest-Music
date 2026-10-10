@@ -1,0 +1,2 @@
+- La scheda ora spiega a cosa serve il microfono: il riconoscimento brani registra un solo campione di circa 12 secondi, lo tiene in memoria, non lo salva e invia solo un'impronta audio.
+- Interno: la variante F-Droid torna a essere verificata dalla CI ed e' stato corretto un errore nella sua ricetta di build.

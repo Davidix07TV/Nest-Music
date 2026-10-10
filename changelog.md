@@ -3,6 +3,22 @@
 This file contains Nest Music release notes consumed by the Android release workflow. Each `---v<version>` line starts a release-note
 block. Nest Music's history here starts at v1.0.0.
 
+---v1.0.12
+# v1.0.12 — F-Droid submission (2026-10-10)
+
+### Changed
+- The store listing now says exactly what the microphone is used for. Music recognition records a
+  single sample of about 12 seconds, keeps it in memory, never writes it to storage, and sends only
+  a computed audio fingerprint — never the recording itself. Deny the permission and the rest of the
+  app is unaffected.
+
+### Internal
+- The `izzy` variant (no Cast, no self-updater) is compiled by CI again on every push. It is the
+  build the F-Droid repositories produce from source, and nothing had been verifying it since it
+  stopped being attached to releases.
+- Corrected the F-Droid build recipe, which pointed at the repository root instead of the `app`
+  module and would have failed the build outright.
+
 ---v1.0.11
 # v1.0.11 — F-Droid ready (2026-10-07)
 

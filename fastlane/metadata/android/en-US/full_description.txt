@@ -38,6 +38,11 @@ Interface
 - Light, dark, black and dynamic themes, with 19 preset colour palettes
 - Built with Jetpack Compose and Material 3
 
+Permissions
+
+- Microphone (RECORD_AUDIO): requested only by the optional music recognition feature. When you start a recognition, the app records a single sample of about 12 seconds and then stops on its own. The audio is held in memory only, is never written to storage, and is never uploaded: what leaves the device is a computed audio fingerprint, not the recording. Nothing is captured in the background, and if you deny the permission every other part of the app keeps working.
+- Notifications, foreground service and wake lock: needed to keep playback running and to show the media notification while the screen is off.
+
 Requirements
 
 - Android 8.0 or newer
