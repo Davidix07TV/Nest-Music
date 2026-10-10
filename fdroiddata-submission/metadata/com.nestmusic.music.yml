@@ -18,9 +18,9 @@ RepoType: git
 Repo: https://github.com/Davidix07TV/Nest-Music.git
 
 Builds:
-  - versionName: 1.0.11
-    versionCode: 158
-    commit: 04a422bb9f4fd9ee7096c76274cff43694714452
+  - versionName: 1.0.12
+    versionCode: 159
+    commit: v1.0.12
     subdir: app
     submodules: true
     gradle:
@@ -28,5 +28,5 @@ Builds:
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 1.0.11
-CurrentVersionCode: 158
+CurrentVersion: 1.0.12
+CurrentVersionCode: 159

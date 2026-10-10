@@ -17,7 +17,7 @@ Nest Music is a maintained fork rather than a rebrand. Concrete additions over u
 - Package: `com.nestmusic.music`
 - License: GPL-3.0-only (matches the `LICENSE` file in the repository root)
 - Source: https://github.com/Davidix07TV/Nest-Music
-- Tag `v1.0.11` → commit `04a422bb9f4fd9ee7096c76274cff43694714452` (verified against the GitHub tag ref), `versionName` 1.0.11, `versionCode` 158
+- Tag `v1.0.12` → `versionName` 1.0.12, `versionCode` 159. The recipe pins the tag name, consistent with `UpdateCheckMode: Tags` and `AutoUpdateMode: Version`; happy to pin the commit SHA instead if you prefer.
 - Build variant: Gradle `izzy` product flavour, which disables Google Cast and the in-app updater. It is the only F-Droid-compliant flavour; `foss` and `gms` both ship the in-app updater.
 - The build checks out the `metroproto` Git submodule, hence `submodules: true`.
 - `subdir: app` — the Android application module lives in `app/`, alongside the library modules `innertube`, `kugou`, `lrclib`, `lastfm`, `betterlyrics`, `shazamkit` and `paxsenix`.
@@ -45,7 +45,7 @@ Listed up front rather than left to be discovered:
 
 The app was proposed to IzzyOnDroid ([repodata issue #686](https://codeberg.org/IzzyOnDroid/repodata/issues/686)) and was declined there under that repository's App Inclusion AI Policy. Independently of that decision, the maintainer ran a courtesy APK scan on the `v1.0.10` release (SHA-256 `e905d7e4a5ae2f85a5356c7d9fcde66dae2db22a5dbe163e8238bcda71ab0f85`) and reported: *"Scan results look fine, fastlane tree looks fine – you might consider heading over to F-Droid.org for inclusion."*
 
-The scan found 12 permissions with `RECORD_AUDIO` as the only dangerous one, and detected libraries that are all Apache-2.0 or compatible. The scan covered `v1.0.10`; this MR submits `v1.0.11`, which differs by the updater and F-Droid listing changes described in the release notes.
+The scan found 12 permissions with `RECORD_AUDIO` as the only dangerous one, and detected libraries that are all Apache-2.0 or compatible. The scan covered `v1.0.10`; this MR submits `v1.0.12`. The differences are the updater change in 1.0.11 and the listing and CI changes in 1.0.12, both described in the release notes — no change to the permission set.
 
 ## Use of AI assistance
 
@@ -59,7 +59,7 @@ F-Droid's guidance for apps entering the main repository is to consume upstream 
 
 Screenshots for review:
 
-- [1](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.11/fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg) · [2](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.11/fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg) · [3](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.11/fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg) · [4](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.11/fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg) · [5](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.11/fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpg) · [6](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.11/fastlane/metadata/android/en-US/images/phoneScreenshots/6.jpg)
+- [1](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.12/fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg) · [2](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.12/fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg) · [3](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.12/fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg) · [4](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.12/fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg) · [5](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.12/fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpg) · [6](https://raw.githubusercontent.com/Davidix07TV/Nest-Music/v1.0.12/fastlane/metadata/android/en-US/images/phoneScreenshots/6.jpg)
 
 ## Inclusion checklist
 
@@ -79,7 +79,7 @@ Screenshots for review:
 
 ## CI status
 
-The `v1.0.11` tag's Android release workflow run [37668543387](https://github.com/Davidix07TV/Nest-Music/actions/runs/37668543387) succeeded, including the `izzy` release build, signing and verification.
+The `v1.0.11` tag's Android release workflow run [37668543387](https://github.com/Davidix07TV/Nest-Music/actions/runs/37668543387) succeeded, including the `izzy` release build, signing and verification. `v1.0.12` is cut by the same workflow from master.
 
 A later change ([PR #46](https://github.com/Davidix07TV/Nest-Music/pull/46)) dropped the `izzy` APK from the release workflow, since no repository consumed it once the IzzyOnDroid listing was declined. That left the F-Droid flavour built by nothing. A dedicated `build_fdroid_flavor` job has since been added to `.github/workflows/build.yml`: it runs `./gradlew assembleIzzyRelease` on every push to master as a compile check (no signing, no artifact upload), so the variant this recipe builds cannot break silently. The published GitHub release continues to expose the standard FOSS APK only; F-Droid builds from tagged source regardless.
 

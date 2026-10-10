@@ -1,0 +1,2 @@
+- The listing now explains what the microphone is for: music recognition records one sample of about 12 seconds, keeps it in memory, never stores it, and sends only an audio fingerprint.
+- Internal: the F-Droid build variant is verified by CI again, and a fault in its build recipe was fixed.
