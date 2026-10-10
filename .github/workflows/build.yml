@@ -24,6 +24,48 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The `izzy` flavour (no Cast, no in-app updater) is the variant F-Droid builds
+  # from source for the fdroiddata submission. No release workflow publishes it
+  # any more, so without this job it would be the only variant nobody compiles
+  # and it could break silently until an F-Droid build fails downstream. This is
+  # a compile check only: no signing, no artifact upload. The release build type
+  # falls back to the debug keystore when no release keystore is present, so it
+  # needs no secrets.
+  build_fdroid_flavor:
+    name: Verify F-Droid flavour compiles (izzy)
+    if: github.actor != 'dependabot[bot]' && github.actor != 'renovate[bot]'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_CACHE_KEY }}
+          cache-cleanup: on-success
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build izzy release APK
+        run: ./gradlew --console=plain assembleIzzyRelease --warning-mode summary
+        env:
+          NESTMUSIC_APPLICATION_ID: com.nestmusic.music
+          PULL_REQUEST: "false"
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
+
   build_release:
     name: Build Release (${{ matrix.variant }})
     if: github.actor != 'dependabot[bot]' && github.actor != 'renovate[bot]'
@@ -35,9 +77,9 @@ jobs:
         include:
           # FOSS and Izzy differ from GMS only by ~80 lines of Cast stubs,
           # plus the updater flag for Izzy (GMS and FOSS enable the updater,
-          # Izzy disables it). The release workflow builds FOSS, and the izzy
-          # APK is no longer built at all, so building them nightly too only
-          # doubled this workflow for almost no extra coverage.
+          # Izzy disables it). The release workflow builds FOSS, and izzy is
+          # compile-checked by the build_fdroid_flavor job above, so producing
+          # signed nightly APKs for them here adds almost no extra coverage.
           - variant: gms
             variantName: Gms
 
@@ -109,9 +151,9 @@ jobs:
         include:
           # FOSS and Izzy differ from GMS only by ~80 lines of Cast stubs,
           # plus the updater flag for Izzy (GMS and FOSS enable the updater,
-          # Izzy disables it). The release workflow builds FOSS, and the izzy
-          # APK is no longer built at all, so building them nightly too only
-          # doubled this workflow for almost no extra coverage.
+          # Izzy disables it). The release workflow builds FOSS, and izzy is
+          # compile-checked by the build_fdroid_flavor job above, so producing
+          # signed nightly APKs for them here adds almost no extra coverage.
           - variant: gms
             variantName: Gms
 
