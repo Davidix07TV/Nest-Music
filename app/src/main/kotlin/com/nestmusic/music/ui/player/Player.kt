@@ -148,6 +148,8 @@ import com.nestmusic.music.constants.PlayerBackgroundStyleKey
 import com.nestmusic.music.constants.PlayerButtonsStyle
 import com.nestmusic.music.constants.PlayerButtonsStyleKey
 import com.nestmusic.music.constants.PlayerHorizontalPadding
+import com.nestmusic.music.constants.PlayerStyle
+import com.nestmusic.music.constants.PlayerStyleKey
 import com.nestmusic.music.constants.QueuePeekHeight
 import com.nestmusic.music.constants.SleepTimerDefaultKey
 import com.nestmusic.music.constants.SleepTimerFadeOutKey
@@ -220,6 +222,18 @@ fun BottomSheetPlayer(
     val copiedArtistStr = stringResource(R.string.copied_artist)
     val bottomSheetPageState = LocalBottomSheetPageState.current
     val playerConnection = LocalPlayerConnection.current ?: return
+
+    // The player style is a whole different screen, not a different arrangement of this one, so it
+    // hands over here rather than threading a flag through every branch below.
+    val (playerStyle, _) = rememberEnumPreference(PlayerStyleKey, PlayerStyle.NEST)
+    if (playerStyle == PlayerStyle.APPLE_MUSIC) {
+        AppleMusicPlayer(
+            state = state,
+            navController = navController,
+            modifier = modifier,
+        )
+        return
+    }
 
     val (useNewPlayerDesign, onUseNewPlayerDesignChange) =
         rememberPreference(

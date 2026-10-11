@@ -125,7 +125,11 @@ import kotlinx.coroutines.withContext
 import com.nestmusic.music.ui.theme.NestSunsetColors
 import com.nestmusic.music.ui.theme.PlayerColorExtractor
 import com.nestmusic.music.ui.theme.useNestUi
+import com.nestmusic.music.ui.component.LocalGlassBackdrop
+import com.nestmusic.music.ui.component.LocalLiquidGlassEnabled
 import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.isLiquidGlassSupported
+import com.nestmusic.music.ui.component.liquidGlass
 import com.nestmusic.music.ui.menu.AddToPlaylistDialog
 
 /**
@@ -293,12 +297,24 @@ private fun NewMiniPlayer(
 
     // Memoize colors
     val nestUi = useNestUi()
-    val backgroundColor = when (miniPlayerBackground) {
-        MiniPlayerBackgroundStyle.DEFAULT    -> if (nestUi) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.surfaceContainer
-        MiniPlayerBackgroundStyle.TRANSPARENT -> Color.Black.copy(alpha = 0.25f)
-        MiniPlayerBackgroundStyle.BLUR       -> MaterialTheme.colorScheme.surfaceContainer
-        MiniPlayerBackgroundStyle.GRADIENT   -> MaterialTheme.colorScheme.surfaceContainer
-        MiniPlayerBackgroundStyle.PURE_BLACK -> Color.Black
+
+    // Liquid glass replaces the flat surface of the default style: the pane samples and blurs the
+    // screen behind the mini player instead of painting a solid colour over it. The other styles
+    // keep their own background — glass over a blurred cover would only be soup.
+    val glassBackdrop = LocalGlassBackdrop.current
+    val glassActive =
+        LocalLiquidGlassEnabled.current &&
+            isLiquidGlassSupported &&
+            glassBackdrop != null &&
+            miniPlayerBackground == MiniPlayerBackgroundStyle.DEFAULT
+
+    val backgroundColor = when {
+        glassActive -> Color.Transparent
+        miniPlayerBackground == MiniPlayerBackgroundStyle.DEFAULT -> if (nestUi) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.surfaceContainer
+        miniPlayerBackground == MiniPlayerBackgroundStyle.TRANSPARENT -> Color.Black.copy(alpha = 0.25f)
+        miniPlayerBackground == MiniPlayerBackgroundStyle.BLUR -> MaterialTheme.colorScheme.surfaceContainer
+        miniPlayerBackground == MiniPlayerBackgroundStyle.GRADIENT -> MaterialTheme.colorScheme.surfaceContainer
+        else -> Color.Black
     }
     val forceLightColors = !useDarkTheme && (miniPlayerBackground == MiniPlayerBackgroundStyle.PURE_BLACK ||
             miniPlayerBackground == MiniPlayerBackgroundStyle.BLUR ||
@@ -387,6 +403,19 @@ private fun NewMiniPlayer(
                     .height(64.dp)
                     .offset { IntOffset(offsetXAnimatable.value.roundToInt(), 0) }
                     .clip(RoundedCornerShape(32.dp))
+                    .then(
+                        if (glassActive) {
+                            // Drawn behind the row's own content, exactly where the flat background
+                            // would have been.
+                            Modifier.liquidGlass(
+                                backdrop = glassBackdrop,
+                                shape = RoundedCornerShape(32.dp),
+                                blurRadius = 24.dp,
+                            )
+                        } else {
+                            Modifier
+                        },
+                    )
                     .background(color = backgroundColor)
                     .border(1.dp, outlineColor.copy(alpha = 0.3f), RoundedCornerShape(32.dp))
                     .clickable(

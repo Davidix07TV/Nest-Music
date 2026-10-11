@@ -488,6 +488,26 @@ enum class PlayerBackgroundStyle {
     BLUR,
 }
 
+/**
+ * Which full-screen player the app draws.
+ *
+ * NEST is the player this fork has always had. APPLE_MUSIC is the Apple Music-style one, ported
+ * from SimpMusic: artwork you tap to swap for the lyrics, the title row with its badge, a thin
+ * scrubber, plain transport controls and a row of glass buttons under them.
+ */
+val PlayerStyleKey = stringPreferencesKey("player_style")
+
+enum class PlayerStyle {
+    NEST,
+    APPLE_MUSIC,
+}
+
+/**
+ * Liquid glass surfaces (player, mini player, navigation bar). Only Android 12 and up can blur, so
+ * the setting is offered only there; below it the surfaces fall back to the flat pill.
+ */
+val LiquidGlassKey = booleanPreferencesKey("liquid_glass")
+
 val TopSize = stringPreferencesKey("topSize")
 val HistoryDuration = floatPreferencesKey("historyDuration")
 

@@ -61,10 +61,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nestmusic.music.constants.LyricsAnimationStyle
+import com.nestmusic.music.constants.LyricsAnimationStyleKey
 import com.nestmusic.music.lyrics.LyricsEntry
 import com.nestmusic.music.lyrics.WordTimestamp
 import com.nestmusic.music.playback.PlayerConnection
 import com.nestmusic.music.ui.screens.settings.LyricsPosition
+import com.nestmusic.music.utils.rememberEnumPreference
 import kotlinx.coroutines.isActive
 import kotlin.math.abs
 import kotlin.math.cos
@@ -142,21 +145,42 @@ internal fun LyricsLine(
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
-    
+
+    val lyricsAnimationStyle by rememberEnumPreference(LyricsAnimationStyleKey, LyricsAnimationStyle.APPLE)
+
+    // Apple Music lyrics: every line is drawn at the same size and what separates the sung line
+    // from the rest is focus, not scale — the active line is white and sharp, its neighbours grey
+    // and progressively out of focus. Background vocals keep the classic treatment: they annotate
+    // the line rather than being one, so they must not take part in the depth of field.
+    val appleStyle = lyricsAnimationStyle == LyricsAnimationStyle.APPLE && isSynced && !item.isBackground
+    val appleHasActiveLine = displayedCurrentLineIndex >= 0
+    val appleDistance = if (appleHasActiveLine) index - displayedCurrentLineIndex else 0
+
     val itemModifier = modifier
         .fillMaxWidth()
         .onSizeChanged { onSizeChanged(it.height) }
-        .clip(RoundedCornerShape(8.dp))
+        .clip(RoundedCornerShape(if (appleStyle) AppleMusicLyricCornerRadius else 8.dp))
         .combinedClickable(
             onClick = onClick,
             onLongClick = onLongClick
         )
         .background(if (isSelected && isSelectionModeActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else Color.Transparent)
         .padding(
-            start = when (lyricsTextPosition) { LyricsPosition.LEFT, LyricsPosition.RIGHT -> 11.dp; LyricsPosition.CENTER -> 24.dp },
-            end = when (lyricsTextPosition) { LyricsPosition.LEFT, LyricsPosition.RIGHT -> 11.dp; LyricsPosition.CENTER -> 24.dp },
-            top = if (item.isBackground) 0.dp else 12.dp,
-            bottom = if (item.isBackground) 2.dp else 12.dp // simplified gap logic
+            start = if (appleStyle) AppleMusicLyricPaddingX else when (lyricsTextPosition) { LyricsPosition.LEFT, LyricsPosition.RIGHT -> 11.dp; LyricsPosition.CENTER -> 24.dp },
+            end = if (appleStyle) AppleMusicLyricPaddingX else when (lyricsTextPosition) { LyricsPosition.LEFT, LyricsPosition.RIGHT -> 11.dp; LyricsPosition.CENTER -> 24.dp },
+            // Apple spaces the lines from inside the line item, so the row itself carries no gap.
+            top = if (appleStyle) 0.dp else if (item.isBackground) 0.dp else 12.dp,
+            bottom = if (appleStyle) 0.dp else if (item.isBackground) 2.dp else 12.dp
+        )
+        .then(
+            if (appleStyle) {
+                Modifier.appleMusicLyricFocus(
+                    distanceFromCurrent = appleDistance,
+                    hasActiveLine = appleHasActiveLine,
+                )
+            } else {
+                Modifier
+            },
         )
 
     val agentAlignment = when {
@@ -200,17 +224,28 @@ internal fun LyricsLine(
                 val inactiveAlpha = if (item.isBackground) 0.08f else 0.2f
                 val activeAlpha = 1f
                 val focusedAlpha = if (item.isBackground) 0.5f else 0.3f
-                val targetAlpha = if (!isSynced || item.isBackground || isActiveLine) {
-                    activeAlpha
-                } else if (isAutoScrollEnabled && displayedCurrentLineIndex >= 0) {
-                    when (abs(index - displayedCurrentLineIndex)) {
-                        0 -> focusedAlpha
-                        1 -> 0.2f; 2 -> 0.2f; 3 -> 0.15f; 4 -> 0.1f; else -> 0.08f
-                    }
-                } else inactiveAlpha
+                val targetAlpha = when {
+                    // The Apple page's dimming is distance-based and lives on the focus modifier;
+                    // animating alpha here as well would only fight it.
+                    appleStyle -> 1f
+                    !isSynced || item.isBackground || isActiveLine -> activeAlpha
+                    isAutoScrollEnabled && displayedCurrentLineIndex >= 0 ->
+                        when (abs(index - displayedCurrentLineIndex)) {
+                            0 -> focusedAlpha
+                            1 -> 0.2f; 2 -> 0.2f; 3 -> 0.15f; 4 -> 0.1f; else -> 0.08f
+                        }
+                    else -> inactiveAlpha
+                }
                 
                 val animatedAlpha by animateFloatAsState(targetAlpha, tween(250), label = "lyricsLineAlpha")
-                val lineColor = expressiveAccent.copy(alpha = if (item.isBackground) focusedAlpha else animatedAlpha)
+                val lineColor =
+                    if (appleStyle) {
+                        // Grey, full stop — white at reduced opacity is still white on a dark page,
+                        // which is what made every line look equally lit.
+                        AppleMusicInactiveLineColor
+                    } else {
+                        expressiveAccent.copy(alpha = if (item.isBackground) focusedAlpha else animatedAlpha)
+                    }
                 
                 val romanizedTextState by item.romanizedTextFlow.collectAsStateWithLifecycle()
                 val isRomanizedAvailable = romanizedTextState != null
@@ -220,10 +255,12 @@ internal fun LyricsLine(
                 val subText = if (item.isBackground) subTextRaw?.removePrefix("(")?.removeSuffix(")") else subTextRaw
 
                 val lyricStyle = TextStyle(
-                    fontSize = if (item.isBackground) (lyricsTextSize * 0.7f).sp else lyricsTextSize.sp,
+                    // Apple sets lyrics far larger than body copy: a line is meant to fill most of
+                    // the width and wrap after a few words, so it reads at arm's length.
+                    fontSize = if (appleStyle) AppleMusicLyricFontSize else if (item.isBackground) (lyricsTextSize * 0.7f).sp else lyricsTextSize.sp,
                     fontWeight = FontWeight.Bold,
                     fontStyle = if (item.isBackground) FontStyle.Italic else FontStyle.Normal,
-                    lineHeight = if (item.isBackground) (lyricsTextSize * 0.7f * lyricsLineSpacing).sp else (lyricsTextSize * lyricsLineSpacing).sp,
+                    lineHeight = if (appleStyle) AppleMusicLyricLineHeight else if (item.isBackground) (lyricsTextSize * 0.7f * lyricsLineSpacing).sp else (lyricsTextSize * lyricsLineSpacing).sp,
                     letterSpacing = (-0.5).sp,
                     textAlign = agentTextAlign,
                     fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
@@ -266,12 +303,24 @@ internal fun LyricsLine(
                         expressiveAccent = expressiveAccent,
                         isBackground = item.isBackground,
                         focusedAlpha = focusedAlpha,
-                        alignment = agentTextAlign
+                        alignment = agentTextAlign,
+                        // The unsung ink of an Apple line is grey and the sung ink white; the
+                        // canvas renderer takes both so it can paint the wipe in those colours.
+                        pendingInkOverride = if (appleStyle) AppleMusicPendingWordColor else null,
+                        sungInkOverride = if (appleStyle) AppleMusicSungWordColor else null,
                     )
                 } else {
                     Text(
                         text = mainText ?: "",
-                        style = lyricStyle.copy(color = if (isActiveLine) expressiveAccent else lineColor),
+                        style =
+                            lyricStyle.copy(
+                                color =
+                                    if (appleStyle) {
+                                        if (isActiveLine) AppleMusicSungWordColor else AppleMusicInactiveLineColor
+                                    } else {
+                                        if (isActiveLine) expressiveAccent else lineColor
+                                    },
+                            ),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -280,11 +329,16 @@ internal fun LyricsLine(
                     subText?.let { 
                         Text(
                             text = it,
-                            fontSize = 18.sp,
-                            color = expressiveAccent.copy(alpha = 0.6f),
+                            fontSize = if (appleStyle) AppleMusicSubLineFontSize else 18.sp,
+                            color =
+                                if (appleStyle) {
+                                    if (isActiveLine) AppleMusicRomanizedColor else AppleMusicInactiveLineColor
+                                } else {
+                                    expressiveAccent.copy(alpha = 0.6f)
+                                },
                             textAlign = agentTextAlign,
                             fontWeight = FontWeight.Normal,
-                            modifier = Modifier.padding(top = 2.dp)
+                            modifier = Modifier.padding(top = if (appleStyle) AppleMusicMainToSubGap else 2.dp)
                         )
                     }
                 }
@@ -293,11 +347,16 @@ internal fun LyricsLine(
                 transText?.let { 
                     Text(
                         text = it,
-                        fontSize = 16.sp,
-                        color = expressiveAccent.copy(alpha = 0.5f),
+                        fontSize = if (appleStyle) AppleMusicSubLineFontSize else 16.sp,
+                        color =
+                            if (appleStyle) {
+                                if (isActiveLine) AppleMusicTranslatedColor else AppleMusicInactiveLineColor
+                            } else {
+                                expressiveAccent.copy(alpha = 0.5f)
+                            },
                         textAlign = agentTextAlign,
                         fontWeight = FontWeight.Normal,
-                        modifier = Modifier.padding(top = 4.dp)
+                        modifier = Modifier.padding(top = if (appleStyle) AppleMusicMainToSubGap else 4.dp)
                     )
                 }
             }
@@ -330,8 +389,14 @@ private fun WordLevelLyrics(
     expressiveAccent: Color,
     isBackground: Boolean,
     focusedAlpha: Float,
-    alignment: TextAlign
+    alignment: TextAlign,
+    // Null keeps the classic palette. Overridden, the wipe is painted in Apple's white-on-grey.
+    pendingInkOverride: Color? = null,
+    sungInkOverride: Color? = null,
 ) {
+    val pendingInk = pendingInkOverride ?: expressiveAccent
+    val sungInk = sungInkOverride ?: expressiveAccent
+    val appleInk = pendingInkOverride != null
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
     val glowPaint = remember {
@@ -535,7 +600,7 @@ private fun WordLevelLyrics(
                         Triple(sungFactor, isWordSung, isWordActive)
                     }
 
-                    drawText(layoutResult, color = lineColor.copy(alpha = focusedAlpha))
+                    drawText(layoutResult, color = if (appleInk) lineColor else lineColor.copy(alpha = focusedAlpha))
 
                     effectiveWords.indices.forEach { wIdx ->
                         val (sungFactor, isWordSung, isWordActive) = wordFactors[wIdx]
@@ -561,11 +626,19 @@ private fun WordLevelLyrics(
                         if (found) {
                             if (isWordSung) {
                                 clipRect(left = left, top = top, right = right, bottom = bottom) {
-                                    drawText(layoutResult, color = expressiveAccent)
+                                    drawText(layoutResult, color = sungInk)
                                 }
                             } else if (isWordActive && sungFactor > 0f) {
                                 clipRect(left = left, top = top, right = right, bottom = bottom) {
-                                    drawText(layoutResult, color = expressiveAccent.copy(alpha = focusedAlpha + (1f - focusedAlpha) * sungFactor))
+                                    drawText(
+                                        layoutResult,
+                                        color =
+                                            if (appleInk) {
+                                                sungInk
+                                            } else {
+                                                expressiveAccent.copy(alpha = focusedAlpha + (1f - focusedAlpha) * sungFactor)
+                                            },
+                                    )
                                 }
                             }
                         }
@@ -761,7 +834,7 @@ private fun WordLevelLyrics(
                                 val baseGlowRadius = 12.dp.toPx() * impactFactor                                                                                    
                                 drawIntoCanvas { canvas ->
                                     glowPaint.maskFilter = BlurMaskFilter(baseGlowRadius, BlurMaskFilter.Blur.NORMAL)
-                                    glowPaint.color = expressiveAccent.copy(alpha = glowAlpha).toArgb()
+                                    glowPaint.color = (if (appleInk) Color.White else expressiveAccent).copy(alpha = glowAlpha).toArgb()
                                     glowPaint.textSize = lyricStyle.fontSize.toPx()
                                     glowPaint.typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
                                     canvas.nativeCanvas.drawText(letterLayouts[i].layoutInput.text.text, 0f, letterLayouts[i].firstBaseline, glowPaint)
@@ -769,19 +842,29 @@ private fun WordLevelLyrics(
                             }
                         }
                         val baseAlpha = if (isWordSung || charLp > 0.99f) 1f else (focusedAlpha + (1f - focusedAlpha) * sungFactor)
-                        drawText(letterLayouts[i], color = expressiveAccent.copy(alpha = if (wordIdx == -1) focusedAlpha else baseAlpha))
+                        drawText(
+                            letterLayouts[i],
+                            color =
+                                if (appleInk) {
+                                    // Grey until the wipe reaches the character; the white is painted
+                                    // on top by the clips below.
+                                    pendingInk
+                                } else {
+                                    expressiveAccent.copy(alpha = if (wordIdx == -1) focusedAlpha else baseAlpha)
+                                },
+                        )
                         if (!isWordSung && charLp > 0f && charLp < 1f) {
                             val fXL = charBounds.width * charLp
                             val eW = (charBounds.width * 0.45f).coerceAtLeast(1f)
                             val sWL = (fXL - eW).coerceAtLeast(0f)
                             if (sWL > 0f) {
-                                clipRect(left = 0f, top = 0f, right = sWL, bottom = charBounds.height) { drawText(letterLayouts[i], color = expressiveAccent) }
+                                clipRect(left = 0f, top = 0f, right = sWL, bottom = charBounds.height) { drawText(letterLayouts[i], color = sungInk) }
                             }
                             for (j in 0 until 12) {
                                 val start = sWL + (j * eW / 12f)
                                 val end = (sWL + ((j + 1) * eW / 12f) + 0.5f).coerceAtMost(fXL)
                                 if (end > start) {
-                                    clipRect(left = start, top = 0f, right = end, bottom = charBounds.height) { drawText(letterLayouts[i], color = expressiveAccent.copy(alpha = 1f - (j + 0.5f) / 12f)) }
+                                    clipRect(left = start, top = 0f, right = end, bottom = charBounds.height) { drawText(letterLayouts[i], color = sungInk.copy(alpha = 1f - (j + 0.5f) / 12f)) }
                                 }
                             }
                         }
