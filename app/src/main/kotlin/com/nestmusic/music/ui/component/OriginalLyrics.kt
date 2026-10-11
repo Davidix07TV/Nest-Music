@@ -171,6 +171,7 @@ import com.nestmusic.music.ui.screens.settings.LyricsPosition
 import com.nestmusic.music.ui.screens.settings.defaultList
 import com.nestmusic.music.ui.utils.fadingEdge
 import com.nestmusic.music.utils.ComposeToImage
+import androidx.compose.ui.graphics.lerp
 import com.nestmusic.music.utils.rememberEnumPreference
 import com.nestmusic.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
@@ -899,6 +900,15 @@ fun OriginalLyrics(
                         key = { index, item -> "$index-${item.time}" }, // Add stable key
                     ) { index, item ->
                         val isSelected = selectedIndices.contains(index)
+
+                        // Apple Music lyrics: one size for every line, the sung one white and sharp,
+                        // the others grey and progressively out of focus. Background vocals keep the
+                        // classic treatment — they annotate a line rather than being one.
+                        val appleStyle =
+                            lyricsAnimationStyle == LyricsAnimationStyle.APPLE && isSynced && !item.isBackground
+                        val appleHasActiveLine = displayedCurrentLineIndex >= 0
+                        val appleDistance = if (appleHasActiveLine) index - displayedCurrentLineIndex else 0
+
                         val itemModifier =
                             Modifier
                                 .fillMaxWidth()
@@ -976,7 +986,12 @@ fun OriginalLyrics(
                                     } else {
                                         Color.Transparent
                                     },
-                                ).padding(horizontal = 24.dp, vertical = 8.dp)
+                                ).padding(
+                                    // Apple's line item carries its own vertical rhythm, and its
+                                    // gutter is the 20dp the reference uses on a phone.
+                                    horizontal = if (appleStyle) AppleMusicLyricPaddingX else 24.dp,
+                                    vertical = if (appleStyle) 0.dp else 8.dp,
+                                )
 
                         // Check if this line shares the same time as the currently active line
                         // This enables synchronized word-by-word animation for both main and background vocals
@@ -993,6 +1008,9 @@ fun OriginalLyrics(
                         val alpha by animateFloatAsState(
                             targetValue =
                                 when {
+                                    // The Apple page dims by distance and blurs; the focus modifier
+                                    // below does both, so the line itself stays fully opaque.
+                                    appleStyle -> 1f
                                     !isSynced || (isSelectionModeActive && isSelected) -> 1f
                                     isActiveByIndex || isActiveByTime -> 1f
                                     else -> 0.5f
@@ -1000,7 +1018,8 @@ fun OriginalLyrics(
                             animationSpec = tween(durationMillis = 400),
                         )
                         val scale by animateFloatAsState(
-                            targetValue = if (isActiveByIndex || isActiveByTime) 1.05f else 1f,
+                            // Apple never scales the sung line: focus is the whole signal there.
+                            targetValue = if (appleStyle) 1f else if (isActiveByIndex || isActiveByTime) 1.05f else 1f,
                             animationSpec = tween(durationMillis = 400),
                         )
 
@@ -1066,9 +1085,21 @@ fun OriginalLyrics(
                         // Smaller scale for background vocals
                         val bgScale = if (item.isBackground) 0.85f else 1f
 
+                        val appleFocusModifier =
+                            if (appleStyle) {
+                                Modifier.appleMusicLyricFocus(
+                                    distanceFromCurrent = appleDistance,
+                                    hasActiveLine = appleHasActiveLine,
+                                )
+                            } else {
+                                Modifier
+                            }
+
                         Column(
                             modifier =
-                                itemModifier.graphicsLayer {
+                                itemModifier
+                                    .then(appleFocusModifier)
+                                    .graphicsLayer {
                                     this.alpha = if (item.isBackground) alpha * 0.8f else alpha
                                     this.scaleX = scale * bgScale
                                     this.scaleY = scale * bgScale
@@ -1078,10 +1109,12 @@ fun OriginalLyrics(
                             // Use time-based active check to sync both main and background lines with same timestamp
                             val isActiveLine = (isActiveByIndex || isActiveByTime) && isSynced
                             val lineColor =
-                                if (isActiveLine) {
-                                    if (item.isBackground) expressiveAccent.copy(alpha = 0.85f) else expressiveAccent
-                                } else {
-                                    expressiveAccent.copy(alpha = if (item.isBackground) 0.5f else 0.7f)
+                                when {
+                                    // Apple's own ink: white while sung, one flat grey for the rest.
+                                    appleStyle -> if (isActiveLine) AppleMusicSungWordColor else AppleMusicInactiveLineColor
+                                    isActiveLine ->
+                                        if (item.isBackground) expressiveAccent.copy(alpha = 0.85f) else expressiveAccent
+                                    else -> expressiveAccent.copy(alpha = if (item.isBackground) 0.5f else 0.7f)
                                 }
                             val alignment = agentTextAlign
 
@@ -1137,7 +1170,19 @@ fun OriginalLyrics(
                                                     else -> 0.35f
                                                 }
 
-                                            val wordColor = expressiveAccent.copy(alpha = wordAlpha)
+                                            // Apple's wipe runs white (sung) to grey (still to come)
+                                            // and never involves the theme accent.
+                                            val wordColor =
+                                                if (appleStyle) {
+                                                    when {
+                                                        hasWordPassed -> AppleMusicSungWordColor
+                                                        isWordActive ->
+                                                            lerp(AppleMusicPendingWordColor, AppleMusicSungWordColor, smoothProgress)
+                                                        else -> AppleMusicPendingWordColor
+                                                    }
+                                                } else {
+                                                    expressiveAccent.copy(alpha = wordAlpha)
+                                                }
                                             val wordWeight =
                                                 when {
                                                     !isActiveLine -> FontWeight.Bold
@@ -1533,7 +1578,8 @@ fun OriginalLyrics(
                                                 when {
                                                     isWordActive -> {
                                                         Shadow(
-                                                            color = expressiveAccent.copy(alpha = 0.2f + (0.4f * glowIntensity)),
+                                                            color = (if (appleStyle) Color.White else expressiveAccent)
+                                                                .copy(alpha = 0.2f + (0.4f * glowIntensity)),
                                                             offset = Offset.Zero,
                                                             blurRadius = 10f + (12f * glowIntensity),
                                                         )
@@ -1541,7 +1587,7 @@ fun OriginalLyrics(
 
                                                     hasWordPassed && isActiveLine -> {
                                                         Shadow(
-                                                            color = expressiveAccent.copy(alpha = 0.2f),
+                                                            color = (if (appleStyle) Color.White else expressiveAccent).copy(alpha = 0.2f),
                                                             offset = Offset.Zero,
                                                             blurRadius = 8f,
                                                         )
@@ -1560,13 +1606,16 @@ fun OriginalLyrics(
                                     }
                                 Text(
                                     text = styledText,
-                                    fontSize = lyricsTextSize.sp,
+                                    // Apple sets lyrics far larger than body copy — a line fills most
+                                    // of the width and wraps after a few words.
+                                    fontSize = if (appleStyle) AppleMusicLyricFontSize else lyricsTextSize.sp,
                                     textAlign = alignment,
                                     lineHeight =
-                                        (
-                                            lyricsTextSize *
-                                                lyricsLineSpacing
-                                        ).sp,
+                                        if (appleStyle) {
+                                            AppleMusicLyricLineHeight
+                                        } else {
+                                            (lyricsTextSize * lyricsLineSpacing).sp
+                                        },
                                 )
                             } else if (isActiveLine && lyricsGlowEffect) {
                                 // Initial animation for glow fill from left to right

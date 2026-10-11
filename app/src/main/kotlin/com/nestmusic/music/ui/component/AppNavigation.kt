@@ -120,6 +120,14 @@ private fun EmberDock(
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(32.dp)
+
+    // The dock is the surface liquid glass was made for: a floating capsule of icons over content
+    // that scrolls under it. The backdrop is recorded by the screen behind and handed down through
+    // the composition, so nothing here has to know which screen it is on.
+    val glassBackdrop = LocalGlassBackdrop.current
+    val glassActive =
+        LocalLiquidGlassEnabled.current && isLiquidGlassSupported && glassBackdrop != null
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -133,7 +141,24 @@ private fun EmberDock(
                 .fillMaxHeight()
                 .shadow(16.dp, shape, ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.28f))
                 .clip(shape)
-                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .then(
+                    if (glassActive) {
+                        Modifier.liquidGlass(
+                            backdrop = glassBackdrop,
+                            shape = shape,
+                            blurRadius = 24.dp,
+                        )
+                    } else {
+                        Modifier
+                    },
+                )
+                .background(
+                    if (glassActive) {
+                        Color.Transparent
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainerHigh
+                    },
+                )
                 .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f), shape)
                 .padding(horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically,

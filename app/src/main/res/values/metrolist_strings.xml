@@ -1208,4 +1208,13 @@
     <string name="settings_search_hint">Search settings</string>
     <string name="settings_search_no_results">No matching settings</string>
 
+
+    <!-- Apple Music player style & liquid glass -->
+    <string name="player_style">Player style</string>
+    <string name="player_style_nest">Nest</string>
+    <string name="player_style_apple_music">Apple Music</string>
+    <string name="player_style_desc">How the full-screen player is laid out. Apple Music swaps the artwork for the lyrics when you tap it, counts the song down and puts the transport controls on a glass disc.</string>
+    <string name="liquid_glass">Liquid glass</string>
+    <string name="liquid_glass_desc">Glassy, blurring surfaces for the player, the mini player and the navigation bar, adapting to the artwork behind them. Needs Android 12 or newer.</string>
+
 </resources>

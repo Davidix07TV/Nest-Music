@@ -82,6 +82,7 @@ import com.nestmusic.music.constants.LyricsGlowEffectKey
 import com.nestmusic.music.constants.LyricsLineSpacingKey
 import com.nestmusic.music.constants.LyricsScrollKey
 import com.nestmusic.music.constants.LyricsTextPositionKey
+import com.nestmusic.music.constants.LiquidGlassKey
 import com.nestmusic.music.constants.LyricsTextSizeKey
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyle
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyleKey
@@ -90,6 +91,8 @@ import com.nestmusic.music.ui.component.NestUiChoiceDialog
 import com.nestmusic.music.constants.PlayerBackgroundStyle
 import com.nestmusic.music.constants.PlayerBackgroundStyleKey
 import com.nestmusic.music.constants.PlayerButtonsStyle
+import com.nestmusic.music.constants.PlayerStyle
+import com.nestmusic.music.constants.PlayerStyleKey
 import com.nestmusic.music.constants.PlayerButtonsStyleKey
 import com.nestmusic.music.constants.PureBlackMiniPlayerKey
 import com.nestmusic.music.constants.RespectAgentPositioningKey
@@ -363,6 +366,22 @@ fun AppearanceSettings(
             it != PlayerBackgroundStyle.BLUR || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         }
 
+    val (playerStyle, onPlayerStyleChange) =
+        rememberEnumPreference(
+            key = PlayerStyleKey,
+            defaultValue = PlayerStyle.NEST,
+        )
+
+    var showPlayerStyleDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val (liquidGlass, onLiquidGlassChange) =
+        rememberPreference(
+            key = LiquidGlassKey,
+            defaultValue = true,
+        )
+
     val (defaultChip, onDefaultChipChange) =
         rememberEnumPreference(
             key = ChipSortTypeKey,
@@ -617,6 +636,25 @@ fun AppearanceSettings(
                     PlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
                     PlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
                     PlayerBackgroundStyle.BLUR -> stringResource(R.string.player_background_blur)
+                }
+            },
+        )
+    }
+
+    if (showPlayerStyleDialog) {
+        EnumDialog(
+            onDismiss = { showPlayerStyleDialog = false },
+            onSelect = {
+                onPlayerStyleChange(it)
+                showPlayerStyleDialog = false
+            },
+            title = stringResource(R.string.player_style),
+            current = playerStyle,
+            values = PlayerStyle.entries.toList(),
+            valueText = {
+                when (it) {
+                    PlayerStyle.NEST -> stringResource(R.string.player_style_nest)
+                    PlayerStyle.APPLE_MUSIC -> stringResource(R.string.player_style_apple_music)
                 }
             },
         )
@@ -1298,6 +1336,36 @@ fun AppearanceSettings(
                             )
                         },
                         onClick = { showPlayerBackgroundDialog = true },
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.play),
+                        title = { Text(stringResource(R.string.player_style)) },
+                        description = {
+                            Text(
+                                when (playerStyle) {
+                                    PlayerStyle.NEST -> stringResource(R.string.player_style_nest)
+                                    PlayerStyle.APPLE_MUSIC -> stringResource(R.string.player_style_apple_music)
+                                },
+                            )
+                        },
+                        onClick = { showPlayerStyleDialog = true },
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.graphic_eq),
+                        title = { Text(stringResource(R.string.liquid_glass)) },
+                        description = { Text(stringResource(R.string.liquid_glass_desc)) },
+                        trailingContent = {
+                            Switch(
+                                checked = liquidGlass && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+                                enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+                                onCheckedChange = onLiquidGlassChange,
+                            )
+                        },
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                onLiquidGlassChange(!liquidGlass)
+                            }
+                        },
                     ),
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.hide_image),

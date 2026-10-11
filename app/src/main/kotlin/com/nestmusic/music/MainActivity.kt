@@ -147,6 +147,7 @@ import com.nestmusic.music.constants.ExperimentalLyricsKey
 import com.nestmusic.music.constants.LastSeenVersionKey
 import com.nestmusic.music.constants.ListenTogetherInTopBarKey
 import com.nestmusic.music.constants.ListenTogetherUsernameKey
+import com.nestmusic.music.constants.LiquidGlassKey
 import com.nestmusic.music.constants.LyricsProviderOrderKey
 import com.nestmusic.music.constants.MiniPlayerBottomSpacing
 import com.nestmusic.music.constants.MiniPlayerHeight
@@ -186,7 +187,12 @@ import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.NestUiChoiceDialog
 import com.nestmusic.music.ui.theme.NestViolet
+import com.nestmusic.music.ui.component.LocalGlassBackdrop
+import com.nestmusic.music.ui.component.LocalLiquidGlassEnabled
+import com.nestmusic.music.ui.component.glassBackdrop
+import com.nestmusic.music.ui.component.isLiquidGlassSupported
 import com.nestmusic.music.ui.component.rememberBottomSheetState
+import com.nestmusic.music.ui.component.rememberGlassBackdrop
 import com.nestmusic.music.ui.component.shimmer.ShimmerTheme
 import com.nestmusic.music.ui.menu.YouTubeSongMenu
 import com.nestmusic.music.ui.player.BottomSheetPlayer
@@ -589,6 +595,12 @@ class MainActivity : ComponentActivity() {
         val selectedThemeColor = Color(selectedThemeColorInt)
 
         val (nestUi, onNestUiChange) = rememberPreference(NestUiKey, defaultValue = true)
+        val (liquidGlass, _) = rememberPreference(LiquidGlassKey, defaultValue = true)
+
+        // The backdrop the player surfaces sample. Only created while the effect can actually draw:
+        // recording a full-screen layer costs a GPU copy per frame, and there is no point paying it
+        // for a blur the platform cannot do.
+        val glassBackdrop = rememberGlassBackdrop().takeIf { liquidGlass && isLiquidGlassSupported }
         val (uiChoiceShown, onUiChoiceShownChange) = rememberPreference(NestUiChoiceShownKey, defaultValue = false)
 
         val showChangelog = rememberSaveable { mutableStateOf(false) }
@@ -1037,6 +1049,8 @@ class MainActivity : ComponentActivity() {
                     LocalNavController provides navController,
                     LocalContentColor provides if (pureBlack) Color.White else contentColorFor(MaterialTheme.colorScheme.surface),
                     LocalPlayerConnection provides playerConnection,
+                    LocalLiquidGlassEnabled provides (liquidGlass && isLiquidGlassSupported),
+                    LocalGlassBackdrop provides glassBackdrop,
                     LocalPlayerAwareWindowInsets provides playerAwareWindowInsets,
                     LocalDownloadUtil provides downloadUtil,
                     LocalShimmerTheme provides ShimmerTheme,
@@ -1338,7 +1352,7 @@ class MainActivity : ComponentActivity() {
                                     onSearchLongClick = onRailSearchLongClick,
                                 )
                             }
-                            Box(Modifier.weight(1f)) {
+                            Box(Modifier.weight(1f).glassBackdrop(glassBackdrop)) {
                                 // NavHost with animations (Material 3 Expressive style)
                                 NavHost(
                                     navController = navController,
