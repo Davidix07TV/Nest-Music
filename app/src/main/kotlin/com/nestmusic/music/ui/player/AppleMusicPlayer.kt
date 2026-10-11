@@ -74,6 +74,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.nestmusic.music.LocalPlayerConnection
 import com.nestmusic.music.R
 import com.nestmusic.music.models.MediaMetadata
 import com.nestmusic.music.ui.component.BottomSheet

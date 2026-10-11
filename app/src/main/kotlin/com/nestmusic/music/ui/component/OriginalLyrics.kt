@@ -1177,7 +1177,7 @@ fun OriginalLyrics(
                                                     when {
                                                         hasWordPassed -> AppleMusicSungWordColor
                                                         isWordActive ->
-                                                            lerp(AppleMusicPendingWordColor, AppleMusicSungWordColor, smoothProgress)
+                                                            lerp(AppleMusicPendingWordColor, AppleMusicSungWordColor, transitionProgress)
                                                         else -> AppleMusicPendingWordColor
                                                     }
                                                 } else {

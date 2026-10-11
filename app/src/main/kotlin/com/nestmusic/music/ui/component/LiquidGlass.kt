@@ -19,10 +19,7 @@
 
 package com.nestmusic.music.ui.component
 
-import android.graphics.RenderEffect
-import android.graphics.Shader
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -50,18 +47,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.luminance
@@ -150,6 +145,7 @@ fun rememberGlassBackdrop(): GlassBackdrop {
  * The content is drawn normally and, in the same pass, recorded into [backdrop]'s layer — recording
  * costs nothing extra to display, it only keeps a GPU-side copy for the glass to sample.
  */
+@Composable
 fun Modifier.glassBackdrop(backdrop: GlassBackdrop?): Modifier {
     if (backdrop == null) return this
     val density = LocalDensity.current
@@ -247,6 +243,10 @@ fun Modifier.liquidGlass(
     val blurPx = with(density) { blurRadius.toPx() }
     val rimWidth = with(density) { 1.dp.toPx() }
     var surfacePosition by remember { mutableStateOf(Offset.Zero) }
+    // Scratch layer the backdrop is re-recorded into, so the blur and the saturation can be applied
+    // to the pane as a whole rather than to each draw call: that is what makes it read as one sheet
+    // of glass instead of a stack of independently blurred pieces.
+    val glassLayer = rememberGraphicsLayer()
 
     return this
         .clip(shape)
@@ -281,22 +281,22 @@ fun Modifier.liquidGlass(
 
             val outline = shape.createOutline(size, layoutDirection, this)
             run {
-                val backdropOffset = backdrop.positionInRoot - surfacePosition
-                drawIntoCanvas { canvas ->
-                    val paint = Paint()
-                    paint.colorFilter =
+                val width = size.width.roundToInt()
+                val height = size.height.roundToInt()
+                if (width > 0 && height > 0) {
+                    val backdropOffset = backdrop.positionInRoot - surfacePosition
+                    glassLayer.record(density, layoutDirection, IntSize(width, height)) {
+                        // The recorded layer covers the whole source region, so it is translated by
+                        // the glass surface's own offset inside it: what lands under the glass is
+                        // exactly the content that is behind it on screen.
+                        translate(left = backdropOffset.x, top = backdropOffset.y) {
+                            drawLayer(backdrop.layer)
+                        }
+                    }
+                    glassLayer.renderEffect = BlurEffect(radius, radius, TileMode.Clamp)
+                    glassLayer.colorFilter =
                         ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(saturation) })
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        paint.asFrameworkPaint().applyGlassBlur(radius)
-                    }
-                    canvas.saveLayer(Rect(Offset.Zero, Size(size.width, size.height)), paint)
-                    // The recorded layer covers the whole source region, so it is translated by the
-                    // glass surface's own offset inside it: what lands under the glass is exactly
-                    // the content that is behind it on screen.
-                    translate(left = backdropOffset.x, top = backdropOffset.y) {
-                        drawLayer(backdrop.layer)
-                    }
-                    canvas.restore()
+                    drawLayer(glassLayer)
                 }
 
                 // The rim: a directional sweep, which reads well on an elongated pill and stays
@@ -336,11 +336,6 @@ fun Modifier.liquidGlass(
             }
             drawContent()
         }
-}
-
-@RequiresApi(Build.VERSION_CODES.S)
-private fun android.graphics.Paint.applyGlassBlur(radius: Float) {
-    setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP))
 }
 
 /**
