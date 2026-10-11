@@ -60,6 +60,7 @@
 
 #### Lyrics & Discovery
 - Live synced lyrics with word-by-word highlighting
+- Apple Music-style lyrics: one size for every line, the sung one lit and sharp while the rest fall out of focus with distance
 - AI-powered lyrics translation
 - AI playlist generation from a text prompt
 - Music recognition (Shazam integration)
@@ -90,6 +91,8 @@
     <td width="50%" valign="top">
 
 #### Interface
+- Two full-screen players: the classic Nest layout and an Apple Music-style one that swaps the artwork for the lyrics on a tap
+- Liquid glass surfaces for the player, the mini player and the navigation bar (Android 12+)
 - Home screen widget
 - Multiple theme modes (Light / Dark / Black / Dynamic)
 - Dynamic color + 19 preset color palettes
