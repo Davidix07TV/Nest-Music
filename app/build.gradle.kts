@@ -101,8 +101,8 @@ android {
         applicationId = applicationIdOverride ?: baseApplicationId
         minSdk = 26
         targetSdk = 36
-        versionCode = 159
-        versionName = "1.0.12"
+        versionCode = 160
+        versionName = "1.0.13"
         resValue("string", "app_name", appNameOverride ?: "Nest Music")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
