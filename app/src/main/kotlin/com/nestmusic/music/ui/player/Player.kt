@@ -55,6 +55,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ContainedLoadingIndicator
@@ -167,6 +168,7 @@ import com.nestmusic.music.listentogether.RoomRole
 import com.nestmusic.music.models.MediaMetadata
 import com.nestmusic.music.ui.component.BottomSheet
 import com.nestmusic.music.ui.component.BottomSheetState
+import com.nestmusic.music.ui.component.GlassBackdrop
 import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.Lyrics
@@ -174,6 +176,7 @@ import com.nestmusic.music.ui.component.PlayerSliderTrack
 import com.nestmusic.music.ui.component.ResizableIconButton
 import com.nestmusic.music.ui.component.SquigglySlider
 import com.nestmusic.music.ui.component.WavySlider
+import com.nestmusic.music.ui.component.liquidGlass
 import com.nestmusic.music.ui.component.rememberBottomSheetState
 import com.nestmusic.music.ui.menu.PlayerMenu
 import com.nestmusic.music.ui.screens.settings.DarkMode
@@ -2229,16 +2232,21 @@ fun MoreActionsButton(
     state: BottomSheetState,
     textButtonColor: Color,
     iconButtonColor: Color,
+    // When provided, the button is drawn as a liquid-glass disc over the player backdrop.
+    // Without it (or when the effect is off) it falls back to the plain tinted disc.
+    backdrop: GlassBackdrop? = null,
 ) {
     val menuState = LocalMenuState.current
     val bottomSheetPageState = LocalBottomSheetPageState.current
 
     Box(
+        // Centre the icon explicitly: a Box defaults to TopStart, which pushed the three dots
+        // off-centre inside the 40dp disc.
+        contentAlignment = Alignment.Center,
         modifier =
             Modifier
                 .size(40.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(textButtonColor)
+                .liquidGlass(backdrop = backdrop, shape = CircleShape, tint = textButtonColor)
                 .clickable {
                     menuState.show {
                         PlayerMenu(

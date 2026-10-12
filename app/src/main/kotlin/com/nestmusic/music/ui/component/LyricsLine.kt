@@ -846,9 +846,10 @@ private fun WordLevelLyrics(
                             letterLayouts[i],
                             color =
                                 if (appleInk) {
-                                    // Grey until the wipe reaches the character; the white is painted
-                                    // on top by the clips below.
-                                    pendingInk
+                                    // A glyph the wipe has already passed is sung: it must stay white.
+                                    // Otherwise it is grey until the wipe reaches it, and the white part
+                                    // of a glyph in transition is painted on top by the clips below.
+                                    if (isWordSung || charLp >= 1f) sungInk else pendingInk
                                 } else {
                                     expressiveAccent.copy(alpha = if (wordIdx == -1) focusedAlpha else baseAlpha)
                                 },
