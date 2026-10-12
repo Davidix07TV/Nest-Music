@@ -375,6 +375,8 @@ private fun AppleMusicTopRow(
                 state = state,
                 textButtonColor = Color.White.copy(alpha = 0.16f),
                 iconButtonColor = Color.White,
+                // Same liquid-glass disc as the collapse button beside it.
+                backdrop = backdrop,
             )
         }
     }
@@ -544,13 +546,21 @@ private fun AppleMusicTransport(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onPrevious, enabled = canSkipPrevious) {
-            Icon(
-                painter = painterResource(R.drawable.skip_previous),
-                contentDescription = null,
-                tint = Color.White.copy(alpha = if (canSkipPrevious) 1f else 0.4f),
-                modifier = Modifier.size(36.dp),
-            )
+        // Previous / next sit in the same glass discs as play-pause so the whole transport row
+        // reads as one set of controls. A disabled skip keeps its glass and only dims the icon.
+        LiquidGlassContainer(
+            backdrop = backdrop,
+            modifier = Modifier.size(56.dp),
+            shape = CircleShape,
+        ) {
+            IconButton(onClick = onPrevious, enabled = canSkipPrevious) {
+                Icon(
+                    painter = painterResource(R.drawable.skip_previous),
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = if (canSkipPrevious) 1f else 0.4f),
+                    modifier = Modifier.size(30.dp),
+                )
+            }
         }
 
         LiquidGlassContainer(
@@ -568,13 +578,19 @@ private fun AppleMusicTransport(
             }
         }
 
-        IconButton(onClick = onNext, enabled = canSkipNext) {
-            Icon(
-                painter = painterResource(R.drawable.skip_next),
-                contentDescription = null,
-                tint = Color.White.copy(alpha = if (canSkipNext) 1f else 0.4f),
-                modifier = Modifier.size(36.dp),
-            )
+        LiquidGlassContainer(
+            backdrop = backdrop,
+            modifier = Modifier.size(56.dp),
+            shape = CircleShape,
+        ) {
+            IconButton(onClick = onNext, enabled = canSkipNext) {
+                Icon(
+                    painter = painterResource(R.drawable.skip_next),
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = if (canSkipNext) 1f else 0.4f),
+                    modifier = Modifier.size(30.dp),
+                )
+            }
         }
     }
 }
