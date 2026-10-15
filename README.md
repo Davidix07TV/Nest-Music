@@ -20,7 +20,7 @@
 
 <br/>
 
-[**Download**](#download-now) · [**Features**](#features) · [**FAQ**](#faq) · [**Support**](#support-the-project)
+[**Download**](#download-now) · [**Features**](#features) · [**Screenshots**](#screenshots) · [**FAQ**](#faq) · [**Support**](#support-the-project)
 
 </div>
 
@@ -99,6 +99,25 @@
 </td>
   </tr>
 </table>
+
+</div>
+
+---
+
+<div align="center">
+
+<h1><a id="screenshots"></a>Screenshots</h1>
+
+<img src="assets/screenshots/hero.jpg" alt="Nest Music on Android — home, player and synced lyrics" width="100%" />
+
+<br/>
+
+<img src="assets/screenshots/01-home.jpg" alt="Nest Music home screen with quick picks and keep listening" width="32%" />
+<img src="assets/screenshots/02-artist-pages.jpg" alt="Nest Music artist page with top songs" width="32%" />
+<img src="assets/screenshots/03-music-recognition.jpg" alt="Nest Music recognizing a song with the microphone" width="32%" />
+<img src="assets/screenshots/04-listen-together.jpg" alt="Nest Music Listen Together room screen" width="32%" />
+<img src="assets/screenshots/05-player.jpg" alt="Nest Music player with now playing artwork" width="32%" />
+<img src="assets/screenshots/06-synced-lyrics.jpg" alt="Nest Music synced lyrics highlighted line by line" width="32%" />
 
 </div>
 
