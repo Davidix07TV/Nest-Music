@@ -1,0 +1,3 @@
+- The Apple Music player now works with a screen reader: every control says what it does, and the toggles say which way they will go (Pause, Remove like, Unmute).
+- The artwork announces that tapping it opens the lyrics, and the three-dot menu button finally has a name.
+- The Apple Music player no longer refreshes its clock five times a second behind a paused track.

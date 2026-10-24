@@ -1,0 +1,4 @@
+- Liquid glass: the mini player, the navigation dock and the player controls now blur the artwork behind them (Android 12+). Switch it under Settings, Appearance.
+- New Apple Music lyrics style, with the sung line sharp and the others blurred by their distance from it.
+- New Apple Music player style. Tap the artwork to cross-fade into the lyrics; the scrubber counts the song down.
+- Fixed the Apple word-wipe dimming words that had already been sung.
