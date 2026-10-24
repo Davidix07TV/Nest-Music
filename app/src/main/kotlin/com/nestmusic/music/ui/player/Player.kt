@@ -104,6 +104,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
@@ -2247,7 +2248,12 @@ fun MoreActionsButton(
             Modifier
                 .size(40.dp)
                 .liquidGlass(backdrop = backdrop, shape = CircleShape, tint = textButtonColor)
-                .clickable {
+                // A plain clickable Box carries no name of its own, so the label and the role have
+                // to be declared here; the icon inside stays decorative.
+                .clickable(
+                    onClickLabel = stringResource(R.string.more_options),
+                    role = Role.Button,
+                ) {
                     menuState.show {
                         PlayerMenu(
                             mediaMetadata = mediaMetadata,
@@ -2290,7 +2296,10 @@ private fun PlayerMoreMenuButton(
                 .size(40.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(textButtonColor)
-                .clickable {
+                .clickable(
+                    onClickLabel = stringResource(R.string.more_options),
+                    role = Role.Button,
+                ) {
                     menuState.show {
                         PlayerMenu(
                             mediaMetadata = mediaMetadata,

@@ -1214,6 +1214,8 @@
     <string name="player_style_nest">Nest</string>
     <string name="player_style_apple_music">Apple Music</string>
     <string name="player_style_desc">How the full-screen player is laid out. Apple Music swaps the artwork for the lyrics when you tap it, counts the song down and puts the transport controls on a glass disc.</string>
+    <!-- Read out by screen readers for the repeat button of the Apple Music player. -->
+    <string name="repeat">Repeat</string>
     <string name="liquid_glass">Liquid glass</string>
     <string name="liquid_glass_desc">Glassy, blurring surfaces for the player, the mini player and the navigation bar, adapting to the artwork behind them. Needs Android 12 or newer.</string>
 

@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -127,7 +128,10 @@ fun AppleMusicPlayer(
                     (mediaMetadata?.duration?.takeIf { it > 0 }?.toLong()?.times(1000L))
                         ?: runCatching { playerConnection.player.duration }.getOrDefault(0L).coerceAtLeast(0L)
             }
-            delay(200)
+            // A playing track needs the fast tick for a smooth scrubber; a paused one does not
+            // move at all, and waking the main thread five times a second behind a static
+            // slider is pure battery.
+            delay(if (isPlaying) 200L else 1000L)
         }
     }
 
@@ -364,7 +368,7 @@ private fun AppleMusicTopRow(
         LiquidGlassIconButton(
             backdrop = backdrop,
             painter = painterResource(R.drawable.arrow_downward),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.close),
             onClick = onCollapse,
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -398,6 +402,9 @@ private fun AppleMusicArtwork(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
+                    // The tap target is the whole cover, so the action has to be spelled out:
+                    // the artwork alone announces the song, not what tapping it does.
+                    onClickLabel = stringResource(R.string.lyrics),
                     onClick = onClick,
                 ),
         contentAlignment = Alignment.Center,
@@ -556,7 +563,7 @@ private fun AppleMusicTransport(
             IconButton(onClick = onPrevious, enabled = canSkipPrevious) {
                 Icon(
                     painter = painterResource(R.drawable.skip_previous),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.previous),
                     tint = Color.White.copy(alpha = if (canSkipPrevious) 1f else 0.4f),
                     modifier = Modifier.size(30.dp),
                 )
@@ -571,7 +578,7 @@ private fun AppleMusicTransport(
             IconButton(onClick = onPlayPause) {
                 Icon(
                     painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                    contentDescription = null,
+                    contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                     tint = Color.White,
                     modifier = Modifier.size(34.dp),
                 )
@@ -586,7 +593,7 @@ private fun AppleMusicTransport(
             IconButton(onClick = onNext, enabled = canSkipNext) {
                 Icon(
                     painter = painterResource(R.drawable.skip_next),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.next),
                     tint = Color.White.copy(alpha = if (canSkipNext) 1f else 0.4f),
                     modifier = Modifier.size(30.dp),
                 )
@@ -627,7 +634,8 @@ private fun AppleMusicActionRow(
             IconButton(onClick = onToggleLike) {
                 Icon(
                     painter = painterResource(if (metadata.liked) R.drawable.favorite else R.drawable.favorite_border),
-                    contentDescription = null,
+                    contentDescription =
+                        stringResource(if (metadata.liked) R.string.action_remove_like else R.string.like),
                     tint = if (metadata.liked) MaterialTheme.colorScheme.primary else Color.White,
                     modifier = Modifier.size(24.dp),
                 )
@@ -635,7 +643,7 @@ private fun AppleMusicActionRow(
             IconButton(onClick = onToggleLyrics) {
                 Icon(
                     painter = painterResource(R.drawable.lyrics),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.lyrics),
                     tint = if (showLyrics) MaterialTheme.colorScheme.primary else Color.White,
                     modifier = Modifier.size(24.dp),
                 )
@@ -649,7 +657,7 @@ private fun AppleMusicActionRow(
                                 else -> R.drawable.repeat
                             },
                         ),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.repeat),
                     tint = if (repeatMode != Player.REPEAT_MODE_OFF) MaterialTheme.colorScheme.primary else Color.White,
                     modifier = Modifier.size(24.dp),
                 )
@@ -657,7 +665,7 @@ private fun AppleMusicActionRow(
             IconButton(onClick = onToggleMute) {
                 Icon(
                     painter = painterResource(if (isMuted) R.drawable.volume_off else R.drawable.volume_up),
-                    contentDescription = null,
+                    contentDescription = stringResource(if (isMuted) R.string.unmute else R.string.mute),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp),
                 )

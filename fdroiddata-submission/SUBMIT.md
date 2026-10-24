@@ -38,7 +38,7 @@ staged only in case maintainers ask for it.
 
 ## Before you open it
 
-- [ ] The release the recipe targets exists and is public: https://github.com/Davidix07TV/Nest-Music/releases/tag/v1.0.12
+- [ ] The release the recipe targets exists and is public: https://github.com/Davidix07TV/Nest-Music/releases/tag/v1.0.13
 - [ ] The repository is public and the `LICENSE` file is GPL-3.0
 - [ ] You are signed in to GitLab as the account that will own the MR
 
@@ -51,12 +51,14 @@ the JitPack dependencies, the Aliyun Maven mirror in `settings.gradle.kts`, and
 the build-time `protoc` download.
 
 If they ask for a commit SHA instead of the tag name in `commit:`, the SHA for
-`v1.0.12` is `644cf390f2cba724c973fb63e994c3f203107dbe`.
+`v1.0.13` is `5f10a14b1658dcb831f9d350c4a27b85e98dd1bf`.
 
 ## Keeping the recipe honest afterwards
 
 `AutoUpdateMode: Version` with `UpdateCheckMode: Tags ^v[0-9.]+$` means F-Droid
 picks up future releases on its own, as long as tags keep the `vX.Y.Z` shape and
-`versionCode` keeps increasing. The `build_fdroid_flavor` CI job guards the
+`versionCode` keeps increasing. The `Builds:` entry and the two `CurrentVersion*`
+lines are still written by hand: they point at the newest public tag, which is
+`v1.0.13` (`versionCode` 160) at the time of writing. The `build_fdroid_flavor` CI job guards the
 variant F-Droid builds, so a change that breaks `assembleIzzyRelease` fails on
 master rather than inside F-Droid's build farm.

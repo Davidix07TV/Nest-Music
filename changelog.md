@@ -3,6 +3,49 @@
 This file contains Nest Music release notes consumed by the Android release workflow. Each `---v<version>` line starts a release-note
 block. Nest Music's history here starts at v1.0.0.
 
+---v1.0.14
+# v1.0.14 — Names where there were none (2026-10-24)
+
+### Fixed
+- The Apple Music player can be used with a screen reader. Its collapse button, previous, play/pause,
+  next, like, lyrics, repeat and mute were all unnamed icons — a screen reader had nothing to
+  announce but "button". Each one now says what it does, and the ones that toggle say which way they
+  will go: "Pause" while a track is playing, "Remove like" on a liked song, "Unmute" while muted,
+  "Close" for the chevron that folds the player back into the mini player.
+- Tapping the artwork is the only way to reach the lyrics in that player, and it announced nothing
+  about what the tap does. It now offers "Lyrics" as its action.
+- The three-dot button that opens the track menu had no accessible name in either player style: it
+  is a plain clickable box around a decorative icon. It now announces itself as "More options",
+  button.
+
+### Internal
+- The Apple Music player only refreshes its clock five times a second while something is playing.
+  A paused track does not move, so the old loop kept waking the main thread at the same rate behind
+  a slider that could not change. It now ticks once a second while paused.
+- One new string (`repeat`); every other label reuses what the app already ships.
+
+---v1.0.13
+# v1.0.13 — Liquid glass and an Apple Music player (2026-10-12)
+
+### Added
+- **Liquid glass.** The mini player, the navigation dock and the player controls are drawn as
+  glass surfaces that blur and desaturate the artwork behind them, and darken or lighten their
+  rim depending on what they cover. It needs Android 12 or newer and has its own switch under
+  **Settings → Appearance**; below Android 12 those surfaces stay the flat tinted pills they were.
+- **Apple Music lyrics.** A second lyrics style, chosen under **Settings → Appearance → Lyrics
+  animation style**: one line size for every line, the sung line white and sharp, the neighbouring
+  lines grey and blurred by their distance from the one being sung. Available in both lyrics
+  renderers.
+- **Apple Music player.** A second full-screen player, chosen under **Settings → Appearance →
+  Player style**: artwork that cross-fades into the lyrics when you tap it, the title with its
+  explicit badge, a thin scrubber that counts the song down, transport controls on glass discs and
+  a glass pill of secondary actions. It reuses the existing player, queue and menus — only the
+  layout changes.
+
+### Fixed
+- In the Apple word-wipe, words that had already been sung lost their white ink and dimmed with
+  the rest of the line.
+
 ---v1.0.12
 # v1.0.12 — F-Droid submission (2026-10-10)
 
