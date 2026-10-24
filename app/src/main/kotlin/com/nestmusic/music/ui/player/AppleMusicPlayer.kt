@@ -128,7 +128,10 @@ fun AppleMusicPlayer(
                     (mediaMetadata?.duration?.takeIf { it > 0 }?.toLong()?.times(1000L))
                         ?: runCatching { playerConnection.player.duration }.getOrDefault(0L).coerceAtLeast(0L)
             }
-            delay(200)
+            // A playing track needs the fast tick for a smooth scrubber; a paused one does not
+            // move at all, and waking the main thread five times a second behind a static
+            // slider is pure battery.
+            delay(if (isPlaying) 200L else 1000L)
         }
     }
 
