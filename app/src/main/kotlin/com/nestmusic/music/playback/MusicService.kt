@@ -33,6 +33,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.datastore.preferences.core.Preferences
@@ -445,6 +446,9 @@ class MusicService :
     @Volatile
     private var startupPrefs: Preferences? = null
 
+    /** Latest DataStore snapshot, kept hot so player (re)creation never needs runBlocking. */
+    @Volatile private var latestPrefs: Preferences? = null
+
     private val _playerFlow = MutableStateFlow<ExoPlayer?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
@@ -473,6 +477,34 @@ class MusicService :
     @Volatile private var lastDiscordReconnectAttemptAtMs: Long = 0L
     @Volatile private var discordIntentionalDisconnect = false
     @Volatile private var isScreenOff = false
+
+    /**
+     * Partial wake lock held only while playing. C.WAKE_MODE_NETWORK keeps the network path
+     * awake but does not stop the CPU from sleeping in Doze once the screen is off; without
+     * this the process could freeze between buffers and surface minutes later as a network
+     * error -> stopOnError(). Released on pause and in onDestroy so it can never leak past
+     * actual playback.
+     */
+    private var playbackWakeLock: PowerManager.WakeLock? = null
+
+    @Synchronized
+    private fun updatePlaybackWakeLock(playing: Boolean) {
+        try {
+            if (playing) {
+                if (playbackWakeLock == null) {
+                    playbackWakeLock = getSystemService<PowerManager>()
+                        ?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NestMusic:playback")
+                        ?.apply { setReferenceCounted(false) }
+                }
+                if (playbackWakeLock?.isHeld != true) playbackWakeLock?.acquire()
+            } else if (playbackWakeLock?.isHeld == true) {
+                playbackWakeLock?.release()
+            }
+        } catch (e: Exception) {
+            Timber.tag(TAG).w(e, "Failed to update playback wake lock (playing=%s)", playing)
+        }
+    }
+
     private val screenOffHandler = Handler(Looper.getMainLooper())
     private val screenOffTimeout = Runnable {
         Timber.tag("DiscordSvc").i("screenOffTimeout: isPlaying=%s, isReady=%s",
@@ -724,6 +756,7 @@ class MusicService :
         )
         player = createExoPlayer(prefs = startupPrefs!!)
         player.addListener(this@MusicService)
+        updatePlaybackWakeLock(player.isPlaying)
         sleepTimer =
             SleepTimer(scope, player) { multiplier ->
                 sleepTimerVolumeMultiplier.value = multiplier
@@ -1061,7 +1094,7 @@ class MusicService :
                 playerTransitionProcessors.remove(player)
                 player.release()
 
-                val newPlayer = createExoPlayer()
+                val newPlayer = createExoPlayer(prefs = latestPrefs ?: startupPrefs)
                 newPlayer.addListener(this@MusicService)
                 sleepTimer?.let { newPlayer.addListener(it) }
 
@@ -1263,6 +1296,9 @@ class MusicService :
             }
 
         // Observe and cache common preferences to avoid runBlocking reads in playback callbacks
+        scope.launch {
+            dataStore.data.collect { latestPrefs = it }
+        }
         scope.launch {
             dataStore.data.map { it[PersistentQueueKey] ?: true }.distinctUntilChanged().collect { cachedPersistentQueue = it }
         }
@@ -2936,6 +2972,7 @@ class MusicService :
 
         if (events.containsAny(Player.EVENT_IS_PLAYING_CHANGED)) {
             updateWidgetUI(player.isPlaying)
+            updatePlaybackWakeLock(player.isPlaying)
             if (player.isPlaying) {
                 discordIntentionalDisconnect = false
                 screenOffHandler.removeCallbacks(screenOffTimeout)
@@ -4500,6 +4537,7 @@ class MusicService :
         }
         screenOffHandler.removeCallbacks(screenOffTimeout)
         screenOffHandler.removeCallbacks(pauseTimeout)
+        updatePlaybackWakeLock(playing = false)
         if (DiscordRpcManager.isReady()) {
             Timber.tag("DiscordSvc").i("onDestroy: disconnecting Discord RPC")
             DiscordRpcManager.disconnect()
@@ -5118,7 +5156,7 @@ class MusicService :
         activeMixEqMode = explicitTransition?.eqMode ?: MixEqMode.NONE
         activeMixEffect = explicitTransition?.effect ?: MixEffect.NONE
 
-        secondaryPlayer = createExoPlayer()
+        secondaryPlayer = createExoPlayer(prefs = latestPrefs ?: startupPrefs)
         val secPlayer = secondaryPlayer!!
         secPlayer.addListener(secondaryPlayerListener)
         // Volume ramping requires software rendering; the offload preference

@@ -64,6 +64,7 @@ import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -247,6 +248,17 @@ fun Modifier.liquidGlass(
     // to the pane as a whole rather than to each draw call: that is what makes it read as one sheet
     // of glass instead of a stack of independently blurred pieces.
     val glassLayer = rememberGraphicsLayer()
+    // SimpMusic's glass (Kyant's backdrop library) refracts the backdrop at the rim: the content
+    // bends inwards near the edge and splits slightly into its colour channels, which is most of
+    // what makes it read as a lens rather than a frosted sticker. AGSL runtime shaders need
+    // API 33; below that the surface keeps the blur+saturation treatment only.
+    val refractionShader = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            runCatching { android.graphics.RuntimeShader(REFRACTION_AGSL) }.getOrNull()
+        } else {
+            null
+        }
+    }
 
     return this
         .clip(shape)
@@ -293,7 +305,26 @@ fun Modifier.liquidGlass(
                             drawLayer(backdrop.layer)
                         }
                     }
-                    glassLayer.renderEffect = BlurEffect(radius, radius, TileMode.Clamp)
+                    val blurEffect = BlurEffect(radius, radius, TileMode.Clamp)
+                    glassLayer.renderEffect =
+                        if (refractionShader != null) {
+                            runCatching {
+                                refractionShader.setFloatUniform("size", width.toFloat(), height.toFloat())
+                                refractionShader.setFloatUniform("strength", 14f + 10f * press)
+                                val shaderEffect =
+                                    android.graphics.RenderEffect.createRuntimeShaderEffect(refractionShader, "content")
+                                val blurAndroid =
+                                    android.graphics.RenderEffect.createBlurEffect(
+                                        radius, radius, android.graphics.Shader.TileMode.CLAMP,
+                                    )
+                                // Blur first, then refract the blurred pane.
+                                android.graphics.RenderEffect
+                                    .createChainEffect(shaderEffect, blurAndroid)
+                                    .asComposeRenderEffect()
+                            }.getOrNull() ?: blurEffect
+                        } else {
+                            blurEffect
+                        }
                     glassLayer.colorFilter =
                         ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(saturation) })
                     drawLayer(glassLayer)
@@ -403,9 +434,7 @@ internal suspend fun PointerInputScope.inspectDragGestures(
     onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit,
 ) {
     awaitEachGesture {
-        awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-
-        val down = awaitFirstDown(requireUnconsumed = false)
+        val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
 
         onDragStart(down)
         onDrag(down, Offset.Zero)
@@ -537,6 +566,26 @@ fun rememberGlassLuminance(
     }
     return backdrop.luminance.asState()
 }
+
+/**
+ * Edge refraction + slight chromatic dispersion for the glass pane. Sampling is pulled towards
+ * the centre near the rim (a magnifying lens edge) and the red/blue channels are sampled a
+ * fraction apart along the same direction, like SimpMusic's lens effect.
+ */
+private const val REFRACTION_AGSL = """
+uniform shader content;
+uniform float2 size;
+uniform float strength;
+half4 main(float2 coord) {
+    float2 centered = coord / max(size, float2(1.0)) - 0.5;
+    float rim = smoothstep(0.18, 0.5, max(abs(centered.x), abs(centered.y)));
+    float2 offset = centered * rim * strength;
+    half4 center = content.eval(coord - offset);
+    float r = content.eval(coord - offset * 1.18).r;
+    float b = content.eval(coord - offset * 0.82).b;
+    return half4(r, center.g, b, center.a);
+}
+"""
 
 /** The padding a glass pill keeps around the controls it wraps. */
 internal val GlassContentPadding: Dp = 12.dp

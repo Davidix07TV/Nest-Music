@@ -7,6 +7,8 @@ package com.nestmusic.music.ui.screens.settings
 
 import android.content.Intent
 import android.net.Uri
+import android.os.PowerManager
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -1124,6 +1126,34 @@ fun PlayerSettings(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Background playback reliability: on aggressive OEM battery savers the foreground
+        // service alone is not enough and music stops a while after the screen turns off.
+        val powerManager = remember { context.getSystemService(PowerManager::class.java) }
+        var ignoringBatteryOptimization by remember {
+            mutableStateOf(powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true)
+        }
+        if (!ignoringBatteryOptimization) {
+            Material3SettingsGroup(
+                title = stringResource(R.string.alarm_battery_optimization_title),
+                items = listOf(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.warning),
+                        title = { Text(stringResource(R.string.alarm_battery_optimization_title)) },
+                        description = { Text(stringResource(R.string.playback_battery_optimization_desc)) },
+                        onClick = {
+                            try {
+                                context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                            } catch (_: Exception) {
+                            }
+                            ignoringBatteryOptimization =
+                                powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
+                        }
+                    )
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         AlarmSettingsSection()
 
