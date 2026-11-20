@@ -336,6 +336,8 @@
     <string name="alarm_exact_permission_desc">Grants permission for precise alarm timing, improving reliability when the app is in the background</string>
     <string name="alarm_battery_optimization_title">Battery optimization</string>
     <string name="alarm_battery_optimization_desc">Disable battery optimization for more reliable alarm behavior in the background</string>
+    <string name="playback_battery_optimization_desc">Disable battery optimization so playback is not stopped after a while with the screen off</string>
+    <string name="error_age_restricted">This app does not support playing age-restricted songs. We are working on fixing this issue.</string>
 
     <!-- Player Settings -->
     <string name="disable_load_more_when_repeat_all">Disable auto-load in repeat all mode</string>

@@ -76,6 +76,20 @@ generated code).
 7. Test before asking for review, and report honestly what you ran and what you could not run.
    If a build was impossible in your environment, say so explicitly instead of implying success.
 
+## Player styles, lyrics and errors — read before touching the player
+
+- The now-playing screen has two styles (`PlayerStyle` in `constants/PreferenceKeys.kt`): NEST
+  (`ui/player/Player.kt`) and APPLE_MUSIC (`ui/player/AppleMusicPlayer.kt`, layout ported from
+  SimpMusic). They share `PlayerConnection`, the queue and the menus — anything one style shows,
+  the other must show too. In particular both must surface `PlayerConnection.error` through
+  `ui/player/PlaybackError.kt`; the Apple style once showed nothing and failed silently.
+- Missing lyrics are fetched by `EnsureCurrentLyricsLoaded` (`ui/component/Lyrics.kt`), which
+  every player style must call: `Lyrics()` itself only renders what is already in Room. The
+  Apple style once skipped the fetch and spun its loading shimmer forever.
+- Liquid glass lives in `ui/component/LiquidGlass.kt`: a hand-rolled `GraphicsLayer` backdrop
+  (no Kyant `backdrop` dependency), with AGSL edge refraction on API 33+. Keep new dependencies
+  out unless explicitly approved (rule 6).
+
 ## Building and testing your changes
 
 Prerequisites: **JDK 21**, a recent Android SDK (`compileSdk = 37`, `minSdk = 26`,

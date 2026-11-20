@@ -80,6 +80,7 @@ import com.nestmusic.music.R
 import com.nestmusic.music.models.MediaMetadata
 import com.nestmusic.music.ui.component.BottomSheet
 import com.nestmusic.music.ui.component.BottomSheetState
+import com.nestmusic.music.ui.component.EnsureCurrentLyricsLoaded
 import com.nestmusic.music.ui.component.GlassBackdrop
 import com.nestmusic.music.ui.component.LiquidGlassContainer
 import com.nestmusic.music.ui.component.LiquidGlassIconButton
@@ -109,6 +110,7 @@ fun AppleMusicPlayer(
     val isMuted by playerConnection.isMuted.collectAsStateWithLifecycle()
     val canSkipPrevious by playerConnection.canSkipPrevious.collectAsStateWithLifecycle()
     val canSkipNext by playerConnection.canSkipNext.collectAsStateWithLifecycle()
+    val playbackError by playerConnection.error.collectAsStateWithLifecycle()
 
     // State objects rather than plain values, so the mini player in the collapsed sheet can share
     // the same clock instead of running a second one.
@@ -136,6 +138,10 @@ fun AppleMusicPlayer(
     }
 
     var showLyrics by rememberSaveable { mutableStateOf(false) }
+
+    // The NEST player fetches missing lyrics from its InlineLyricsView; without this the Apple
+    // style only ever read the Room cache and spun forever on uncached tracks.
+    EnsureCurrentLyricsLoaded(enabled = showLyrics)
 
     // The glass samples the artwork behind the sheet. The source is the BACKGROUND and not the
     // sheet content on purpose: a glass surface must never be inside the layer it samples.
@@ -187,7 +193,15 @@ fun AppleMusicPlayer(
                         .padding(horizontal = 24.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Crossfade(
+                val currentError = playbackError
+                if (currentError != null) {
+                    // Same affordance the NEST player gives through Thumbnail: a visible reason
+                    // plus a retry, instead of a silent frozen cover when playback fails.
+                    PlaybackError(
+                        error = currentError,
+                        retry = { runCatching { playerConnection.player.prepare() } },
+                    )
+                } else Crossfade(
                     targetState = showLyrics,
                     animationSpec = tween(400),
                     label = "appleMusicArtworkOrLyrics",
@@ -300,7 +314,7 @@ private fun AppleMusicBackdrop(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .blur(80.dp),
+                            .blur(56.dp),
                 )
             }
         }

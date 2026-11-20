@@ -41,6 +41,8 @@
 #### Playback
 - Stream any song or video from YouTube Music
 - Background playback
+- Optional Apple Music-style now-playing screen with liquid-glass controls (ported from SimpMusic)
+- Visible playback errors with retry, in both player styles
 - Download & cache for offline use
 - Skip silence
 - Sleep timer

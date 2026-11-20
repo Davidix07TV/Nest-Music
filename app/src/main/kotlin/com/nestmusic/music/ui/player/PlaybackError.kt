@@ -43,25 +43,12 @@ fun PlaybackError(
         ?: error.message 
         ?: stringResource(R.string.error_unknown)
     
-    // Check if this is an age-restricted content error
-    // Age-restricted content typically returns 403 Forbidden or contains age-related messages
-    val isAgeRestricted = rawErrorMessage.contains("age", ignoreCase = true) ||
-            rawErrorMessage.contains("Sign in to confirm your age", ignoreCase = true) ||
-            rawErrorMessage.contains("LOGIN_REQUIRED", ignoreCase = true) ||
-            rawErrorMessage.contains("confirm your age", ignoreCase = true) ||
-            rawErrorMessage.contains("403", ignoreCase = true) ||
-            rawErrorMessage.contains("Response code: 403", ignoreCase = true) ||
-            error.errorCode == PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS
-
-    // Check if this is a "job cancelled" error from YouTube
-    // YouTube returns this when the playback job cannot be started (often transient)
-    val isJobCancelled = rawErrorMessage.contains("job", ignoreCase = true) &&
-            (rawErrorMessage.contains("cancelled", ignoreCase = true) ||
-                    rawErrorMessage.contains("canceled", ignoreCase = true) ||
-                    rawErrorMessage.contains("cancellat", ignoreCase = true))
+    val kind = classifyPlaybackError(rawErrorMessage, error.errorCode)
+    val isAgeRestricted = kind == PlaybackErrorKind.AGE_RESTRICTED
+    val isJobCancelled = kind == PlaybackErrorKind.JOB_CANCELLED
     
     val errorMessage = if (isAgeRestricted) {
-        "This app does not support playing age-restricted songs. We are working on fixing this issue."
+        stringResource(R.string.error_age_restricted)
     } else if (isJobCancelled) {
         stringResource(R.string.error_job_cancelled)
     } else {
@@ -180,4 +167,31 @@ private fun getErrorCodeName(errorCode: Int): String {
         PlaybackException.ERROR_CODE_DRM_LICENSE_EXPIRED -> "DRM_LICENSE_EXPIRED"
         else -> "UNKNOWN_ERROR_$errorCode"
     }
+}
+
+/** Coarse classification that decides which user-facing message a playback error gets. */
+internal enum class PlaybackErrorKind { AGE_RESTRICTED, JOB_CANCELLED, OTHER }
+
+/**
+ * Pure classification (no Android types beyond the error-code int) so it is JVM-testable.
+ * Age-restricted content typically returns 403 Forbidden or contains age-related messages;
+ * a "job cancelled" error from YouTube means the playback job could not be started (transient).
+ */
+internal fun classifyPlaybackError(rawMessage: String, errorCode: Int): PlaybackErrorKind {
+    val isAgeRestricted = rawMessage.contains("age", ignoreCase = true) ||
+        rawMessage.contains("Sign in to confirm your age", ignoreCase = true) ||
+        rawMessage.contains("LOGIN_REQUIRED", ignoreCase = true) ||
+        rawMessage.contains("confirm your age", ignoreCase = true) ||
+        rawMessage.contains("403", ignoreCase = true) ||
+        rawMessage.contains("Response code: 403", ignoreCase = true) ||
+        errorCode == PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS
+    if (isAgeRestricted) return PlaybackErrorKind.AGE_RESTRICTED
+
+    val isJobCancelled = rawMessage.contains("job", ignoreCase = true) &&
+        (rawMessage.contains("cancelled", ignoreCase = true) ||
+            rawMessage.contains("canceled", ignoreCase = true) ||
+            rawMessage.contains("cancellat", ignoreCase = true))
+    if (isJobCancelled) return PlaybackErrorKind.JOB_CANCELLED
+
+    return PlaybackErrorKind.OTHER
 }

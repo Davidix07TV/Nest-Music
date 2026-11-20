@@ -202,6 +202,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.roundToInt
 import com.nestmusic.music.ui.component.Icon as MIcon
@@ -2097,8 +2098,6 @@ fun InlineLyricsView(
     val lyrics = remember(currentLyrics) { currentLyrics?.lyrics?.trim() }
     val context = LocalContext.current
     val database = LocalDatabase.current
-    val coroutineScope = rememberCoroutineScope()
-
     var appInForeground by remember {
         mutableStateOf(
             ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED),
@@ -2123,27 +2122,9 @@ fun InlineLyricsView(
             }
         }
 
-    LaunchedEffect(mediaMetadata?.id, currentLyrics) {
-        if (mediaMetadata != null && currentLyrics == null) {
-            delay(500)
-            coroutineScope.launch(Dispatchers.IO) {
-                try {
-                    val entryPoint =
-                        EntryPointAccessors.fromApplication(
-                            context.applicationContext,
-                            com.nestmusic.music.di.LyricsHelperEntryPoint::class.java,
-                        )
-                    val lyricsHelper = entryPoint.lyricsHelper()
-                    val fetchedLyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
-                    database.query {
-                        upsert(LyricsEntity(mediaMetadata.id, fetchedLyricsWithProvider.lyrics, fetchedLyricsWithProvider.provider))
-                    }
-                } catch (e: Exception) {
-                    // Handle error
-                }
-            }
-        }
-    }
+    // Shared with the Apple Music player: fetches and upserts the current track's lyrics when
+    // they are not cached yet (previously this lived only here, so the Apple style never loaded).
+    com.nestmusic.music.ui.component.EnsureCurrentLyricsLoaded()
 
     // Prefetch lyrics for the next queue item only while the lyrics pane is visible, the app is in the
     // foreground, and the current track's lyrics row has finished loading (avoids competing with the
@@ -2178,7 +2159,8 @@ fun InlineLyricsView(
                 database.query {
                     upsert(LyricsEntity(nextId, fetched.lyrics, fetched.provider))
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Timber.tag("Lyrics").w(e, "Failed to prefetch lyrics for %s", nextId)
             }
         }
     }
