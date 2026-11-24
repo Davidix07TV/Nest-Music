@@ -393,19 +393,19 @@ private fun ContentDrawScope.riseWith(
             val hi = maxOf(wordLeft, wordRight)
             if (lo > cursor) {
                 clipRect(left = cursor, top = top, right = lo, bottom = bottom) {
-                    draw()
+                    this@riseWith.draw()
                 }
             }
             if (growing != null) {
                 growEach(layout, span, visualLine, growing, positionMs, risePx, into)
             } else {
-                clipShiftedDown(lo, top, hi, bottom, risePx * lift) { draw() }
+                clipShiftedDown(lo, top, hi, bottom, risePx * lift) { this@riseWith.draw() }
             }
             cursor = maxOf(cursor, hi)
         }
         if (cursor < lineRight) {
             clipRect(left = cursor, top = top, right = lineRight, bottom = bottom) {
-                draw()
+                this@riseWith.draw()
             }
         }
     }
@@ -1352,7 +1352,7 @@ internal fun NestLyricsPanel(
                             rise = false,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .revealBelow(subRevealProgress)
+                                .revealBelow(subRevealProgress.asState())
                                 .padding(start = GLOW_ROOM, end = GLOW_ROOM, bottom = GLOW_ROOM)
                                 .offset(y = -SUB_LYRIC_TUCK)
                                 .graphicsLayer { alpha = SUB_LYRIC_ALPHA },
