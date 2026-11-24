@@ -1,17 +1,7 @@
-/**
- * Metrolist Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
- *
- * Nest Music Apple Music Now Playing screen (ported from Nest Music under GPL-3.0),
- * integrated natively with Nest Music's PlayerConnection, BottomSheet, LyricsViewModel, and Queue.
- */
-
 package com.nestmusic.music.ui.player
 
 import android.app.Activity
-import android.content.Intent
-import android.os.Build
-import android.provider.Settings
+import android.graphics.Bitmap
 import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -28,18 +18,23 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,9 +44,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
@@ -63,9 +58,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.navigation.NavController
 import com.nestmusic.music.LocalPlayerConnection
-import com.nestmusic.music.R
+import com.nestmusic.music.constants.AnimatedCanvasKey
+import com.nestmusic.music.constants.CanvasOverCellularKey
+import com.nestmusic.music.constants.DolbyAtmosKey
+import com.nestmusic.music.constants.FullBleedArtworkKey
 import com.nestmusic.music.constants.KeepScreenOn
 import com.nestmusic.music.constants.SimilarContent
+import com.nestmusic.music.constants.SpatialAudioKey
+import com.nestmusic.music.playback.audio.NestAudioOutputKind
+import com.nestmusic.music.playback.audio.NestAudioOutputStatus
+import com.nestmusic.music.playback.audio.rememberNestAudioOutputs
 import com.nestmusic.music.ui.component.BottomSheet
 import com.nestmusic.music.ui.component.BottomSheetState
 import com.nestmusic.music.ui.component.EnsureCurrentLyricsLoaded
@@ -74,24 +76,28 @@ import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.glassBackdrop
 import com.nestmusic.music.ui.component.rememberGlassBackdrop
 import com.nestmusic.music.ui.menu.PlayerMenu
+import com.nestmusic.music.ui.player.nest.LocalPlayerAlphas
+import com.nestmusic.music.ui.player.nest.LocalPlayerInk
+import com.nestmusic.music.ui.player.nest.LocalPlayerInkGlow
 import com.nestmusic.music.ui.player.nest.NEST_GUTTER
 import com.nestmusic.music.ui.player.nest.NEST_HEADER_HEIGHT
+import com.nestmusic.music.ui.player.nest.NestArtworkMeshBackdrop
+import com.nestmusic.music.ui.player.nest.NestAudioOutputSheet
+import com.nestmusic.music.ui.player.nest.NestAudioPipelineDialog
 import com.nestmusic.music.ui.player.nest.NestAudioQualityBadge
 import com.nestmusic.music.ui.player.nest.NestCurrentLyricStrip
 import com.nestmusic.music.ui.player.nest.NestLyricsPanel
 import com.nestmusic.music.ui.player.nest.NestMorphingArtwork
 import com.nestmusic.music.ui.player.nest.NestPlayerActionRow
 import com.nestmusic.music.ui.player.nest.NestPlayerTopStrip
-import com.nestmusic.music.ui.player.nest.NestPortraitBackdrop
 import com.nestmusic.music.ui.player.nest.NestPortraitCredits
 import com.nestmusic.music.ui.player.nest.NestQueuePanel
 import com.nestmusic.music.ui.player.nest.NestThinSlider
 import com.nestmusic.music.ui.player.nest.NestTransportRow
 import com.nestmusic.music.ui.player.nest.NestVolumeRow
-import com.nestmusic.music.ui.player.nest.LocalPlayerAlphas
-import com.nestmusic.music.ui.player.nest.LocalPlayerInk
-import com.nestmusic.music.ui.player.nest.LocalPlayerInkGlow
 import com.nestmusic.music.ui.player.nest.NowPlayingAlphas
+import com.nestmusic.music.ui.player.nest.canvas.NestCanvasArtwork
+import com.nestmusic.music.ui.player.nest.canvas.NestCanvasRepository
 import com.nestmusic.music.ui.player.nest.rememberNestLyricsSession
 import com.nestmusic.music.ui.player.nest.rememberNestPalette
 import com.nestmusic.music.ui.utils.ShowMediaInfo
@@ -134,6 +140,20 @@ fun AppleMusicPlayer(
 
     val (autoplayEnabled, onAutoplayChange) = rememberPreference(SimilarContent, defaultValue = true)
     val isKeepScreenOn by rememberPreference(KeepScreenOn, defaultValue = false)
+    val animatedCanvasEnabled by rememberPreference(AnimatedCanvasKey, defaultValue = true)
+    val fullBleedEnabled by rememberPreference(FullBleedArtworkKey, defaultValue = true)
+    val canvasOverCellular by rememberPreference(CanvasOverCellularKey, defaultValue = true)
+    val dolbyAtmosPref by rememberPreference(DolbyAtmosKey, defaultValue = true)
+    val spatialAudioPref by rememberPreference(SpatialAudioKey, defaultValue = false)
+
+    val audioPipeline by NestAudioOutputStatus.pipeline.collectAsState()
+    val audioOutputs = rememberNestAudioOutputs()
+    val activeExternalRoute = remember(audioOutputs) {
+        audioOutputs.firstOrNull { it.isSelected && it.kind != NestAudioOutputKind.SPEAKER }?.name
+    }
+
+    var showPipelineDialog by remember { mutableStateOf(false) }
+    var showAudioOutputSheet by remember { mutableStateOf(false) }
 
     val positionState = remember {
         mutableLongStateOf(runCatching { playerConnection.player.currentPosition }.getOrDefault(0L))
@@ -158,8 +178,36 @@ fun AppleMusicPlayer(
     var activePanel by rememberSaveable { mutableStateOf(NestPlayerPanel.NONE) }
     val panelOpen = activePanel != NestPlayerPanel.NONE
 
-    // Ensure uncached lyrics are fetched automatically for both the live strip above the scrubber
-    // and the full Nest Music lyrics panel (preserving Nest Music's LyricsFetchPolicy).
+    // Animated album cover (Apple Music HLS tall/square editorial motion + Tidal loop fallback)
+    var canvasArtwork by remember(mediaMetadata?.id) { mutableStateOf<NestCanvasArtwork?>(null) }
+    var liveCanvasBitmap by remember(mediaMetadata?.id) { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(
+        mediaMetadata?.id,
+        animatedCanvasEnabled,
+        fullBleedEnabled,
+        canvasOverCellular,
+        state.isExpanded,
+    ) {
+        val meta = mediaMetadata
+        if (!animatedCanvasEnabled || !state.isExpanded || meta == null) {
+            canvasArtwork = null
+            liveCanvasBitmap = null
+            return@LaunchedEffect
+        }
+        val artistName = meta.artists.firstOrNull()?.name.orEmpty()
+        canvasArtwork =
+            NestCanvasRepository.resolve(
+                context = context,
+                mediaId = meta.id,
+                title = meta.title,
+                artist = artistName,
+                album = meta.album?.title,
+                preferTall = fullBleedEnabled,
+                allowCellular = canvasOverCellular,
+            )
+    }
+
     EnsureCurrentLyricsLoaded(enabled = state.isExpanded || activePanel == NestPlayerPanel.LYRICS)
 
     val lyricsSession = rememberNestLyricsSession(
@@ -198,7 +246,8 @@ fun AppleMusicPlayer(
         imageUrl = mediaMetadata?.thumbnailUrl,
         darkTheme = true,
     )
-    val inkState = rememberUpdatedState(palette.ink)
+    // Always crisp luminous white ink on dark full-bleed / mesh Now Playing
+    val inkState = rememberUpdatedState(Color.White)
     val glowState = rememberUpdatedState(palette.inkGlow)
     val alphas = remember { NowPlayingAlphas() }
     val sheetBackdrop = rememberGlassBackdrop()
@@ -209,17 +258,39 @@ fun AppleMusicPlayer(
         label = "nestHeaderCollapseProgress",
     )
 
-    val qualityInfo = remember(currentFormat) {
-        val fmt = currentFormat ?: return@remember null
-        val mime = fmt.mimeType.lowercase()
-        val kbps = fmt.bitrate / 1000
+    // Badge label: Dolby Atmos / Hi-Res Lossless / Lossless / Spatial Audio
+    data class BadgeSpec(
+        val label: String,
+        val isDolbyAtmos: Boolean,
+        val isLossless: Boolean,
+    )
+
+    val badgeSpec = remember(currentFormat, audioPipeline, dolbyAtmosPref, spatialAudioPref) {
+        val fmt = currentFormat
+        val mime = (audioPipeline.mimeType ?: fmt?.mimeType).orEmpty().lowercase()
+        val isLosslessStream = "flac" in mime || "alac" in mime || "wav" in mime
+        val sampleRate = audioPipeline.sampleRateHz.takeIf { it > 0 } ?: (fmt?.sampleRate ?: 0)
         when {
-            "flac" in mime || "alac" in mime || "wav" in mime -> {
-                if ((fmt.sampleRate ?: 0) > 48_000) "Hi-Res Lossless" to true else "Lossless" to true
-            }
-            kbps >= 256 -> "High Quality" to false
-            kbps > 0 -> "${kbps} kbps" to false
-            else -> null
+            dolbyAtmosPref || audioPipeline.isDolbyAtmos -> BadgeSpec(
+                label = if (isLosslessStream) "Dolby Atmos · Lossless" else "Dolby Atmos",
+                isDolbyAtmos = true,
+                isLossless = false,
+            )
+            isLosslessStream -> BadgeSpec(
+                label = if (sampleRate > 48_000) "Hi-Res Lossless" else "Lossless",
+                isDolbyAtmos = false,
+                isLossless = true,
+            )
+            spatialAudioPref || audioPipeline.isSpatialAudio -> BadgeSpec(
+                label = "Spatial Audio",
+                isDolbyAtmos = true,
+                isLossless = false,
+            )
+            else -> BadgeSpec(
+                label = audioPipeline.badgeLabel,
+                isDolbyAtmos = false,
+                isLossless = false,
+            )
         }
     }
 
@@ -227,6 +298,15 @@ fun AppleMusicPlayer(
         queueTitle?.takeIf { it.isNotBlank() }
             ?: mediaMetadata?.album?.title?.takeIf { it.isNotBlank() }
             ?: mediaMetadata?.artists?.firstOrNull()?.name
+    }
+
+    val paletteStops = remember(palette) {
+        listOf(
+            palette.primary,
+            palette.secondary,
+            palette.tertiary,
+            palette.background,
+        )
     }
 
     CompositionLocalProvider(
@@ -238,12 +318,12 @@ fun AppleMusicPlayer(
             state = state,
             modifier = modifier,
             background = {
-                NestPortraitBackdrop(
-                    imageUrl = mediaMetadata?.thumbnailUrl,
-                    palette = palette,
-                    trackKey = mediaMetadata?.id,
-                    panelOpen = panelOpen,
-                    darkTheme = true,
+                NestArtworkMeshBackdrop(
+                    artworkModel = mediaMetadata?.thumbnailUrl,
+                    liveFrameBitmap = liveCanvasBitmap,
+                    fallbackPalette = paletteStops,
+                    isPlaying = isPlaying && state.isExpanded,
+                    dimScrimAlpha = if (panelOpen) 0.42f else 0.26f,
                     modifier = Modifier
                         .fillMaxSize()
                         .glassBackdrop(sheetBackdrop),
@@ -258,344 +338,372 @@ fun AppleMusicPlayer(
             },
         ) {
             val metadata = mediaMetadata
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .systemBarsPadding(),
-            ) {
-                NestPlayerTopStrip(
-                    queueTitle = playingFromTitle,
-                    onCollapse = { state.collapseSoft() },
-                )
+            val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
-                if (metadata == null) {
-                    Spacer(Modifier.weight(1f))
-                    return@Column
-                }
-
-                // Upper morphing stage: houses the Sleeve <-> Collapsed Header + Credits + Lyrics/Queue body
-                BoxWithConstraints(
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
+                        .fillMaxSize()
+                        .navigationBarsPadding(),
                 ) {
-                    val stageWidth = maxWidth
-                    val stageHeight = maxHeight
-
-                    // Reserve ~64dp at the bottom of the upper stage for PortraitCredits when expanded
-                    val creditsBlockHeight = 62.dp
-                    val maxArtFromWidth = (stageWidth - NEST_GUTTER * 2).coerceAtLeast(120.dp)
-                    val maxArtFromHeight = (stageHeight - creditsBlockHeight - 24.dp).coerceAtLeast(120.dp)
-                    val expandedArtSize = min(maxArtFromWidth, maxArtFromHeight)
-                    val expandedArtLeft = (stageWidth - expandedArtSize) / 2f
-                    val expandedArtTop = ((stageHeight - creditsBlockHeight - expandedArtSize) / 2f)
-                        .coerceAtLeast(4.dp)
-
-                    val collapsedArtLeft = NEST_GUTTER
-                    val collapsedArtTop = 4.dp
-
-                    val expandedCreditsTop = (expandedArtTop + expandedArtSize + 14.dp)
-                        .coerceAtMost((stageHeight - creditsBlockHeight).coerceAtLeast(0.dp))
-                    val collapsedCreditsTop = 8.dp
-                    val currentCreditsTop = lerp(expandedCreditsTop, collapsedCreditsTop, collapseProgress)
-
-                    val currentError = playbackError
-                    if (currentError != null && !panelOpen) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(expandedArtSize)
-                                .offset(y = expandedArtTop)
-                                .padding(horizontal = NEST_GUTTER),
-                        ) {
-                            PlaybackError(
-                                error = currentError,
-                                retry = { runCatching { playerConnection.player.prepare() } },
-                            )
-                        }
-                    } else {
-                        NestMorphingArtwork(
-                            thumbnailUrl = metadata.thumbnailUrl,
-                            isPlaying = isPlaying,
-                            collapseProgress = collapseProgress,
-                            expandedSize = expandedArtSize,
-                            expandedTop = expandedArtTop,
-                            expandedLeft = expandedArtLeft,
-                            collapsedTop = collapsedArtTop,
-                            collapsedLeft = collapsedArtLeft,
-                            canSkipPrevious = canSkipPrevious,
-                            canSkipNext = canSkipNext,
-                            onSkipPrevious = { playerConnection.seekToPrevious() },
-                            onSkipNext = { playerConnection.seekToNext() },
-                            onCollapsedTap = { activePanel = NestPlayerPanel.NONE },
-                            modifier = Modifier.zIndex(2f),
-                        )
+                    if (metadata == null) {
+                        Spacer(Modifier.weight(1f))
+                        return@Column
                     }
 
-                    // Credits row: sits under the full artwork when expanded, and glides up next to the
-                    // 66dp thumbnail in the collapsed header when Lyrics or Queue opens!
-                    val isLiked = currentSong?.song?.liked ?: metadata.liked
-                    NestPortraitCredits(
-                        mediaMetadata = metadata,
-                        liked = isLiked,
-                        collapseProgress = collapseProgress,
-                        onToggleLike = { runCatching { playerConnection.toggleLike() } },
-                        onTitleClick = {
-                            val albumId = metadata.album?.id
-                            if (!albumId.isNullOrBlank()) {
-                                state.collapseSoft()
-                                navController.navigate("album/$albumId")
-                            }
-                        },
-                        onArtistClick = {
-                            val artistId = metadata.artists.firstOrNull()?.id
-                            if (!artistId.isNullOrBlank()) {
-                                state.collapseSoft()
-                                navController.navigate("artist/$artistId")
-                            }
-                        },
-                        onMoreClick = {
-                            menuState.show {
-                                PlayerMenu(
-                                    mediaMetadata = metadata,
-                                    playerBottomSheetState = state,
-                                    onShowDetailsDialog = {
-                                        bottomSheetPageState.show {
-                                            ShowMediaInfo(metadata.id)
-                                        }
-                                    },
-                                    onDismiss = menuState::dismiss,
+                    // Upper morphing stage: Edge-to-Edge Full-Screen Cover (from y = 0 behind status bar!)
+                    // <-> 66dp Collapsed Header + Credits + Lyrics/Queue panel
+                    BoxWithConstraints(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    ) {
+                        val stageWidth = maxWidth
+                        val stageHeight = maxHeight
+                        val creditsBlockHeight = 62.dp
+
+                        val expandedWidth =
+                            if (fullBleedEnabled) {
+                                stageWidth
+                            } else {
+                                min(
+                                    (stageWidth - NEST_GUTTER * 2).coerceAtLeast(120.dp),
+                                    (stageHeight - statusBarTop - 36.dp - creditsBlockHeight - 20.dp).coerceAtLeast(120.dp),
                                 )
                             }
-                        },
-                        modifier = Modifier
-                            .offset(y = currentCreditsTop)
-                            .padding(horizontal = NEST_GUTTER)
-                            .zIndex(2f),
-                    )
+                        val expandedHeight =
+                            if (fullBleedEnabled) {
+                                // Full-screen cover extends from top edge (0.dp) right down through the credits zone
+                                // so its 16-stop smooth bottom fade melts directly behind the song title!
+                                (stageHeight - 10.dp).coerceAtLeast(220.dp)
+                            } else {
+                                expandedWidth
+                            }
+                        val expandedLeft = if (fullBleedEnabled) 0.dp else (stageWidth - expandedWidth) / 2f
+                        val expandedTop =
+                            if (fullBleedEnabled) {
+                                0.dp
+                            } else {
+                                (statusBarTop + 34.dp + ((stageHeight - statusBarTop - 34.dp - creditsBlockHeight - expandedHeight) / 2f))
+                                    .coerceAtLeast(statusBarTop + 28.dp)
+                            }
 
-                    // Inline Lyrics / Queue body occupying the stage below the 72dp collapsed header
-                    if (collapseProgress > 0.02f) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(top = NEST_HEADER_HEIGHT + 6.dp)
-                                .graphicsLayer {
-                                    alpha = ((collapseProgress - 0.15f) / 0.85f).coerceIn(0f, 1f)
-                                    translationY = (1f - collapseProgress) * 32.dp.toPx()
+                        val collapsedArtLeft = NEST_GUTTER
+                        val collapsedArtTop = statusBarTop + 30.dp
+
+                        val expandedCreditsTop = (stageHeight - creditsBlockHeight - 2.dp).coerceAtLeast(statusBarTop + 40.dp)
+                        val collapsedCreditsTop = statusBarTop + 34.dp
+                        val currentCreditsTop = lerp(expandedCreditsTop, collapsedCreditsTop, collapseProgress)
+
+                        val currentError = playbackError
+                        if (currentError != null && !panelOpen) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(expandedHeight)
+                                    .offset(y = expandedTop)
+                                    .padding(horizontal = NEST_GUTTER),
+                            ) {
+                                PlaybackError(
+                                    error = currentError,
+                                    retry = { runCatching { playerConnection.player.prepare() } },
+                                )
+                            }
+                        } else {
+                            NestMorphingArtwork(
+                                thumbnailUrl = metadata.thumbnailUrl,
+                                canvasArtwork = canvasArtwork,
+                                isPlaying = isPlaying,
+                                fullBleed = fullBleedEnabled,
+                                collapseProgress = collapseProgress,
+                                expandedWidth = expandedWidth,
+                                expandedHeight = expandedHeight,
+                                expandedTop = expandedTop,
+                                expandedLeft = expandedLeft,
+                                collapsedTop = collapsedArtTop,
+                                collapsedLeft = collapsedArtLeft,
+                                canSkipPrevious = canSkipPrevious,
+                                canSkipNext = canSkipNext,
+                                onSkipPrevious = { playerConnection.seekToPrevious() },
+                                onSkipNext = { playerConnection.seekToNext() },
+                                onCollapsedTap = { activePanel = NestPlayerPanel.NONE },
+                                onCanvasFrameSampled = { bmp -> liveCanvasBitmap = bmp },
+                                modifier = Modifier.zIndex(if (panelOpen) 2f else 1f),
+                            )
+                        }
+
+                        // Credits row: floats cleanly over the bottom fade of the full-screen cover when expanded,
+                        // and glides up beside the 66dp thumbnail when Lyrics or Queue opens!
+                        val isLiked = currentSong?.song?.liked ?: metadata.liked
+                        NestPortraitCredits(
+                            mediaMetadata = metadata,
+                            liked = isLiked,
+                            collapseProgress = collapseProgress,
+                            onToggleLike = { runCatching { playerConnection.toggleLike() } },
+                            onTitleClick = {
+                                val albumId = metadata.album?.id
+                                if (!albumId.isNullOrBlank()) {
+                                    state.collapseSoft()
+                                    navController.navigate("album/$albumId")
                                 }
-                                .zIndex(1f),
-                        ) {
-                            when (activePanel) {
-                                NestPlayerPanel.LYRICS -> {
-                                    if (lyricsSession != null) {
-                                        NestLyricsPanel(
-                                            lines = lyricsSession.lines,
-                                            rawEntries = lyricsSession.rawEntries,
-                                            clock = lyricsSession.clock,
-                                            isSynced = lyricsSession.isSynced,
-                                            isLoading = lyricsSession.isLoading,
-                                            lyricsUnavailable = lyricsSession.lyricsUnavailable,
-                                            showRomanized = lyricsSession.showRomanized,
-                                            showTranslated = lyricsSession.showTranslated,
-                                            onToggleRomanized = lyricsSession.onToggleRomanized,
-                                            onToggleTranslated = lyricsSession.onToggleTranslated,
-                                            onSeekToMs = lyricsSession.onSeekToMs,
-                                            onLineLongPress = { lyricsSession.onOpenLyricsMenu() },
+                            },
+                            onArtistClick = {
+                                val artistId = metadata.artists.firstOrNull()?.id
+                                if (!artistId.isNullOrBlank()) {
+                                    state.collapseSoft()
+                                    navController.navigate("artist/$artistId")
+                                }
+                            },
+                            onMoreClick = {
+                                menuState.show {
+                                    PlayerMenu(
+                                        mediaMetadata = metadata,
+                                        playerBottomSheetState = state,
+                                        onShowDetailsDialog = {
+                                            bottomSheetPageState.show {
+                                                ShowMediaInfo(metadata.id)
+                                            }
+                                        },
+                                        onDismiss = menuState::dismiss,
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .offset(y = currentCreditsTop)
+                                .padding(horizontal = NEST_GUTTER)
+                                .zIndex(3f),
+                        )
+
+                        // Inline Lyrics / Queue body occupying the stage below the collapsed header
+                        if (collapseProgress > 0.02f) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = statusBarTop + 30.dp + NEST_HEADER_HEIGHT)
+                                    .graphicsLayer {
+                                        alpha = ((collapseProgress - 0.15f) / 0.85f).coerceIn(0f, 1f)
+                                        translationY = (1f - collapseProgress) * 32.dp.toPx()
+                                    }.zIndex(2f),
+                            ) {
+                                when (activePanel) {
+                                    NestPlayerPanel.LYRICS -> {
+                                        if (lyricsSession != null) {
+                                            NestLyricsPanel(
+                                                lines = lyricsSession.lines,
+                                                rawEntries = lyricsSession.rawEntries,
+                                                clock = lyricsSession.clock,
+                                                isSynced = lyricsSession.isSynced,
+                                                isLoading = lyricsSession.isLoading,
+                                                lyricsUnavailable = lyricsSession.lyricsUnavailable,
+                                                showRomanized = lyricsSession.showRomanized,
+                                                showTranslated = lyricsSession.showTranslated,
+                                                onToggleRomanized = lyricsSession.onToggleRomanized,
+                                                onToggleTranslated = lyricsSession.onToggleTranslated,
+                                                onSeekToMs = lyricsSession.onSeekToMs,
+                                                onLineLongPress = { lyricsSession.onOpenLyricsMenu() },
+                                                bottomPadding = 12.dp,
+                                                modifier = Modifier.fillMaxSize(),
+                                            )
+                                        }
+                                    }
+                                    NestPlayerPanel.QUEUE -> {
+                                        NestQueuePanel(
+                                            playerBottomSheetState = state,
+                                            shuffleEnabled = shuffleModeEnabled,
+                                            repeatMode = repeatMode,
+                                            autoplayEnabled = autoplayEnabled,
+                                            onToggleShuffle = {
+                                                val next = !shuffleModeEnabled
+                                                runCatching { playerConnection.player.shuffleModeEnabled = next }
+                                            },
+                                            onToggleRepeat = {
+                                                val next = when (repeatMode) {
+                                                    Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                                                    Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                                                    else -> Player.REPEAT_MODE_OFF
+                                                }
+                                                runCatching { playerConnection.player.repeatMode = next }
+                                            },
+                                            onToggleAutoplay = {
+                                                onAutoplayChange(!autoplayEnabled)
+                                            },
                                             bottomPadding = 12.dp,
                                             modifier = Modifier.fillMaxSize(),
                                         )
                                     }
+                                    NestPlayerPanel.NONE -> Unit
                                 }
-                                NestPlayerPanel.QUEUE -> {
-                                    NestQueuePanel(
-                                        playerBottomSheetState = state,
-                                        bottomPadding = 12.dp,
-                                        modifier = Modifier.fillMaxSize(),
-                                    )
-                                }
-                                NestPlayerPanel.NONE -> Unit
                             }
                         }
                     }
-                }
 
-                // Bottom Now Playing Deck (Lyric Strip + ThinSlider + Timestamps/Badge + Transport + Volume + Action Row)
-                val ink = LocalPlayerInk.current.value
-                val effectivePosition = sliderPosition ?: position
-                val safeDuration = duration.coerceAtLeast(1L)
-                val sliderFraction = if (duration > 0L) {
-                    (effectivePosition.toFloat() / safeDuration).coerceIn(0f, 1f)
-                } else {
-                    0f
-                }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = NEST_GUTTER),
-                ) {
-                    // Single-line word-swept lyric preview directly above the scrubber (when main cover is shown)
-                    AnimatedVisibility(
-                        visible = !panelOpen && lyricsSession != null,
-                        enter = fadeIn(tween(240)) + expandVertically(tween(260)),
-                        exit = fadeOut(tween(180)) + shrinkVertically(tween(220)),
-                    ) {
-                        if (lyricsSession != null) {
-                            NestCurrentLyricStrip(
-                                lines = lyricsSession.lines,
-                                clock = lyricsSession.clock,
-                                isSynced = lyricsSession.isSynced,
-                                isLoading = lyricsSession.isLoading,
-                                lyricsUnavailable = lyricsSession.lyricsUnavailable,
-                                onClick = { activePanel = NestPlayerPanel.LYRICS },
-                            )
-                        }
+                    // Bottom Now Playing Deck (Lyric Strip + Scrubber + Dolby Atmos Badge + Transport + Volume + 3-Icon Dock)
+                    val ink = LocalPlayerInk.current.value
+                    val effectivePosition = sliderPosition ?: position
+                    val safeDuration = duration.coerceAtLeast(1L)
+                    val sliderFraction = if (duration > 0L) {
+                        (effectivePosition.toFloat() / safeDuration).coerceIn(0f, 1f)
+                    } else {
+                        0f
                     }
 
-                    // Hairline Apple Music capsule scrubber (7dp -> 12dp spring + MixSheen while buffering)
-                    NestThinSlider(
-                        value = sliderFraction,
-                        onValueChange = { fraction ->
-                            if (duration > 0L) {
-                                sliderPosition = (fraction * duration).roundToLong()
-                            }
-                        },
-                        onValueChangeFinished = {
-                            sliderPosition?.let { target ->
-                                runCatching { playerConnection.player.seekTo(target) }
-                                position = target
-                            }
-                            sliderPosition = null
-                        },
-                        isLoading = playbackState == Player.STATE_BUFFERING,
-                        activeColor = ink.copy(alpha = 0.84f),
-                        inactiveColor = ink.copy(alpha = 0.24f),
-                        relativeDrag = true,
-                    )
-
-                    // Timestamps + centered Lossless / Quality badge
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .offset(y = (-4).dp),
+                            .padding(horizontal = NEST_GUTTER),
                     ) {
-                        Text(
-                            text = makeTimeString(effectivePosition),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                            color = ink.copy(alpha = 0.52f),
-                        )
-
-                        NestAudioQualityBadge(
-                            label = qualityInfo?.first,
-                            isLossless = qualityInfo?.second == true,
-                            onClick = {
-                                bottomSheetPageState.show {
-                                    ShowMediaInfo(metadata.id)
-                                }
-                            },
-                        )
-
-                        Text(
-                            text = if (duration > 0L) {
-                                "-${makeTimeString((duration - effectivePosition).coerceAtLeast(0L))}"
-                            } else {
-                                "-0:00"
-                            },
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                            color = ink.copy(alpha = 0.52f),
-                        )
-                    }
-
-                    Spacer(Modifier.height(if (panelOpen) 2.dp else 8.dp))
-
-                    NestTransportRow(
-                        isPlaying = isPlaying,
-                        canSkipPrevious = canSkipPrevious,
-                        canSkipNext = canSkipNext,
-                        onPlayPause = { playerConnection.togglePlayPause() },
-                        onSkipPrevious = { playerConnection.seekToPrevious() },
-                        onSkipNext = { playerConnection.seekToNext() },
-                        compact = panelOpen,
-                    )
-
-                    // Volume row hides smoothly when Lyrics/Queue opens, giving full vertical room to lyrics
-                    AnimatedVisibility(
-                        visible = !panelOpen,
-                        enter = fadeIn(tween(240)) + expandVertically(tween(260)),
-                        exit = fadeOut(tween(180)) + shrinkVertically(tween(220)),
-                    ) {
-                        Column {
-                            Spacer(Modifier.height(8.dp))
-                            NestVolumeRow()
+                        AnimatedVisibility(
+                            visible = !panelOpen && lyricsSession != null,
+                            enter = fadeIn(tween(240)) + expandVertically(tween(260)),
+                            exit = fadeOut(tween(180)) + shrinkVertically(tween(220)),
+                        ) {
+                            if (lyricsSession != null) {
+                                NestCurrentLyricStrip(
+                                    lines = lyricsSession.lines,
+                                    clock = lyricsSession.clock,
+                                    isSynced = lyricsSession.isSynced,
+                                    isLoading = lyricsSession.isLoading,
+                                    lyricsUnavailable = lyricsSession.lyricsUnavailable,
+                                    onClick = { activePanel = NestPlayerPanel.LYRICS },
+                                )
+                            }
                         }
-                    }
 
-                    Spacer(Modifier.height(if (panelOpen) 4.dp else 8.dp))
-
-                    NestPlayerActionRow(
-                        lyricsOpen = activePanel == NestPlayerPanel.LYRICS,
-                        queueOpen = activePanel == NestPlayerPanel.QUEUE,
-                        shuffleEnabled = shuffleModeEnabled,
-                        repeatMode = repeatMode,
-                        autoplayEnabled = autoplayEnabled,
-                        onToggleLyrics = {
-                            activePanel = if (activePanel == NestPlayerPanel.LYRICS) {
-                                NestPlayerPanel.NONE
-                            } else {
-                                NestPlayerPanel.LYRICS
-                            }
-                        },
-                        onToggleQueue = {
-                            activePanel = if (activePanel == NestPlayerPanel.QUEUE) {
-                                NestPlayerPanel.NONE
-                            } else {
-                                NestPlayerPanel.QUEUE
-                            }
-                        },
-                        onToggleShuffle = {
-                            val next = !shuffleModeEnabled
-                            runCatching { playerConnection.player.shuffleModeEnabled = next }
-                        },
-                        onToggleRepeat = {
-                            val next = when (repeatMode) {
-                                Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
-                                Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
-                                else -> Player.REPEAT_MODE_OFF
-                            }
-                            runCatching { playerConnection.player.repeatMode = next }
-                        },
-                        onToggleAutoplay = {
-                            onAutoplayChange(!autoplayEnabled)
-                        },
-                        onAirPlayClick = {
-                            runCatching {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    val panelIntent = Intent("com.android.settings.panel.action.MEDIA_OUTPUT").apply {
-                                        putExtra("com.android.settings.panel.extra.PACKAGE_NAME", context.packageName)
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(panelIntent)
-                                } else {
-                                    context.startActivity(
-                                        Intent(Settings.ACTION_BLUETOOTH_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                                    )
+                        NestThinSlider(
+                            value = sliderFraction,
+                            onValueChange = { fraction ->
+                                if (duration > 0L) {
+                                    sliderPosition = (fraction * duration).roundToLong()
                                 }
-                            }
-                        },
-                    )
+                            },
+                            onValueChangeFinished = {
+                                sliderPosition?.let { target ->
+                                    runCatching { playerConnection.player.seekTo(target) }
+                                    position = target
+                                }
+                                sliderPosition = null
+                            },
+                            isLoading = playbackState == Player.STATE_BUFFERING,
+                            activeColor = ink.copy(alpha = 0.88f),
+                            inactiveColor = ink.copy(alpha = 0.24f),
+                            relativeDrag = true,
+                        )
 
-                    Spacer(Modifier.height(10.dp))
+                        // Timestamps + centered tappable Dolby Atmos / Lossless / Spatial Audio badge
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(y = (-4).dp),
+                        ) {
+                            Text(
+                                text = makeTimeString(effectivePosition),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                                color = ink.copy(alpha = 0.56f),
+                            )
+
+                            NestAudioQualityBadge(
+                                label = badgeSpec.label,
+                                isDolbyAtmos = badgeSpec.isDolbyAtmos,
+                                isLossless = badgeSpec.isLossless,
+                                onClick = { showPipelineDialog = true },
+                            )
+
+                            Text(
+                                text = if (duration > 0L) {
+                                    "-${makeTimeString((duration - effectivePosition).coerceAtLeast(0L))}"
+                                } else {
+                                    "-0:00"
+                                },
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                                color = ink.copy(alpha = 0.56f),
+                            )
+                        }
+
+                        Spacer(Modifier.height(if (panelOpen) 2.dp else 8.dp))
+
+                        NestTransportRow(
+                            isPlaying = isPlaying,
+                            canSkipPrevious = canSkipPrevious,
+                            canSkipNext = canSkipNext,
+                            onPlayPause = { playerConnection.togglePlayPause() },
+                            onSkipPrevious = { playerConnection.seekToPrevious() },
+                            onSkipNext = { playerConnection.seekToNext() },
+                            compact = panelOpen,
+                        )
+
+                        AnimatedVisibility(
+                            visible = !panelOpen,
+                            enter = fadeIn(tween(240)) + expandVertically(tween(260)),
+                            exit = fadeOut(tween(180)) + shrinkVertically(tween(220)),
+                        ) {
+                            Column {
+                                Spacer(Modifier.height(8.dp))
+                                NestVolumeRow()
+                            }
+                        }
+
+                        Spacer(Modifier.height(if (panelOpen) 4.dp else 8.dp))
+
+                        NestPlayerActionRow(
+                            lyricsOpen = activePanel == NestPlayerPanel.LYRICS,
+                            queueOpen = activePanel == NestPlayerPanel.QUEUE,
+                            shuffleEnabled = shuffleModeEnabled,
+                            repeatMode = repeatMode,
+                            autoplayEnabled = autoplayEnabled,
+                            activeRouteName = activeExternalRoute,
+                            onToggleLyrics = {
+                                activePanel = if (activePanel == NestPlayerPanel.LYRICS) {
+                                    NestPlayerPanel.NONE
+                                } else {
+                                    NestPlayerPanel.LYRICS
+                                }
+                            },
+                            onToggleQueue = {
+                                activePanel = if (activePanel == NestPlayerPanel.QUEUE) {
+                                    NestPlayerPanel.NONE
+                                } else {
+                                    NestPlayerPanel.QUEUE
+                                }
+                            },
+                            onAirPlayClick = { showAudioOutputSheet = true },
+                        )
+
+                        Spacer(Modifier.height(10.dp))
+                    }
                 }
+
+                // Floating Apple Music grabber capsule overlaid cleanly over the top of the full-bleed cover
+                NestPlayerTopStrip(
+                    queueTitle = playingFromTitle,
+                    showSourceLabel = !fullBleedEnabled && !panelOpen,
+                    onCollapse = { state.collapseSoft() },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .statusBarsPadding()
+                        .zIndex(5f),
+                )
+            }
+
+            if (showPipelineDialog) {
+                NestAudioPipelineDialog(
+                    onDismiss = { showPipelineDialog = false },
+                )
+            }
+
+            if (showAudioOutputSheet) {
+                NestAudioOutputSheet(
+                    onDismiss = { showAudioOutputSheet = false },
+                    onOpenPipelineDetails = { showPipelineDialog = true },
+                )
             }
         }
     }

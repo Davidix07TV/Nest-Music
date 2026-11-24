@@ -370,4 +370,14 @@
     <string name="flac_download_failed">FLAC download failed</string>
     <string name="flac_download_deleted">FLAC deleted: %s</string>
     <string name="folder_persist_failed">Failed to persist folder permission</string>
+    <string name="animated_album_covers">Animated Album Covers</string>
+    <string name="animated_album_covers_desc">Play seamless motion artwork in Now Playing</string>
+    <string name="full_bleed_artwork">Full-Screen Album Covers</string>
+    <string name="full_bleed_artwork_desc">Expand album artwork edge-to-edge across the top of Now Playing</string>
+    <string name="canvas_over_cellular">Motion Artwork on Mobile Data</string>
+    <string name="canvas_over_cellular_desc">Stream animated covers when not connected to Wi-Fi</string>
+    <string name="dolby_atmos">Dolby Atmos</string>
+    <string name="dolby_atmos_desc">Enable hardware E-AC-3 JOC decoding and Atmos spatializer</string>
+    <string name="spatial_audio">Spatial Audio</string>
+    <string name="spatial_audio_desc">Immersive binaural 3D soundstage and Haas crossfeed</string>
 </resources>

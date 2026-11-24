@@ -53,6 +53,8 @@ import com.nestmusic.music.BuildConfig
 import com.nestmusic.music.LocalPlayerAwareWindowInsets
 import com.nestmusic.music.R
 import com.nestmusic.music.constants.AudioNormalizationKey
+import com.nestmusic.music.constants.DolbyAtmosKey
+import com.nestmusic.music.constants.SpatialAudioKey
 import com.nestmusic.music.constants.AudioOffload
 import com.nestmusic.music.constants.AudioTrackPlaybackParamsKey
 import com.nestmusic.music.constants.AudioQuality
@@ -233,6 +235,16 @@ fun PlayerSettings(
     val (audioNormalization, onAudioNormalizationChange) = rememberPreference(
         AudioNormalizationKey,
         defaultValue = true
+    )
+
+    val (dolbyAtmos, onDolbyAtmosChange) = rememberPreference(
+        DolbyAtmosKey,
+        defaultValue = true
+    )
+
+    val (spatialAudio, onSpatialAudioChange) = rememberPreference(
+        SpatialAudioKey,
+        defaultValue = false
     )
 
     val (loudnessLevel, onLoudnessLevelChange) = rememberEnumPreference(
@@ -713,6 +725,48 @@ fun PlayerSettings(
                         )
                     },
                     onClick = { if (skipSilence) onSkipSilenceInstantChange(!skipSilenceInstant) }
+                ))
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.nest_ic_dolby_atmos),
+                    title = { Text(stringResource(R.string.dolby_atmos)) },
+                    description = { Text(stringResource(R.string.dolby_atmos_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = dolbyAtmos,
+                            onCheckedChange = onDolbyAtmosChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (dolbyAtmos) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onDolbyAtmosChange(!dolbyAtmos) }
+                ))
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.nest_airplay),
+                    title = { Text(stringResource(R.string.spatial_audio)) },
+                    description = { Text(stringResource(R.string.spatial_audio_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = spatialAudio,
+                            onCheckedChange = onSpatialAudioChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (spatialAudio) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onSpatialAudioChange(!spatialAudio) }
                 ))
                 add(Material3SettingsItem(
                     icon = painterResource(R.drawable.volume_up),

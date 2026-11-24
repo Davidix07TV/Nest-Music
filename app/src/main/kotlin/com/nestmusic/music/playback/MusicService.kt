@@ -220,6 +220,11 @@ import com.nestmusic.music.constants.FlacStreamingQualityKey
 import com.nestmusic.music.constants.EnableLosslessKey
 import com.nestmusic.music.constants.MemoryCacheToggleKey
 import com.nestmusic.music.constants.LowDataModeKey
+import com.nestmusic.music.constants.DolbyAtmosKey
+import com.nestmusic.music.constants.SpatialAudioKey
+import com.nestmusic.music.playback.audio.NestAudioOutputStatus
+import com.nestmusic.music.playback.audio.NestDeviceCodecs
+import com.nestmusic.music.playback.audio.SpatialAudioProcessor
 import com.nestmusic.music.lossless.FlacCoreLosslessStreamResolver
 import com.nestmusic.music.lossless.model.FlacStreamUrl
 import com.nestmusic.music.utils.CoilBitmapLoader
@@ -454,6 +459,16 @@ class MusicService :
 
     private val playerSilenceProcessors = HashMap<Player, SilenceDetectorAudioProcessor>()
     private val playerTransitionProcessors = HashMap<Player, TransitionAudioProcessor>()
+    private val playerSpatialProcessors = HashMap<Player, SpatialAudioProcessor>()
+
+    @Volatile
+    private var dolbyAtmosEnabledCached: Boolean = true
+
+    @Volatile
+    private var spatialAudioEnabledCached: Boolean = false
+
+    @Volatile
+    private var activeTrackIsNativeAtmos: Boolean = false
 
     private val instantSilenceSkipEnabled = MutableStateFlow(false)
 
@@ -1055,9 +1070,16 @@ class MusicService :
         combine(
             dataStore.data.map { it[AudioOffload] ?: false },
             dataStore.data.map { it[CrossfadeEnabledKey] ?: false },
-        ) { offloadPref, crossfadeEnabled ->
-            // Force disable offload if crossfade is enabled to prevent volume ramp issues
-            if (crossfadeEnabled) false else offloadPref
+            dataStore.data.map { it[DolbyAtmosKey] ?: true },
+            dataStore.data.map { it[SpatialAudioKey] ?: false },
+        ) { offloadPref, crossfadeEnabled, dolbyAtmos, spatialAudio ->
+            dolbyAtmosEnabledCached = dolbyAtmos
+            spatialAudioEnabledCached = spatialAudio
+            val spatialDspActive = (dolbyAtmos || spatialAudio) && !activeTrackIsNativeAtmos
+            playerSpatialProcessors.values.forEach { it.isEnabled = spatialDspActive }
+            refreshAudioPipelineStatus()
+            // Force disable offload if crossfade or spatial DSP is enabled so AudioProcessors run
+            if (crossfadeEnabled || spatialDspActive) false else offloadPref
         }.distinctUntilChanged()
             .collectLatest(scope) { useOffload ->
                 player.setOffloadEnabled(useOffload)
@@ -1092,6 +1114,7 @@ class MusicService :
                 playerNormalizationProcessors.remove(player)
                 playerSilenceProcessors.remove(player)
                 playerTransitionProcessors.remove(player)
+                playerSpatialProcessors.remove(player)
                 player.release()
 
                 val newPlayer = createExoPlayer(prefs = latestPrefs ?: startupPrefs)
@@ -1495,6 +1518,7 @@ class MusicService :
         val eqProcessor = CustomEqualizerAudioProcessor()
         equalizerService.addAudioProcessor(eqProcessor)
         val transitionProcessor = TransitionAudioProcessor()
+        val spatialProcessor = SpatialAudioProcessor()
 
         val silenceProcessor = SilenceDetectorAudioProcessor { handleLongSilenceDetected() }
 
@@ -1502,12 +1526,22 @@ class MusicService :
         val useAudioTrackPlaybackParams = if (prefs != null) {
             val skipSilence = prefs[SkipSilenceKey] ?: false
             val instantSkip = prefs[SkipSilenceInstantKey] ?: false
+            val dolbyAtmos = prefs[DolbyAtmosKey] ?: true
+            val spatialAudio = prefs[SpatialAudioKey] ?: false
+            dolbyAtmosEnabledCached = dolbyAtmos
+            spatialAudioEnabledCached = spatialAudio
+            spatialProcessor.isEnabled = (dolbyAtmos || spatialAudio) && !activeTrackIsNativeAtmos
             silenceProcessor.instantModeEnabled = skipSilence && instantSkip
             prefs[AudioTrackPlaybackParamsKey] ?: true
         } else {
             runBlocking {
                 val skipSilence = dataStore.get(SkipSilenceKey, false)
                 val instantSkip = dataStore.get(SkipSilenceInstantKey, false)
+                val dolbyAtmos = dataStore.get(DolbyAtmosKey, true)
+                val spatialAudio = dataStore.get(SpatialAudioKey, false)
+                dolbyAtmosEnabledCached = dolbyAtmos
+                spatialAudioEnabledCached = spatialAudio
+                spatialProcessor.isEnabled = (dolbyAtmos || spatialAudio) && !activeTrackIsNativeAtmos
                 silenceProcessor.instantModeEnabled = skipSilence && instantSkip
                 dataStore.get(AudioTrackPlaybackParamsKey, true)
             }
@@ -1521,6 +1555,7 @@ class MusicService :
                     createRenderersFactory(
                         normalizationProcessor,
                         eqProcessor,
+                        spatialProcessor,
                         transitionProcessor,
                         silenceProcessor,
                         useAudioTrackPlaybackParams,
@@ -1542,6 +1577,7 @@ class MusicService :
                         .Builder()
                         .setUsage(C.USAGE_MEDIA)
                         .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                        .setSpatializationBehavior(C.SPATIALIZATION_BEHAVIOR_AUTO)
                         .build(),
                     false,
                 ).setSeekBackIncrementMs(5000)
@@ -1552,18 +1588,22 @@ class MusicService :
         playerNormalizationProcessors[player] = normalizationProcessor
         playerSilenceProcessors[player] = silenceProcessor
         playerTransitionProcessors[player] = transitionProcessor
+        playerSpatialProcessors[player] = spatialProcessor
+        NestAudioOutputStatus.attachPlayer(player)
 
         if (prefs != null) {
             val offload = prefs[AudioOffload] ?: false
             val crossfade = prefs[CrossfadeEnabledKey] ?: false
-            player.setOffloadEnabled(if (crossfade) false else offload)
+            val spatialActive = spatialProcessor.isEnabled
+            player.setOffloadEnabled(if (crossfade || spatialActive) false else offload)
             player.skipSilenceEnabled = prefs[SkipSilenceKey] ?: false
         } else {
             player.apply {
                 runBlocking {
                     val offload = dataStore.get(AudioOffload, false)
                     val crossfade = dataStore.get(CrossfadeEnabledKey, false)
-                    setOffloadEnabled(if (crossfade) false else offload)
+                    val spatialActive = spatialProcessor.isEnabled
+                    setOffloadEnabled(if (crossfade || spatialActive) false else offload)
                     skipSilenceEnabled = dataStore.get(SkipSilenceKey, false)
                 }
             }
@@ -3000,6 +3040,54 @@ class MusicService :
         if (events.containsAny(Player.EVENT_IS_PLAYING_CHANGED)) {
             scrobbleManager?.onPlayerStateChanged(player.isPlaying, player.currentMetadata, duration = player.duration)
         }
+
+        if (events.containsAny(
+                Player.EVENT_TRACKS_CHANGED,
+                Player.EVENT_MEDIA_ITEM_TRANSITION,
+                Player.EVENT_PLAYBACK_STATE_CHANGED,
+            )
+        ) {
+            refreshAudioPipelineStatus()
+        }
+    }
+
+    private fun refreshAudioPipelineStatus() {
+        if (!::player.isInitialized) return
+        val audioFmt = player.audioFormat
+        val dbFmt = currentFormat.value
+        val mime = audioFmt?.sampleMimeType ?: dbFmt?.mimeType
+        val channels = audioFmt?.channelCount?.takeIf { it > 0 } ?: dbFmt?.audioChannels ?: 2
+        val sampleRate = audioFmt?.sampleRate?.takeIf { it > 0 } ?: dbFmt?.sampleRate ?: 48_000
+        val bitrateKbps = (audioFmt?.bitrate?.takeIf { it > 0 } ?: dbFmt?.bitrate ?: 0) / 1000
+        val bitDepth = when (audioFmt?.pcmEncoding) {
+            C.ENCODING_PCM_24BIT, C.ENCODING_PCM_24BIT_BIG_ENDIAN -> 24
+            C.ENCODING_PCM_32BIT, C.ENCODING_PCM_32BIT_BIG_ENDIAN, C.ENCODING_PCM_FLOAT -> 24
+            C.ENCODING_PCM_16BIT, C.ENCODING_PCM_16BIT_BIG_ENDIAN -> 16
+            else -> dbFmt?.bitsPerSample ?: if (mime?.contains("flac", ignoreCase = true) == true) 24 else 16
+        }
+        val isNativeAtmos =
+            mime?.equals("audio/eac3-joc", ignoreCase = true) == true ||
+                mime?.equals("audio/ac4", ignoreCase = true) == true ||
+                channels > 2
+        if (activeTrackIsNativeAtmos != isNativeAtmos) {
+            activeTrackIsNativeAtmos = isNativeAtmos
+            val spatialDspActive = (dolbyAtmosEnabledCached || spatialAudioEnabledCached) && !isNativeAtmos
+            playerSpatialProcessors.values.forEach { it.isEnabled = spatialDspActive }
+        }
+        val hwAtmos = NestDeviceCodecs.playsDolbyAtmos(this)
+        val spatializerActive = NestDeviceCodecs.isSpatializerActive(this)
+        val spatialDspActive = (dolbyAtmosEnabledCached || spatialAudioEnabledCached) && !isNativeAtmos
+        NestAudioOutputStatus.updateFromFormat(
+            mimeType = mime,
+            codecs = audioFmt?.codecs ?: dbFmt?.codecs,
+            sampleRateHz = sampleRate,
+            bitDepth = bitDepth,
+            channelCount = channels,
+            bitrateKbps = bitrateKbps,
+            dolbyAtmosEnabled = dolbyAtmosEnabledCached && (hwAtmos || spatialDspActive || isNativeAtmos),
+            spatialAudioActive = spatialDspActive || spatializerActive,
+            hardwareSpatializerActive = spatializerActive || (hwAtmos && isNativeAtmos),
+        )
     }
 
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
@@ -4224,6 +4312,7 @@ class MusicService :
     private fun createRenderersFactory(
         normalizationProcessor: VolumeNormalizationAudioProcessor,
         eqProcessor: CustomEqualizerAudioProcessor,
+        spatialProcessor: SpatialAudioProcessor,
         transitionProcessor: TransitionAudioProcessor,
         silenceProcessor: SilenceDetectorAudioProcessor,
         useAudioTrackPlaybackParams: Boolean,
@@ -4285,6 +4374,7 @@ class MusicService :
                     arrayOf(
                         normalizationProcessor,
                         eqProcessor,
+                        spatialProcessor,
                         transitionProcessor,
                         silenceProcessor,
                     ),
@@ -4553,6 +4643,8 @@ class MusicService :
         playerNormalizationProcessors.remove(player)
         playerSilenceProcessors.remove(player)
         playerTransitionProcessors.remove(player)
+        playerSpatialProcessors.remove(player)
+        NestAudioOutputStatus.detachPlayer(player)
         initialBufferRecoveryJob?.cancel()
         controllerFuture?.let { MediaController.releaseFuture(it) }
         controllerFuture = null
@@ -5201,6 +5293,7 @@ class MusicService :
             Timber.tag(TAG).e(e, "Failed to prepare secondary player for crossfade")
             playerNormalizationProcessors.remove(secPlayer)
             playerTransitionProcessors.remove(secPlayer)
+            playerSpatialProcessors.remove(secPlayer)
             secPlayer.release()
             secondaryPlayer = null
             return
@@ -5222,6 +5315,7 @@ class MusicService :
         fadingPlayer = currentPlayer
         player = nextPlayer
         _playerFlow.value = player
+        NestAudioOutputStatus.attachPlayer(player)
         secondaryPlayer = null
 
         fadingPlayer?.repeatMode = Player.REPEAT_MODE_OFF
@@ -5334,6 +5428,7 @@ class MusicService :
         playerTransitionProcessors[player]?.clearTransition()
         fadingPlayer?.let { playerTransitionProcessors.remove(it) }
         fadingPlayer?.let { playerNormalizationProcessors.remove(it) }
+        fadingPlayer?.let { playerSpatialProcessors.remove(it) }
         fadingPlayer?.stop()
         fadingPlayer?.clearMediaItems()
         fadingPlayer?.release()

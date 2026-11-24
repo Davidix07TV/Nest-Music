@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
 import android.media.AudioManager
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -89,6 +90,8 @@ import androidx.media3.common.Player
 import coil3.compose.AsyncImage
 import com.nestmusic.music.R
 import com.nestmusic.music.models.MediaMetadata
+import com.nestmusic.music.ui.player.nest.canvas.NestCanvasArtwork
+import com.nestmusic.music.ui.player.nest.canvas.NestCanvasArtworkPlayer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -129,25 +132,18 @@ private const val BOTTOM_ACTIVE_TILE_ALPHA = 0.62f
 internal fun NestPlayerTopStrip(
     queueTitle: String?,
     onCollapse: () -> Unit,
+    showSourceLabel: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val ink = LocalPlayerInk.current.value
-    val alphas = LocalPlayerAlphas.current
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp)
-            .background(
-                Brush.verticalGradient(
-                    0f to Color.Black.copy(alpha = 0.28f),
-                    0.6f to Color.Black.copy(alpha = 0.10f),
-                    1f to Color.Transparent,
-                ),
-            )
+            .height(34.dp)
             .padding(horizontal = 20.dp),
     ) {
-        // Apple Music drag-pill handle centered at top
+        // Apple Music / iOS 26 floating frosted grabber pill centered at top
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -155,7 +151,7 @@ internal fun NestPlayerTopStrip(
                 .width(38.dp)
                 .height(5.dp)
                 .clip(CircleShape)
-                .background(ink.copy(alpha = 0.36f))
+                .background(ink.copy(alpha = 0.42f))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -163,51 +159,24 @@ internal fun NestPlayerTopStrip(
                 ),
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(top = 8.dp)
-                .fillMaxWidth(),
-        ) {
-            NestTactileGlyph(
-                onClick = onCollapse,
-                touchSize = 40.dp,
-            ) {
-                Icon(
-                    imageVector = NestPlayerIcons.PlayerChevronDown,
-                    contentDescription = null,
-                    tint = ink.copy(alpha = alphas.secondary),
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-
-            if (!queueTitle.isNullOrBlank()) {
-                Spacer(Modifier.width(8.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.playing_from).uppercase(),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            letterSpacing = 0.8.sp,
-                        ),
-                        color = ink.copy(alpha = 0.56f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = queueTitle,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        ),
-                        color = ink.copy(alpha = alphas.primary),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
+        if (showSourceLabel && !queueTitle.isNullOrBlank()) {
+            Text(
+                text = queueTitle,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                color = ink.copy(alpha = 0.62f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onCollapse,
+                    ),
+            )
         }
     }
 }
@@ -420,9 +389,12 @@ internal fun NestPortraitCredits(
 @Composable
 internal fun NestMorphingArtwork(
     thumbnailUrl: String?,
+    canvasArtwork: NestCanvasArtwork?,
     isPlaying: Boolean,
+    fullBleed: Boolean,
     collapseProgress: Float,
-    expandedSize: Dp,
+    expandedWidth: Dp,
+    expandedHeight: Dp,
     expandedTop: Dp,
     expandedLeft: Dp,
     collapsedTop: Dp,
@@ -432,11 +404,12 @@ internal fun NestMorphingArtwork(
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
     onCollapsedTap: () -> Unit,
+    onCanvasFrameSampled: ((Bitmap) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val p = collapseProgress.coerceIn(0f, 1f)
     val playScale by animateFloatAsState(
-        targetValue = if (isPlaying || p > 0.05f) 1f else 0.845f,
+        targetValue = if (fullBleed || isPlaying || p > 0.05f) 1f else 0.855f,
         animationSpec = spring(
             dampingRatio = 0.68f,
             stiffness = Spring.StiffnessMediumLow,
@@ -444,11 +417,39 @@ internal fun NestMorphingArtwork(
         label = "nestSleevePlayScale",
     )
 
-    val currentSize = lerp(expandedSize, NEST_THUMB_SIZE, p)
+    val currentWidth = lerp(expandedWidth, NEST_THUMB_SIZE, p)
+    val currentHeight = lerp(expandedHeight, NEST_THUMB_SIZE, p)
     val currentLeft = lerp(expandedLeft, collapsedLeft, p)
     val currentTop = lerp(expandedTop, collapsedTop, p)
-    val cornerRadius = lerp(NEST_ART_CORNER, NEST_THUMB_CORNER, p)
-    val shadowElev = lerp(if (isPlaying) 28.dp else 12.dp, 6.dp, p)
+    val expandedCorner = if (fullBleed) 0.dp else NEST_ART_CORNER
+    val cornerRadius = lerp(expandedCorner, NEST_THUMB_CORNER, p)
+    val shadowElev = if (fullBleed && p < 0.05f) 0.dp else lerp(if (isPlaying) 28.dp else 12.dp, 6.dp, p)
+    val bottomFadeStrength = if (fullBleed) (1f - p).coerceIn(0f, 1f) else 0f
+
+    val hiResThumb = remember(thumbnailUrl) {
+        thumbnailUrl?.let { raw ->
+            raw
+                .replace("w544-h544", "w1200-h1200")
+                .replace("w226-h226", "w1200-h1200")
+                .replace("=w120-h120", "=w1200-h1200")
+        }
+    }
+
+    // 16-stop cubic-Hermite bottom mask so full-screen covers melt into the mesh backdrop
+    val bottomMaskStops = remember(bottomFadeStrength) {
+        if (bottomFadeStrength <= 0.001f) {
+            null
+        } else {
+            val fadeStart = 0.56f
+            Array(16) { idx ->
+                val t = idx / 15f
+                val pos = fadeStart + (1f - fadeStart) * t
+                val smooth = t * t * (3f - 2f * t)
+                val alpha = 1f - smooth * bottomFadeStrength
+                pos to Color.Black.copy(alpha = alpha.coerceIn(0f, 1f))
+            }
+        }
+    }
 
     val scope = rememberCoroutineScope()
     val dragX = remember { Animatable(0f) }
@@ -459,21 +460,51 @@ internal fun NestMorphingArtwork(
     Box(
         modifier = modifier
             .offset(x = currentLeft, y = currentTop)
-            .size(currentSize)
+            .width(currentWidth)
+            .height(currentHeight)
             .graphicsLayer {
                 val s = lerp(playScale, 1f, p)
                 scaleX = s
                 scaleY = s
                 translationX = dragX.value * (1f - p)
+                if (bottomMaskStops != null) {
+                    compositingStrategy = CompositingStrategy.Offscreen
+                }
             }
-            .shadow(
-                elevation = shadowElev,
-                shape = shape,
-                ambientColor = Color.Black.copy(alpha = 0.50f),
-                spotColor = Color.Black.copy(alpha = 0.65f),
+            .then(
+                if (shadowElev > 0.5.dp) {
+                    Modifier.shadow(
+                        elevation = shadowElev,
+                        shape = shape,
+                        ambientColor = Color.Black.copy(alpha = 0.50f),
+                        spotColor = Color.Black.copy(alpha = 0.65f),
+                    )
+                } else {
+                    Modifier
+                },
             )
             .clip(shape)
-            .background(Color.White.copy(alpha = 0.08f))
+            .drawWithContent {
+                drawContent()
+                val stops = bottomMaskStops
+                if (stops != null) {
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Black,
+                            *stops,
+                        ),
+                        blendMode = BlendMode.DstIn,
+                    )
+                    // Subtle top status-bar protection veil on full-bleed
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Black.copy(alpha = 0.28f * bottomFadeStrength),
+                            0.18f to Color.Transparent,
+                        ),
+                    )
+                }
+            }
+            .background(Color.White.copy(alpha = 0.06f))
             .then(
                 if (p > 0.6f) {
                     Modifier.clickable(onClick = onCollapsedTap)
@@ -518,20 +549,30 @@ internal fun NestMorphingArtwork(
             ),
     ) {
         AsyncImage(
-            model = thumbnailUrl,
+            model = hiResThumb,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
+
+        if (canvasArtwork != null) {
+            NestCanvasArtworkPlayer(
+                artwork = canvasArtwork,
+                isPlaying = isPlaying,
+                onFrameSampled = onCanvasFrameSampled,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
 
 /**
- * Nest Music `QualityBadgePill` between timestamps (Lossless / Hi-Res / Dolby / High Quality).
+ * Apple Music / iOS 26 Audio Badge Pill between timestamps (Dolby Atmos / Hi-Res Lossless / Spatial Audio).
  */
 @Composable
 internal fun NestAudioQualityBadge(
     label: String?,
+    isDolbyAtmos: Boolean = false,
     isLossless: Boolean = false,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
@@ -540,29 +581,39 @@ internal fun NestAudioQualityBadge(
     val ink = LocalPlayerInk.current.value
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
         modifier = modifier
-            .clip(RoundedCornerShape(5.dp))
+            .clip(RoundedCornerShape(6.dp))
             .background(ink.copy(alpha = 0.14f))
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 7.dp, vertical = 2.5.dp),
+            .padding(horizontal = 8.dp, vertical = 3.dp),
     ) {
-        if (isLossless) {
-            Icon(
-                painter = painterResource(R.drawable.nest_ic_lossless),
-                contentDescription = null,
-                tint = ink.copy(alpha = 0.82f),
-                modifier = Modifier.height(8.dp),
-            )
+        when {
+            isDolbyAtmos -> {
+                Icon(
+                    painter = painterResource(R.drawable.nest_ic_dolby_atmos),
+                    contentDescription = null,
+                    tint = ink.copy(alpha = 0.88f),
+                    modifier = Modifier.height(10.dp),
+                )
+            }
+            isLossless -> {
+                Icon(
+                    painter = painterResource(R.drawable.nest_ic_lossless),
+                    contentDescription = null,
+                    tint = ink.copy(alpha = 0.86f),
+                    modifier = Modifier.height(9.dp),
+                )
+            }
         }
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = 10.sp,
+                fontSize = 10.5.sp,
                 fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.3.sp,
+                letterSpacing = 0.25.sp,
             ),
-            color = ink.copy(alpha = 0.82f),
+            color = ink.copy(alpha = 0.88f),
             maxLines = 1,
         )
     }
@@ -747,11 +798,9 @@ internal fun NestPlayerActionRow(
     shuffleEnabled: Boolean,
     repeatMode: Int,
     autoplayEnabled: Boolean,
+    activeRouteName: String? = null,
     onToggleLyrics: () -> Unit,
     onToggleQueue: () -> Unit,
-    onToggleShuffle: () -> Unit,
-    onToggleRepeat: () -> Unit,
-    onToggleAutoplay: () -> Unit,
     onAirPlayClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -765,11 +814,11 @@ internal fun NestPlayerActionRow(
     }
 
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 12.dp),
     ) {
         NestBottomGlyph(
             icon = NestPlayerIcons.PlayerLyrics,
@@ -778,89 +827,34 @@ internal fun NestPlayerActionRow(
             onClick = onToggleLyrics,
         )
 
-        // Center 3-segment mode pill (Shuffle | Repeat | Autoplay) matching Nest Music PlayerControls.kt
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(36.dp)
-                .clip(CircleShape)
-                .background(ink.copy(alpha = 0.14f)),
-        ) {
-            NestPillSegment(
-                active = shuffleEnabled,
-                onClick = onToggleShuffle,
-            ) { tint ->
-                Icon(
-                    imageVector = NestPlayerIcons.PlayerShuffle,
-                    contentDescription = stringResource(R.string.shuffle),
-                    tint = tint,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-            Box(
-                Modifier
-                    .width(1.dp)
-                    .height(18.dp)
-                    .background(ink.copy(alpha = 0.14f)),
-            )
-            NestPillSegment(
-                active = repeatMode != Player.REPEAT_MODE_OFF,
-                onClick = onToggleRepeat,
-            ) { tint ->
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = NestPlayerIcons.PlayerRepeat,
-                        contentDescription = stringResource(R.string.repeat),
-                        tint = tint,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    if (repeatMode == Player.REPEAT_MODE_ONE) {
-                        Text(
-                            text = "1",
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = tint,
-                        )
-                    }
-                }
-            }
-            Box(
-                Modifier
-                    .width(1.dp)
-                    .height(18.dp)
-                    .background(ink.copy(alpha = 0.14f)),
-            )
-            NestPillSegment(
-                active = autoplayEnabled,
-                onClick = onToggleAutoplay,
-            ) { tint ->
-                Icon(
-                    imageVector = NestPlayerIcons.PlayerAutoplay,
-                    contentDescription = stringResource(R.string.autoplay),
-                    tint = tint,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             NestBottomGlyph(
                 icon = NestPlayerIcons.PlayerAirPlay,
-                active = false,
+                active = !activeRouteName.isNullOrBlank(),
                 contentDescription = stringResource(R.string.airplay),
                 onClick = onAirPlayClick,
             )
-
-            NestBottomGlyph(
-                icon = queueIcon,
-                active = queueOpen,
-                contentDescription = stringResource(R.string.queue),
-                onClick = onToggleQueue,
-            )
+            if (!activeRouteName.isNullOrBlank()) {
+                Text(
+                    text = activeRouteName,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = ink.copy(alpha = 0.78f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.offset(y = (-3).dp),
+                )
+            }
         }
+
+        NestBottomGlyph(
+            icon = queueIcon,
+            active = queueOpen,
+            contentDescription = stringResource(R.string.queue),
+            onClick = onToggleQueue,
+        )
     }
 }
 

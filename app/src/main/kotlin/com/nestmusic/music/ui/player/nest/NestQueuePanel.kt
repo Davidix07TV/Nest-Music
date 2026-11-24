@@ -60,6 +60,12 @@ import com.nestmusic.music.utils.makeTimeString
 @Composable
 internal fun NestQueuePanel(
     playerBottomSheetState: BottomSheetState,
+    shuffleEnabled: Boolean = false,
+    repeatMode: Int = androidx.media3.common.Player.REPEAT_MODE_OFF,
+    autoplayEnabled: Boolean = true,
+    onToggleShuffle: (() -> Unit)? = null,
+    onToggleRepeat: (() -> Unit)? = null,
+    onToggleAutoplay: (() -> Unit)? = null,
     bottomPadding: Dp = 20.dp,
     modifier: Modifier = Modifier,
 ) {
@@ -91,8 +97,57 @@ internal fun NestQueuePanel(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(top = 8.dp),
+            .padding(top = 6.dp),
     ) {
+        if (onToggleShuffle != null && onToggleRepeat != null && onToggleAutoplay != null) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = NEST_GUTTER, vertical = 6.dp),
+            ) {
+                QueueModePill(
+                    active = shuffleEnabled,
+                    label = stringResource(R.string.shuffle),
+                    onClick = onToggleShuffle,
+                    modifier = Modifier.weight(1f),
+                ) { tint ->
+                    Icon(
+                        imageVector = NestPlayerIcons.PlayerShuffle,
+                        contentDescription = null,
+                        tint = tint,
+                        modifier = Modifier.size(17.dp),
+                    )
+                }
+                QueueModePill(
+                    active = repeatMode != androidx.media3.common.Player.REPEAT_MODE_OFF,
+                    label = if (repeatMode == androidx.media3.common.Player.REPEAT_MODE_ONE) "Repeat 1" else stringResource(R.string.repeat),
+                    onClick = onToggleRepeat,
+                    modifier = Modifier.weight(1f),
+                ) { tint ->
+                    Icon(
+                        imageVector = NestPlayerIcons.PlayerRepeat,
+                        contentDescription = null,
+                        tint = tint,
+                        modifier = Modifier.size(17.dp),
+                    )
+                }
+                QueueModePill(
+                    active = autoplayEnabled,
+                    label = stringResource(R.string.autoplay),
+                    onClick = onToggleAutoplay,
+                    modifier = Modifier.weight(1f),
+                ) { tint ->
+                    Icon(
+                        imageVector = NestPlayerIcons.PlayerAutoplay,
+                        contentDescription = null,
+                        tint = tint,
+                        modifier = Modifier.size(17.dp),
+                    )
+                }
+            }
+        }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -102,10 +157,11 @@ internal fun NestQueuePanel(
         ) {
             Column {
                 Text(
-                    text = stringResource(R.string.queue),
+                    text = "Playing Next",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.3).sp,
                     ),
                     color = ink.copy(alpha = alphas.primary),
                 )
@@ -248,3 +304,41 @@ internal fun NestQueuePanel(
         }
     }
 }
+
+@Composable
+private fun QueueModePill(
+    active: Boolean,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: @Composable (androidx.compose.ui.graphics.Color) -> Unit,
+) {
+    val ink = LocalPlayerInk.current.value
+    val haptics = LocalHapticFeedback.current
+    val bg = if (active) ink.copy(alpha = 0.90f) else ink.copy(alpha = 0.14f)
+    val contentTint = if (active) androidx.compose.ui.graphics.Color(0xFF141418) else ink.copy(alpha = 0.88f)
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(bg)
+            .clickable {
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            }
+            .padding(horizontal = 10.dp, vertical = 9.dp),
+    ) {
+        icon(contentTint)
+        Spacer(Modifier.width(6.dp))
+        Text(
+            text = label,
+            color = contentTint,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+

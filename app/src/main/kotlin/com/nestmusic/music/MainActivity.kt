@@ -605,7 +605,7 @@ class MainActivity : ComponentActivity() {
         // recording a full-screen layer costs a GPU copy per frame, and there is no point paying it
         // for a blur the platform cannot do.
         val glassBackdrop = rememberGlassBackdrop().takeIf { liquidGlass && isLiquidGlassSupported }
-        val (uiChoiceShown, onUiChoiceShownChange) = rememberPreference(NestUiChoiceShownKey, defaultValue = false)
+        val (uiChoiceShown, onUiChoiceShownChange) = rememberPreference(NestUiChoiceShownKey, defaultValue = true)
 
         val showChangelog = rememberSaveable { mutableStateOf(false) }
 
@@ -714,21 +714,6 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(if (pureBlack) Color.Black else MaterialTheme.colorScheme.surface),
             ) {
-                if (nestUi && !pureBlack) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(340.dp)
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
-                                        Color.Transparent,
-                                    ),
-                                ),
-                            ),
-                    )
-                }
                 val density = LocalDensity.current
                 val configuration = LocalWindowInfo.current
                 val cutoutInsets = WindowInsets.displayCutout
@@ -1093,10 +1078,10 @@ class MainActivity : ComponentActivity() {
                                         title = {
                                             Text(
                                                 text = when {
-                                                    currentTitleRes == R.string.home -> stringResource(R.string.app_name)
+                                                    currentTitleRes == R.string.home -> stringResource(R.string.home)
                                                     else -> currentTitleRes?.let { stringResource(it) } ?: ""
                                                 },
-                                                style = if (nestUi) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
+                                                style = if (nestUi) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.titleLarge,
                                             )
                                         },
                                         actions = {
@@ -1150,11 +1135,19 @@ class MainActivity : ComponentActivity() {
                                         scrollBehavior = topAppBarScrollBehavior,
                                         colors =
                                             TopAppBarDefaults.topAppBarColors(
-                                                containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
-                                                scrolledContainerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+                                                containerColor = when {
+                                                    pureBlack -> Color.Black
+                                                    nestUi -> MaterialTheme.colorScheme.background.copy(alpha = 0.92f)
+                                                    else -> MaterialTheme.colorScheme.surfaceContainer
+                                                },
+                                                scrolledContainerColor = when {
+                                                    pureBlack -> Color.Black.copy(alpha = 0.92f)
+                                                    nestUi -> MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.92f)
+                                                    else -> MaterialTheme.colorScheme.surfaceContainer
+                                                },
                                                 titleContentColor = MaterialTheme.colorScheme.onSurface,
-                                                actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                actionIconContentColor = if (nestUi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                navigationIconContentColor = if (nestUi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                             ),
                                         modifier =
                                             Modifier.windowInsetsPadding(

@@ -83,6 +83,9 @@ import com.nestmusic.music.constants.LyricsLineSpacingKey
 import com.nestmusic.music.constants.LyricsScrollKey
 import com.nestmusic.music.constants.LyricsTextPositionKey
 import com.nestmusic.music.constants.LiquidGlassKey
+import com.nestmusic.music.constants.AnimatedCanvasKey
+import com.nestmusic.music.constants.FullBleedArtworkKey
+import com.nestmusic.music.constants.CanvasOverCellularKey
 import com.nestmusic.music.constants.LyricsTextSizeKey
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyle
 import com.nestmusic.music.constants.MiniPlayerBackgroundStyleKey
@@ -379,6 +382,24 @@ fun AppearanceSettings(
     val (liquidGlass, onLiquidGlassChange) =
         rememberPreference(
             key = LiquidGlassKey,
+            defaultValue = true,
+        )
+
+    val (animatedCanvas, onAnimatedCanvasChange) =
+        rememberPreference(
+            key = AnimatedCanvasKey,
+            defaultValue = true,
+        )
+
+    val (fullBleedArtwork, onFullBleedArtworkChange) =
+        rememberPreference(
+            key = FullBleedArtworkKey,
+            defaultValue = true,
+        )
+
+    val (canvasOverCellular, onCanvasOverCellularChange) =
+        rememberPreference(
+            key = CanvasOverCellularKey,
             defaultValue = true,
         )
 
@@ -1364,6 +1385,47 @@ fun AppearanceSettings(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 onLiquidGlassChange(!liquidGlass)
+                            }
+                        },
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.album),
+                        title = { Text(stringResource(R.string.full_bleed_artwork)) },
+                        description = { Text(stringResource(R.string.full_bleed_artwork_desc)) },
+                        trailingContent = {
+                            Switch(
+                                checked = fullBleedArtwork,
+                                onCheckedChange = onFullBleedArtworkChange,
+                            )
+                        },
+                        onClick = { onFullBleedArtworkChange(!fullBleedArtwork) },
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.play),
+                        title = { Text(stringResource(R.string.animated_album_covers)) },
+                        description = { Text(stringResource(R.string.animated_album_covers_desc)) },
+                        trailingContent = {
+                            Switch(
+                                checked = animatedCanvas,
+                                onCheckedChange = onAnimatedCanvasChange,
+                            )
+                        },
+                        onClick = { onAnimatedCanvasChange(!animatedCanvas) },
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.album),
+                        title = { Text(stringResource(R.string.canvas_over_cellular)) },
+                        description = { Text(stringResource(R.string.canvas_over_cellular_desc)) },
+                        trailingContent = {
+                            Switch(
+                                checked = canvasOverCellular,
+                                enabled = animatedCanvas,
+                                onCheckedChange = onCanvasOverCellularChange,
+                            )
+                        },
+                        onClick = {
+                            if (animatedCanvas) {
+                                onCanvasOverCellularChange(!canvasOverCellular)
                             }
                         },
                     ),
