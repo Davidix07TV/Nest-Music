@@ -147,7 +147,7 @@ fun BottomSheet(
             )
         }
 
-        if (!state.isExpanded && (onDismiss == null || !state.isDismissed)) {
+        if (!state.isExpanded && state.progress < 0.3f && (onDismiss == null || !state.isDismissed)) {
             Box(
                 modifier =
                 Modifier

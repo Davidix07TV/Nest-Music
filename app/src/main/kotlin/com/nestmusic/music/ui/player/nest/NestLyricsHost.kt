@@ -32,6 +32,7 @@ import com.nestmusic.music.constants.AiProviderKey
 import com.nestmusic.music.constants.AiSystemPromptKey
 import com.nestmusic.music.constants.DeeplApiKey
 import com.nestmusic.music.constants.DeeplFormalityKey
+import com.nestmusic.music.constants.EnableBetterLyricsKey
 import com.nestmusic.music.constants.LyricsClickKey
 import com.nestmusic.music.constants.LyricsRomanizeCyrillicByLineKey
 import com.nestmusic.music.constants.LyricsRomanizeList
@@ -44,15 +45,24 @@ import com.nestmusic.music.constants.RespectAgentPositioningKey
 import com.nestmusic.music.constants.ShowIntervalIndicatorKey
 import com.nestmusic.music.constants.TranslateLanguageKey
 import com.nestmusic.music.constants.TranslateModeKey
+import com.nestmusic.music.db.entities.LyricsEntity
 import com.nestmusic.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
+import com.nestmusic.music.di.LyricsHelperEntryPoint
+import com.nestmusic.music.lyrics.BetterLyricsProvider
 import com.nestmusic.music.lyrics.LyricsEntry
 import com.nestmusic.music.lyrics.LyricsTranslationHelper
+import com.nestmusic.music.lyrics.LyricsUtils
 import com.nestmusic.music.lyrics.lyricsTextLooksSynced
 import com.nestmusic.music.ui.menu.LyricsMenu
 import com.nestmusic.music.ui.screens.settings.defaultList
 import com.nestmusic.music.utils.rememberPreference
 import com.nestmusic.music.viewmodels.LyricsViewModel
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Stable
 internal class NestLyricsSession(
@@ -90,10 +100,64 @@ internal fun rememberNestLyricsSession(
     val currentLyricsEntity by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
 
     val changeLyrics by rememberPreference(LyricsClickKey, true)
+    val enableBetterLyrics by rememberPreference(EnableBetterLyricsKey, true)
     val romanizeLyricsList = rememberPreference(LyricsRomanizeList, "")
     val romanizeCyrillicByLine by rememberPreference(LyricsRomanizeCyrillicByLineKey, false)
     val respectAgentPositioning by rememberPreference(RespectAgentPositioningKey, true)
     val showIntervalIndicator by rememberPreference(ShowIntervalIndicatorKey, true)
+
+    val betterLyricsUpgradeChecked = remember { HashSet<String>() }
+
+    LaunchedEffect(mediaMetadata?.id, currentLyricsEntity, enableBetterLyrics) {
+        val metadata = mediaMetadata ?: return@LaunchedEffect
+        val existing = currentLyricsEntity
+        if (existing == null) {
+            delay(350)
+            withContext(Dispatchers.IO) {
+                try {
+                    val entryPoint = EntryPointAccessors.fromApplication(
+                        context.applicationContext,
+                        LyricsHelperEntryPoint::class.java,
+                    )
+                    val fetched = entryPoint.lyricsHelper().getLyrics(metadata)
+                    database.query {
+                        upsert(LyricsEntity(metadata.id, fetched.lyrics, fetched.provider))
+                    }
+                } catch (e: Exception) {
+                    Timber.tag("NestLyricsHost").w(e, "Failed to fetch lyrics for %s", metadata.id)
+                }
+            }
+        } else if (enableBetterLyrics &&
+            existing.id == metadata.id &&
+            existing.provider != "BetterLyrics" &&
+            existing.provider != "Manual" &&
+            !existing.lyrics.contains('<') &&
+            betterLyricsUpgradeChecked.add(metadata.id)
+        ) {
+            withContext(Dispatchers.IO) {
+                try {
+                    val cleanedTitle = LyricsUtils.cleanTitleForSearch(metadata.title)
+                    val betterResult = BetterLyricsProvider.getLyrics(
+                        context = context.applicationContext,
+                        id = metadata.id,
+                        title = cleanedTitle,
+                        artist = metadata.artists.joinToString { it.name },
+                        duration = metadata.duration,
+                        album = metadata.album?.title,
+                    )
+                    val rawBetter = betterResult.getOrNull()?.takeIf { it.isNotBlank() }
+                    if (rawBetter != null) {
+                        val filtered = LyricsUtils.filterLyricsCreditLines(rawBetter)
+                        database.query {
+                            upsert(LyricsEntity(metadata.id, filtered, "BetterLyrics"))
+                        }
+                    }
+                } catch (e: Exception) {
+                    Timber.tag("NestLyricsHost").d(e, "BetterLyrics upgrade skipped for %s", metadata.id)
+                }
+            }
+        }
+    }
 
     val openRouterApiKey by rememberPreference(OpenRouterApiKey, "")
     val deeplApiKey by rememberPreference(DeeplApiKey, "")

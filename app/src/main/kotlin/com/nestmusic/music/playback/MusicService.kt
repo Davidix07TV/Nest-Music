@@ -164,6 +164,7 @@ import com.nestmusic.music.constants.ResumeOnBluetoothConnectKey
 import com.nestmusic.music.constants.ScrobbleDelayPercentKey
 import com.nestmusic.music.constants.ScrobbleDelaySecondsKey
 import com.nestmusic.music.constants.ScrobbleMinSongDurationKey
+import com.nestmusic.music.constants.NestUiKey
 import com.nestmusic.music.constants.ShowLyricsKey
 import com.nestmusic.music.constants.ShuffleModeKey
 import com.nestmusic.music.constants.ShufflePlaylistFirstKey
@@ -1008,11 +1009,11 @@ class MusicService :
 
         combine(
             currentMediaMetadata.distinctUntilChangedBy { it?.id },
-            dataStore.data.map { it[ShowLyricsKey] ?: false }.distinctUntilChanged(),
-        ) { mediaMetadata, showLyrics ->
-            mediaMetadata to showLyrics
-        }.collectLatest(scope) { (mediaMetadata, showLyrics) ->
-            if (showLyrics && mediaMetadata != null && database
+            dataStore.data.map { (it[ShowLyricsKey] ?: false) || (it[NestUiKey] ?: true) }.distinctUntilChanged(),
+        ) { mediaMetadata, shouldLoadLyrics ->
+            mediaMetadata to shouldLoadLyrics
+        }.collectLatest(scope) { (mediaMetadata, shouldLoadLyrics) ->
+            if (shouldLoadLyrics && mediaMetadata != null && database
                     .lyrics(mediaMetadata.id)
                     .first() == null
             ) {

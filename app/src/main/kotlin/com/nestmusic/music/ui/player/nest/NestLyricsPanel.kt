@@ -240,33 +240,40 @@ private fun ContentDrawScope.sweepTo(
         val start = layout.getLineStart(visualLine)
         if (revealedChars <= start) return
         val end = layout.getLineEnd(visualLine, visibleEnd = true)
+        val lineLeft = layout.getLineLeft(visualLine)
+        val lineRight = layout.getLineRight(visualLine)
         val cut = revealedChars < end
         val right = if (cut) {
-            horizontalAt(layout, revealedChars, visualLine, spans)
+            horizontalAt(layout, revealedChars, visualLine, spans).coerceIn(lineLeft, lineRight)
         } else {
-            layout.getLineRight(visualLine)
+            lineRight
         }
         val top = layout.getLineTop(visualLine)
         val bottom = layout.getLineBottom(visualLine)
+        if (right <= lineLeft) continue
         clipRect(
-            left = layout.getLineLeft(visualLine),
+            left = lineLeft,
             top = top,
             right = right,
             bottom = bottom,
         ) {
             this@sweepTo.drawContent()
-        }
-        if (!feather || !cut) continue
-        val featherPx = WIPE_FEATHER.toPx()
-        clipRect(top = top, bottom = bottom) {
-            drawRect(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(Color.Black, Color.Transparent),
-                    startX = right - featherPx,
-                    endX = right,
-                ),
-                blendMode = BlendMode.DstIn,
-            )
+            if (feather && cut) {
+                val featherPx = WIPE_FEATHER.toPx()
+                val fStart = maxOf(lineLeft, right - featherPx)
+                if (right > fStart + 0.5f) {
+                    drawRect(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(Color.Black, Color.Transparent),
+                            startX = fStart,
+                            endX = right,
+                        ),
+                        topLeft = Offset(fStart, top),
+                        size = Size(right - fStart, bottom - top),
+                        blendMode = BlendMode.DstIn,
+                    )
+                }
+            }
         }
     }
 }
@@ -286,45 +293,6 @@ private fun DrawScope.clipShiftedDown(
     }
 }
 
-private fun ContentDrawScope.riseAgainst(
-    layout: TextLayoutResult,
-    line: NestLyricLine,
-    positionMs: Long,
-    risePx: Float,
-) {
-    val spans = line.wordSpans
-    for (visualLine in 0 until layout.lineCount) {
-        val lineStart = layout.getLineStart(visualLine)
-        val lineEnd = layout.getLineEnd(visualLine, visibleEnd = true)
-        val lineLeft = layout.getLineLeft(visualLine)
-        val lineRight = layout.getLineRight(visualLine)
-        val top = layout.getLineTop(visualLine)
-        val bottom = layout.getLineBottom(visualLine)
-        var cursor = lineLeft
-        for (index in spans.indices) {
-            val span = spans[index]
-            if (span.last < lineStart || span.first >= lineEnd) continue
-            val lifted = line.growingAt(index) != null || line.wordLift(index, positionMs) > 0f
-            if (!lifted) continue
-            val wordLeft = layout.xOn(maxOf(span.first, lineStart), visualLine, lineLeft)
-            val wordRight = layout.xOn(minOf(span.last + 1, lineEnd), visualLine, lineRight)
-            val lo = minOf(wordLeft, wordRight)
-            val hi = maxOf(wordLeft, wordRight)
-            if (lo > cursor) {
-                clipRect(left = cursor, top = top, right = lo, bottom = bottom) {
-                    this@riseAgainst.drawContent()
-                }
-            }
-            cursor = maxOf(cursor, hi)
-        }
-        if (cursor < lineRight) {
-            clipRect(left = cursor, top = top, right = lineRight, bottom = bottom) {
-                this@riseAgainst.drawContent()
-            }
-        }
-    }
-}
-
 private fun ContentDrawScope.growEach(
     layout: TextLayoutResult,
     span: IntRange,
@@ -333,20 +301,29 @@ private fun ContentDrawScope.growEach(
     positionMs: Long,
     risePx: Float,
     into: CharGrowth,
+    draw: ContentDrawScope.() -> Unit,
 ) {
     val lineStart = layout.getLineStart(visualLine)
     val lineEnd = layout.getLineEnd(visualLine, visibleEnd = true)
+    val lineLeft = layout.getLineLeft(visualLine)
+    val lineRight = layout.getLineRight(visualLine)
     val top = layout.getLineTop(visualLine)
     val bottom = layout.getLineBottom(visualLine)
     val from = maxOf(span.first, lineStart)
     val to = minOf(span.last, lineEnd - 1)
     for (offset in from..to) {
         growing.sampleInto(offset - span.first, positionMs, into)
-        val box = layout.getBoundingBox(offset)
-        translate(left = into.shift * box.width, top = -risePx * into.rise) {
-            scale(scaleX = into.scale, scaleY = into.scale, pivot = box.center) {
-                clipRect(left = box.left, top = top, right = box.right, bottom = bottom) {
-                    this@growEach.drawContent()
+        val x0 = layout.xOn(offset, visualLine, lineLeft)
+        val x1 = layout.xOn(offset + 1, visualLine, lineRight)
+        val cLeft = minOf(x0, x1)
+        val cRight = maxOf(x0, x1)
+        if (cRight <= cLeft) continue
+        val width = cRight - cLeft
+        val pivot = Offset((cLeft + cRight) * 0.5f, (top + bottom) * 0.5f)
+        translate(left = into.shift * width, top = -risePx * into.rise) {
+            scale(scaleX = into.scale, scaleY = into.scale, pivot = pivot) {
+                clipRect(left = cLeft, top = top, right = cRight, bottom = bottom) {
+                    this@growEach.draw()
                 }
             }
         }
@@ -359,12 +336,14 @@ private fun ContentDrawScope.riseWith(
     positionMs: Long,
     risePx: Float,
     into: CharGrowth,
+    growDraw: (ContentDrawScope.() -> Unit)? = null,
     draw: ContentDrawScope.() -> Unit,
 ) {
     if (!line.isLifted(positionMs)) {
         draw()
         return
     }
+    val effectiveGrowDraw = growDraw ?: draw
     val spans = line.wordSpans
     val settled = positionMs >= line.words.last().endMs
     for (visualLine in 0 until layout.lineCount) {
@@ -378,7 +357,9 @@ private fun ContentDrawScope.riseWith(
         for (index in spans.indices) {
             val span = spans[index]
             if (span.last < lineStart || span.first >= lineEnd) continue
-            val growing = line.growingAt(index)
+            val growing = line.growingAt(index)?.takeIf {
+                positionMs >= it.startMs && positionMs <= it.restsAtMs
+            }
             val lift = if (growing != null) {
                 0f
             } else if (settled) {
@@ -397,7 +378,7 @@ private fun ContentDrawScope.riseWith(
                 }
             }
             if (growing != null) {
-                growEach(layout, span, visualLine, growing, positionMs, risePx, into)
+                growEach(layout, span, visualLine, growing, positionMs, risePx, into, effectiveGrowDraw)
             } else {
                 clipShiftedDown(lo, top, hi, bottom, risePx * lift) { this@riseWith.draw() }
             }
@@ -520,7 +501,9 @@ internal fun SweptLyricLine(
                     val now = clock.value
                     val risePx = if (rise) WORD_RISE.toPx() else 0f
                     if (risePx > 0f && line.isLifted(now)) {
-                        riseAgainst(measured, line, now, risePx)
+                        riseWith(measured, line, now, risePx, growth) {
+                            drawContent()
+                        }
                     } else {
                         drawContent()
                     }
@@ -550,7 +533,14 @@ internal fun SweptLyricLine(
                         val measured = layout ?: return@drawWithContent
                         val now = clock.value
                         if (!line.isGrowing(now)) return@drawWithContent
-                        riseWith(measured, line, now, WORD_RISE.toPx(), growth) {}
+                        riseWith(
+                            layout = measured,
+                            line = line,
+                            positionMs = now,
+                            risePx = WORD_RISE.toPx(),
+                            into = growth,
+                            growDraw = { drawContent() },
+                        ) {}
                     },
             )
         }

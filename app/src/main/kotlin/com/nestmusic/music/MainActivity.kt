@@ -1251,36 +1251,44 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
 
-                                    AppNavigationBar(
-                                        navigationItems = navigationItems,
-                                        currentRoute = currentRoute,
-                                        onItemClick = onNavItemClick,
-                                        pureBlack = pureBlack,
-                                        slimNav = slimNav,
-                                        onSearchLongClick = onSearchLongClick,
-                                        modifier =
-                                            Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .height(bottomInset + navPadding)
-                                                // Use graphicsLayer instead of offset to avoid recomposition
-                                                // graphicsLayer runs during draw phase, not composition phase
-                                                .graphicsLayer {
-                                                    val navBarHeightPx = navigationBarHeight.toPx()
-                                                    val totalHeightPx = navBarTotalHeight.toPx()
+                                    val renderNavBarHeight = if (slimNav) SlimNavBarHeight else NavigationBarHeight
+                                    if (!playerBottomSheetState.isExpanded &&
+                                        (shouldShowNavigationBar || navigationBarHeight > 0.5.dp)
+                                    ) {
+                                        AppNavigationBar(
+                                            navigationItems = navigationItems,
+                                            currentRoute = currentRoute,
+                                            onItemClick = onNavItemClick,
+                                            pureBlack = pureBlack,
+                                            slimNav = slimNav,
+                                            onSearchLongClick = onSearchLongClick,
+                                            modifier =
+                                                Modifier
+                                                    .align(Alignment.BottomCenter)
+                                                    .height(bottomInset + renderNavBarHeight)
+                                                    // Use graphicsLayer instead of offset to avoid recomposition
+                                                    // graphicsLayer runs during draw phase, not composition phase
+                                                    .graphicsLayer {
+                                                        val navBarHeightPx = navigationBarHeight.toPx().coerceAtLeast(0f)
+                                                        val totalHeightPx = (bottomInset + renderNavBarHeight).toPx()
+                                                        val extraMarginPx = 32.dp.toPx()
+                                                        val navVisibleFraction =
+                                                            (navBarHeightPx / NavigationBarHeight.toPx()).coerceIn(0f, 1f)
+                                                        val progress = playerBottomSheetState.progress.coerceIn(0f, 1f)
 
-                                                    translationY =
-                                                        if (navBarHeightPx == 0f) {
-                                                            totalHeightPx
-                                                        } else {
-                                                            // Read progress only during draw phase
-                                                            val progress = playerBottomSheetState.progress.coerceIn(0f, 1f)
-                                                            val slideOffset = totalHeightPx * progress
-                                                            val hideOffset =
-                                                                totalHeightPx * (1 - navBarHeightPx / NavigationBarHeight.toPx())
-                                                            slideOffset + hideOffset
-                                                        }
-                                                },
-                                    )
+                                                        alpha = ((1f - progress * 2.5f) * navVisibleFraction).coerceIn(0f, 1f)
+                                                        translationY =
+                                                            if (navBarHeightPx <= 0.5f) {
+                                                                totalHeightPx + extraMarginPx
+                                                            } else {
+                                                                val slideOffset = (totalHeightPx + extraMarginPx) * progress
+                                                                val hideOffset =
+                                                                    (totalHeightPx + extraMarginPx) * (1f - navVisibleFraction)
+                                                                slideOffset + hideOffset
+                                                            }
+                                                    },
+                                        )
+                                    }
 
                                     Box(
                                         modifier =

@@ -630,6 +630,20 @@ fun AppleMusicPlayer(
                             onPlayPause = { playerConnection.togglePlayPause() },
                             onSkipPrevious = { playerConnection.seekToPrevious() },
                             onSkipNext = { playerConnection.seekToNext() },
+                            shuffleEnabled = shuffleModeEnabled,
+                            repeatMode = repeatMode,
+                            onToggleShuffle = {
+                                val next = !shuffleModeEnabled
+                                runCatching { playerConnection.player.shuffleModeEnabled = next }
+                            },
+                            onToggleRepeat = {
+                                val next = when (repeatMode) {
+                                    Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                                    Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                                    else -> Player.REPEAT_MODE_OFF
+                                }
+                                runCatching { playerConnection.player.repeatMode = next }
+                            },
                             compact = panelOpen,
                         )
 

@@ -621,10 +621,10 @@ internal fun NestAudioQualityBadge(
 
 /**
  * Nest Music `TransportRow`:
- * - Previous (`53.dp` touch, `51.dp` x `0.80f` `TransportShape.PREVIOUS`)
- * - Play / Pause (`92.dp` touch, `48.dp` morphing `TransportShape.PLAY` <-> `PAUSE`)
- * - Next (`53.dp` touch, `51.dp` x `0.80f` `TransportShape.NEXT`)
- * spaced at `TRANSPORT_SPACING = 15.dp`.
+ * - Optional outer Shuffle & Loop/Repeat mode glyphs (with luminous `BlendMode.SrcOut` active tile + `1` badge on Repeat-One)
+ * - Previous (`TransportShape.PREVIOUS`)
+ * - Play / Pause (morphing `TransportShape.PLAY` <-> `PAUSE`)
+ * - Next (`TransportShape.NEXT`).
  */
 @Composable
 internal fun NestTransportRow(
@@ -634,6 +634,10 @@ internal fun NestTransportRow(
     onPlayPause: () -> Unit,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
+    shuffleEnabled: Boolean = false,
+    repeatMode: Int = Player.REPEAT_MODE_OFF,
+    onToggleShuffle: (() -> Unit)? = null,
+    onToggleRepeat: (() -> Unit)? = null,
     compact: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -645,62 +649,154 @@ internal fun NestTransportRow(
     )
 
     val centerSize = if (compact) 42.dp else 48.dp
-    val skipSize = if (compact) 44.dp else PLAYER_SKIP_ICON_SIZE
+    val skipSize = if (compact) 42.dp else 48.dp
+    val showModes = onToggleShuffle != null && onToggleRepeat != null
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(TRANSPORT_SPACING, Alignment.CenterHorizontally),
+        horizontalArrangement = if (showModes) {
+            Arrangement.SpaceBetween
+        } else {
+            Arrangement.spacedBy(TRANSPORT_SPACING, Alignment.CenterHorizontally)
+        },
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth(),
     ) {
-        NestTactileGlyph(
-            onClick = onSkipPrevious,
-            enabled = canSkipPrevious,
-            touchSize = 56.dp,
-        ) {
-            TransportShapeGlyph(
-                shape = TransportShape.PREVIOUS,
-                tint = ink.copy(alpha = if (canSkipPrevious) 0.94f else 0.36f),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(skipSize)
-                    .graphicsLayer { scaleY = PLAYER_SKIP_ICON_SCALE_Y },
+        if (showModes) {
+            NestTransportModeGlyph(
+                icon = NestPlayerIcons.PlayerShuffle,
+                active = shuffleEnabled,
+                badge = null,
+                contentDescription = stringResource(R.string.shuffle),
+                onClick = onToggleShuffle!!,
             )
         }
 
-        NestTactileGlyph(
-            onClick = onPlayPause,
-            touchSize = if (compact) 76.dp else 92.dp,
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(if (showModes) 12.dp else TRANSPORT_SPACING),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(centerSize)
-                    .graphicsLayer {
-                        scaleX = 0.90f + 0.10f * pauseFraction
-                        scaleY = 0.90f + 0.10f * pauseFraction
-                    },
+            NestTactileGlyph(
+                onClick = onSkipPrevious,
+                enabled = canSkipPrevious,
+                touchSize = 52.dp,
             ) {
                 TransportShapeGlyph(
-                    shape = if (isPlaying) TransportShape.PAUSE else TransportShape.PLAY,
-                    tint = ink.copy(alpha = 0.96f),
+                    shape = TransportShape.PREVIOUS,
+                    tint = ink.copy(alpha = if (canSkipPrevious) 0.94f else 0.36f),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .size(skipSize)
+                        .graphicsLayer { scaleY = PLAYER_SKIP_ICON_SCALE_Y },
+                )
+            }
+
+            NestTactileGlyph(
+                onClick = onPlayPause,
+                touchSize = if (compact) 70.dp else 80.dp,
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(centerSize)
+                        .graphicsLayer {
+                            scaleX = 0.90f + 0.10f * pauseFraction
+                            scaleY = 0.90f + 0.10f * pauseFraction
+                        },
+                ) {
+                    TransportShapeGlyph(
+                        shape = if (isPlaying) TransportShape.PAUSE else TransportShape.PLAY,
+                        tint = ink.copy(alpha = 0.96f),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+
+            NestTactileGlyph(
+                onClick = onSkipNext,
+                enabled = canSkipNext,
+                touchSize = 52.dp,
+            ) {
+                TransportShapeGlyph(
+                    shape = TransportShape.NEXT,
+                    tint = ink.copy(alpha = if (canSkipNext) 0.94f else 0.36f),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(skipSize)
+                        .graphicsLayer { scaleY = PLAYER_SKIP_ICON_SCALE_Y },
                 )
             }
         }
 
-        NestTactileGlyph(
-            onClick = onSkipNext,
-            enabled = canSkipNext,
-            touchSize = 56.dp,
-        ) {
-            TransportShapeGlyph(
-                shape = TransportShape.NEXT,
-                tint = ink.copy(alpha = if (canSkipNext) 0.94f else 0.36f),
-                contentDescription = null,
+        if (showModes) {
+            NestTransportModeGlyph(
+                icon = NestPlayerIcons.PlayerRepeat,
+                active = repeatMode != Player.REPEAT_MODE_OFF,
+                badge = if (repeatMode == Player.REPEAT_MODE_ONE) "1" else null,
+                contentDescription = stringResource(R.string.repeat),
+                onClick = onToggleRepeat!!,
+            )
+        }
+    }
+}
+
+@Composable
+private fun NestTransportModeGlyph(
+    icon: ImageVector,
+    active: Boolean,
+    badge: String?,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val ink = LocalPlayerInk.current.value
+    val alphas = LocalPlayerAlphas.current
+
+    NestTactileGlyph(
+        onClick = onClick,
+        touchSize = 40.dp,
+        modifier = modifier,
+    ) {
+        if (active) {
+            val tileCorner = BOTTOM_ACTIVE_TILE_CORNER
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(skipSize)
-                    .graphicsLayer { scaleY = PLAYER_SKIP_ICON_SCALE_Y },
+                    .size(34.dp)
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    .drawWithContent {
+                        drawContent()
+                        drawRoundRect(
+                            color = ink.copy(alpha = BOTTOM_ACTIVE_TILE_ALPHA),
+                            cornerRadius = CornerRadius(tileCorner.toPx(), tileCorner.toPx()),
+                            blendMode = BlendMode.SrcOut,
+                        )
+                    },
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = contentDescription,
+                    tint = Color.Black,
+                    modifier = Modifier.size(19.dp),
+                )
+                if (!badge.isNullOrEmpty()) {
+                    Text(
+                        text = badge,
+                        fontSize = 8.5.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 2.dp, end = 3.5.dp),
+                    )
+                }
+            }
+        } else {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = ink.copy(alpha = alphas.tertiary),
+                modifier = Modifier.size(20.dp),
             )
         }
     }
