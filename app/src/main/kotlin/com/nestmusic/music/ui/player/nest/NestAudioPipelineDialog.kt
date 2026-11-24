@@ -60,8 +60,8 @@ fun NestAudioPipelineDialog(
     val outputs = rememberNestAudioOutputs()
     val activeOutput = outputs.firstOrNull { it.isSelected } ?: outputs.firstOrNull()
 
-    var dolbyAtmosEnabled by rememberPreference(DolbyAtmosKey, defaultValue = true)
-    var spatialAudioEnabled by rememberPreference(SpatialAudioKey, defaultValue = false)
+    val (dolbyAtmosEnabled, onDolbyAtmosChange) = rememberPreference(DolbyAtmosKey, defaultValue = true)
+    val (spatialAudioEnabled, onSpatialAudioChange) = rememberPreference(SpatialAudioKey, defaultValue = false)
 
     val hwAtmosSupported = remember(context) { NestDeviceCodecs.playsDolbyAtmos(context) }
     val spatializerAvailable = remember(context) { NestDeviceCodecs.hasPlatformSpatializer(context) }
@@ -216,7 +216,7 @@ fun NestAudioPipelineDialog(
                         "Binaural Atmos rendering on stereo tracks"
                     },
                     checked = dolbyAtmosEnabled,
-                    onCheckedChange = { dolbyAtmosEnabled = it },
+                    onCheckedChange = onDolbyAtmosChange,
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -226,7 +226,7 @@ fun NestAudioPipelineDialog(
                     title = "Spatial Audio",
                     subtitle = "Immersive 3D soundstage & crossfeed",
                     checked = spatialAudioEnabled,
-                    onCheckedChange = { spatialAudioEnabled = it },
+                    onCheckedChange = onSpatialAudioChange,
                 )
 
                 Spacer(Modifier.height(16.dp))

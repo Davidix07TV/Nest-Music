@@ -300,14 +300,7 @@ fun AppleMusicPlayer(
             ?: mediaMetadata?.artists?.firstOrNull()?.name
     }
 
-    val paletteStops = remember(palette) {
-        listOf(
-            palette.primary,
-            palette.secondary,
-            palette.tertiary,
-            palette.background,
-        )
-    }
+    val paletteStops = palette.colors
 
     CompositionLocalProvider(
         LocalPlayerInk provides inkState,

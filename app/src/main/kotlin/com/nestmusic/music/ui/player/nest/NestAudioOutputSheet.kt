@@ -58,8 +58,8 @@ fun NestAudioOutputSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val outputs = rememberNestAudioOutputs()
     val pipeline by NestAudioOutputStatus.pipeline.collectAsState()
-    var dolbyAtmos by rememberPreference(DolbyAtmosKey, defaultValue = true)
-    var spatialAudio by rememberPreference(SpatialAudioKey, defaultValue = false)
+    val (dolbyAtmos, onDolbyAtmosChange) = rememberPreference(DolbyAtmosKey, defaultValue = true)
+    val (spatialAudio, onSpatialAudioChange) = rememberPreference(SpatialAudioKey, defaultValue = false)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -137,7 +137,7 @@ fun NestAudioOutputSheet(
                     subtitle = if (dolbyAtmos) "Automatic" else "Off",
                     active = dolbyAtmos,
                     iconRes = R.drawable.nest_ic_dolby_atmos,
-                    onClick = { dolbyAtmos = !dolbyAtmos },
+                    onClick = { onDolbyAtmosChange(!dolbyAtmos) },
                     modifier = Modifier.weight(1f),
                 )
                 QuickAudioModeChip(
@@ -145,7 +145,7 @@ fun NestAudioOutputSheet(
                     subtitle = if (spatialAudio) "Binaural On" else "Stereo",
                     active = spatialAudio,
                     iconRes = R.drawable.nest_airplay,
-                    onClick = { spatialAudio = !spatialAudio },
+                    onClick = { onSpatialAudioChange(!spatialAudio) },
                     modifier = Modifier.weight(1f),
                 )
             }

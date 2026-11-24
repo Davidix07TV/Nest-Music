@@ -3054,16 +3054,15 @@ class MusicService :
     private fun refreshAudioPipelineStatus() {
         if (!::player.isInitialized) return
         val audioFmt = player.audioFormat
-        val dbFmt = currentFormat.value
-        val mime = audioFmt?.sampleMimeType ?: dbFmt?.mimeType
-        val channels = audioFmt?.channelCount?.takeIf { it > 0 } ?: dbFmt?.audioChannels ?: 2
-        val sampleRate = audioFmt?.sampleRate?.takeIf { it > 0 } ?: dbFmt?.sampleRate ?: 48_000
-        val bitrateKbps = (audioFmt?.bitrate?.takeIf { it > 0 } ?: dbFmt?.bitrate ?: 0) / 1000
+        val mime = audioFmt?.sampleMimeType
+        val channels = audioFmt?.channelCount?.takeIf { it > 0 } ?: 2
+        val sampleRate = audioFmt?.sampleRate?.takeIf { it > 0 } ?: 48_000
+        val bitrateKbps = (audioFmt?.bitrate?.takeIf { it > 0 } ?: 0) / 1000
         val bitDepth = when (audioFmt?.pcmEncoding) {
             C.ENCODING_PCM_24BIT, C.ENCODING_PCM_24BIT_BIG_ENDIAN -> 24
             C.ENCODING_PCM_32BIT, C.ENCODING_PCM_32BIT_BIG_ENDIAN, C.ENCODING_PCM_FLOAT -> 24
             C.ENCODING_PCM_16BIT, C.ENCODING_PCM_16BIT_BIG_ENDIAN -> 16
-            else -> dbFmt?.bitsPerSample ?: if (mime?.contains("flac", ignoreCase = true) == true) 24 else 16
+            else -> if (mime?.contains("flac", ignoreCase = true) == true) 24 else 16
         }
         val isNativeAtmos =
             mime?.equals("audio/eac3-joc", ignoreCase = true) == true ||
@@ -3079,7 +3078,7 @@ class MusicService :
         val spatialDspActive = (dolbyAtmosEnabledCached || spatialAudioEnabledCached) && !isNativeAtmos
         NestAudioOutputStatus.updateFromFormat(
             mimeType = mime,
-            codecs = audioFmt?.codecs ?: dbFmt?.codecs,
+            codecs = audioFmt?.codecs,
             sampleRateHz = sampleRate,
             bitDepth = bitDepth,
             channelCount = channels,
