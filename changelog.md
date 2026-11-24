@@ -3,6 +3,31 @@
 This file contains Nest Music release notes consumed by the Android release workflow. Each `---v<version>` line starts a release-note
 block. Nest Music's history here starts at v1.0.0.
 
+---v1.1.0
+# v1.1.0 — Full-bleed motion covers, iOS 26 redesign & Dolby Atmos Spatial Audio (2026-11-23)
+
+### Added
+- **Animated & full-screen album covers.** Now Playing features edge-to-edge full-screen artwork
+  that melts seamlessly into a live 4×4 mesh backdrop, with multi-provider animated motion covers
+  (Apple Music HLS editorial video, Tidal video covers, iTunes catalog fallback) and smooth morphing
+  when opening Lyrics or Queue.
+- **Dolby Atmos & Spatial Audio engine.** Added real-time binaural HRTF Spatial Audio DSP
+  processing (pinna notch, ITD/ILD crossfeed, room reflections and warm sub-bass), hardware
+  Spatializer/codec detection (E-AC-3 JOC, AC-4, FLAC, ALAC, Opus), interactive audio quality
+  badges, audio signal pipeline inspector and output route sheet.
+- **iOS 26 / Apple Music UI remodel.** Pure `#000000` OLED dark surfaces, `#FF2D55` accent, SF Pro
+  Display typography, refined floating Liquid Glass mini player and Home hero carousels.
+- **Direct Shuffle & Loop controls.** Added dedicated Shuffle and Loop/Repeat (`Off` / `All` / `1`)
+  controls directly on the main Now Playing transport row.
+- **BetterLyrics auto-sync & upgrade.** Automatically fetches and upgrades tracks to BetterLyrics
+  word-by-word TTML lyrics with smart YouTube Music metadata fallbacks.
+
+### Fixed
+- Eliminated the intermittent Liquid Glass half-circle artifact appearing at the bottom of the
+  expanded player.
+- Fixed letter-by-letter karaoke sweep darkening or hiding upcoming letters and words on the same
+  lyric line.
+
 ---v1.0.14
 # v1.0.14 — Names where there were none (2026-10-24)
 

@@ -1,0 +1,4 @@
+- Full-bleed edge-to-edge album covers & animated motion artwork (Apple Music HLS, Tidal, iTunes) with live 4x4 mesh backdrop.
+- Dolby Atmos & Spatial Audio binaural HRTF engine, live audio pipeline dialog & output route sheet.
+- iOS 26 / Apple Music OLED redesign (#000000, #FF2D55, SF Pro Display) & refined Liquid Glass mini player.
+- Direct Shuffle & Loop/Repeat controls in Now Playing, BetterLyrics auto-upgrade & fixed letter-by-letter lyric sweep.
