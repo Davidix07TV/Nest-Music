@@ -255,7 +255,7 @@ fun AppearanceSettings(
     val (lyricsAnimationStyle, onLyricsAnimationStyleChange) =
         rememberEnumPreference(
             LyricsAnimationStyleKey,
-            defaultValue = LyricsAnimationStyle.FADE,
+            defaultValue = LyricsAnimationStyle.APPLE,
         )
     val (lyricsTextSize, onLyricsTextSizeChange) = rememberPreference(LyricsTextSizeKey, defaultValue = 24f)
     val (lyricsLineSpacing, onLyricsLineSpacingChange) = rememberPreference(LyricsLineSpacingKey, defaultValue = 1.2f)
@@ -369,7 +369,7 @@ fun AppearanceSettings(
     val (playerStyle, onPlayerStyleChange) =
         rememberEnumPreference(
             key = PlayerStyleKey,
-            defaultValue = PlayerStyle.NEST,
+            defaultValue = PlayerStyle.APPLE_MUSIC,
         )
 
     var showPlayerStyleDialog by rememberSaveable {

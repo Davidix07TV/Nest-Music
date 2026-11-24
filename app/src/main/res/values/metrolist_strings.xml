@@ -1176,8 +1176,8 @@
     <string name="nest_ui_new_desc">The logo, as an interface: violet sky, sunset gradient, blue water and a floating dock</string>
     <string name="nest_ui_legacy">Classic UI</string>
     <string name="nest_ui_legacy_desc">The original Material interface, unchanged</string>
-    <string name="nest_ui_choice_title">Choose your Nest</string>
-    <string name="nest_ui_choice_message">The new look follows the Nest logo. Classic stays exactly as it was. You can switch any time in Settings → Appearance.</string>
+    <string name="nest_ui_choice_title">Choose your Nest Music</string>
+    <string name="nest_ui_choice_message">The new look follows the Nest Music logo. Classic stays exactly as it was. You can switch any time in Settings → Appearance.</string>
     <string name="nest_ui_choice_recommended">Recommended</string>
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_afternoon">Good afternoon</string>
@@ -1213,12 +1213,23 @@
 
     <!-- Apple Music player style & liquid glass -->
     <string name="player_style">Player style</string>
-    <string name="player_style_nest">Nest</string>
+    <string name="player_style_nest">Nest Music</string>
     <string name="player_style_apple_music">Apple Music</string>
     <string name="player_style_desc">How the full-screen player is laid out. Apple Music swaps the artwork for the lyrics when you tap it, counts the song down and puts the transport controls on a glass disc.</string>
     <!-- Read out by screen readers for the repeat button of the Apple Music player. -->
     <string name="repeat">Repeat</string>
     <string name="liquid_glass">Liquid glass</string>
     <string name="liquid_glass_desc">Glassy, blurring surfaces for the player, the mini player and the navigation bar, adapting to the artwork behind them. Needs Android 12 or newer.</string>
+    <string name="playing_from">Playing from</string>
+    <string name="open_lyrics">View Lyrics</string>
+    <string name="instrumental">Instrumental</string>
+    <string name="lossless">Lossless</string>
+    <string name="hi_res_lossless">Hi-Res Lossless</string>
+    <string name="high_quality">High Quality</string>
+    <string name="airplay">Audio Output</string>
+    <string name="lyrics_not_available">Lyrics not available</string>
+    <string name="loading_lyrics">Loading lyrics…</string>
+    <string name="romanize_lyrics_toggle">Romanize</string>
+    <string name="nest_queue_empty">No upcoming songs in queue</string>
 
 </resources>

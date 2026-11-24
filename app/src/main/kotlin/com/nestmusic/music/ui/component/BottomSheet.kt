@@ -82,6 +82,10 @@ fun BottomSheet(
             .fillMaxSize()
             // Use graphicsLayer for offset to ensure hardware acceleration and 120Hz support
             .graphicsLayer {
+                val p = state.progress
+                if (p > 0.001f && p < 0.999f) {
+                    GlassMotion.sheet.moved()
+                }
                 val y = (state.expandedBound - state.value)
                     .toPx()
                     .coerceAtLeast(0f)
@@ -93,6 +97,7 @@ fun BottomSheet(
 
                 detectVerticalDragGestures(
                     onVerticalDrag = { change, dragAmount ->
+                        GlassMotion.sheet.moved()
                         velocityTracker.addPointerInputChange(change)
                         state.dispatchRawDelta(dragAmount)
                     },

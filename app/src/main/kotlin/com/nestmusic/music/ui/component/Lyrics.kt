@@ -15,8 +15,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nestmusic.music.LocalDatabase
 import com.nestmusic.music.LocalPlayerConnection
 import com.nestmusic.music.constants.ExperimentalLyricsKey
+import com.nestmusic.music.constants.LyricsAnimationStyle
+import com.nestmusic.music.constants.LyricsAnimationStyleKey
 import com.nestmusic.music.db.entities.LyricsEntity
 import com.nestmusic.music.di.LyricsHelperEntryPoint
+import com.nestmusic.music.ui.player.nest.NestStandaloneLyricsHost
+import com.nestmusic.music.utils.rememberEnumPreference
 import com.nestmusic.music.utils.rememberPreference
 import com.nestmusic.music.viewmodels.LyricsViewModel
 import dagger.hilt.android.EntryPointAccessors
@@ -27,10 +31,6 @@ import timber.log.Timber
 
 /**
  * Ensures the current track's lyrics are present in the database, fetching them when missing.
- *
- * This used to live only inside the NEST player's InlineLyricsView, so the Apple Music player —
- * which renders [Lyrics] directly — showed the loading shimmer forever for uncached tracks.
- * Every player style must call this (the Apple player does while its lyrics pane is visible).
  */
 @Composable
 fun EnsureCurrentLyricsLoaded(enabled: Boolean = true) {
@@ -55,8 +55,6 @@ fun EnsureCurrentLyricsLoaded(enabled: Boolean = true) {
                     upsert(LyricsEntity(metadata.id, fetched.lyrics, fetched.provider))
                 }
             } catch (e: Exception) {
-                // Previously swallowed silently ("// Handle error"): a failed fetch looked
-                // exactly like "still loading" forever.
                 Timber.tag("Lyrics").w(e, "Failed to fetch lyrics for %s", metadata.id)
             }
         }
@@ -70,9 +68,20 @@ fun Lyrics(
     showLyrics: Boolean,
     lyricsViewModel: LyricsViewModel = hiltViewModel()
 ) {
+    val lyricsAnimationStyle by rememberEnumPreference(
+        LyricsAnimationStyleKey,
+        LyricsAnimationStyle.APPLE,
+    )
     val (experimentalLyrics, _) = rememberPreference(key = ExperimentalLyricsKey, defaultValue = true)
 
-    if (experimentalLyrics) {
+    if (lyricsAnimationStyle == LyricsAnimationStyle.APPLE) {
+        NestStandaloneLyricsHost(
+            sliderPositionProvider = sliderPositionProvider,
+            showLyrics = showLyrics,
+            modifier = modifier,
+            lyricsViewModel = lyricsViewModel,
+        )
+    } else if (experimentalLyrics) {
         ExperimentalLyrics(
             sliderPositionProvider = sliderPositionProvider,
             modifier = modifier,

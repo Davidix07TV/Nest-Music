@@ -187,8 +187,12 @@ import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.NestUiChoiceDialog
 import com.nestmusic.music.ui.theme.NestViolet
+import com.nestmusic.music.ui.component.BottomFadeScrim
+import com.nestmusic.music.ui.component.GlassMotion
+import com.nestmusic.music.ui.component.LocalAppBackdrop
 import com.nestmusic.music.ui.component.LocalGlassBackdrop
 import com.nestmusic.music.ui.component.LocalLiquidGlassEnabled
+import com.nestmusic.music.ui.component.backdrop.backdrops.EmptyBackdrop
 import com.nestmusic.music.ui.component.glassBackdrop
 import com.nestmusic.music.ui.component.isLiquidGlassSupported
 import com.nestmusic.music.ui.component.rememberBottomSheetState
@@ -1044,6 +1048,18 @@ class MainActivity : ComponentActivity() {
                     else -> MaterialTheme.colorScheme.surfaceContainer
                 }
 
+                val glassScrollConnection = remember {
+                    object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+                        override fun onPreScroll(
+                            available: androidx.compose.ui.geometry.Offset,
+                            source: androidx.compose.ui.input.nestedscroll.NestedScrollSource,
+                        ): androidx.compose.ui.geometry.Offset {
+                            if (available.y != 0f) GlassMotion.scroll.moved()
+                            return androidx.compose.ui.geometry.Offset.Zero
+                        }
+                    }
+                }
+
                 CompositionLocalProvider(
                     LocalDatabase provides database,
                     LocalNavController provides navController,
@@ -1051,6 +1067,7 @@ class MainActivity : ComponentActivity() {
                     LocalPlayerConnection provides playerConnection,
                     LocalLiquidGlassEnabled provides (liquidGlass && isLiquidGlassSupported),
                     LocalGlassBackdrop provides glassBackdrop,
+                    LocalAppBackdrop provides (glassBackdrop ?: EmptyBackdrop),
                     LocalPlayerAwareWindowInsets provides playerAwareWindowInsets,
                     LocalDownloadUtil provides downloadUtil,
                     LocalShimmerTheme provides ShimmerTheme,
@@ -1076,7 +1093,7 @@ class MainActivity : ComponentActivity() {
                                         title = {
                                             Text(
                                                 text = when {
-                                                    nestUi && currentTitleRes == R.string.home -> stringResource(R.string.app_name)
+                                                    currentTitleRes == R.string.home -> stringResource(R.string.app_name)
                                                     else -> currentTitleRes?.let { stringResource(it) } ?: ""
                                                 },
                                                 style = if (nestUi) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
@@ -1219,6 +1236,20 @@ class MainActivity : ComponentActivity() {
 
                             if (!showRail && currentRoute != "wrapped") {
                                 Box {
+                                    if (nestUi || (liquidGlass && isLiquidGlassSupported)) {
+                                        BottomFadeScrim(
+                                            withMiniPlayer = activePlayerConnection != null && !playerBottomSheetState.isDismissed,
+                                            bottomInset = bottomInsetDp,
+                                            pageColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.background,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomCenter)
+                                                .graphicsLayer {
+                                                    val p = playerBottomSheetState.progress.coerceIn(0f, 1f)
+                                                    alpha = 1f - p
+                                                },
+                                        )
+                                    }
+
                                     if (activePlayerConnection != null) {
                                         BottomSheetPlayer(
                                             state = playerBottomSheetState,
@@ -1307,6 +1338,7 @@ class MainActivity : ComponentActivity() {
                         modifier =
                             Modifier
                                 .fillMaxSize()
+                                .nestedScroll(glassScrollConnection)
                                 .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
                     ) {
                         Row(Modifier.fillMaxSize()) {

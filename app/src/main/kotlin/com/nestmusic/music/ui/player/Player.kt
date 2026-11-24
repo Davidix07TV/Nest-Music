@@ -230,7 +230,7 @@ fun BottomSheetPlayer(
 
     // The player style is a whole different screen, not a different arrangement of this one, so it
     // hands over here rather than threading a flag through every branch below.
-    val (playerStyle, _) = rememberEnumPreference(PlayerStyleKey, PlayerStyle.NEST)
+    val (playerStyle, _) = rememberEnumPreference(PlayerStyleKey, PlayerStyle.APPLE_MUSIC)
     if (playerStyle == PlayerStyle.APPLE_MUSIC) {
         AppleMusicPlayer(
             state = state,
