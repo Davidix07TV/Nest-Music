@@ -1,14 +1,19 @@
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
-
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.ByteArrayOutputStream
 import java.net.URL
 import java.util.Properties
 import javax.inject.Inject
@@ -41,6 +46,10 @@ abstract class GenerateProtoTask : DefaultTask() {
     @get:Input
     abstract val protocUrl: Property<String>
 
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val protocBinary: ConfigurableFileCollection
+
     @get:InputFile
     abstract val protoSourceFile: RegularFileProperty
 
@@ -61,32 +70,74 @@ abstract class GenerateProtoTask : DefaultTask() {
 
         outputDir.mkdirs()
 
-        if (!protocFile.exists() || protocFile.length() == 0L) {
-            val url = protocUrl.get()
-            logger.lifecycle("Downloading protoc ${url.substringAfterLast('/')} from $url")
+        val resolvedBinary = runCatching { protocBinary.files.firstOrNull() }.getOrNull()
+        if (resolvedBinary != null && resolvedBinary.exists() && resolvedBinary.length() > 0L) {
+            if (!protocFile.exists() || protocFile.length() != resolvedBinary.length()) {
+                protocFile.parentFile.mkdirs()
+                resolvedBinary.copyTo(protocFile, overwrite = true)
+            }
+        } else if (!protocFile.exists() || protocFile.length() == 0L) {
+            val primaryUrl = protocUrl.get()
+            val mirrorUrl = primaryUrl.replace(
+                "https://repo1.maven.org/maven2/",
+                "https://maven-central.storage-download.googleapis.com/maven2/",
+            )
+            val candidateUrls = listOf(mirrorUrl, primaryUrl).distinct()
             protocFile.parentFile.mkdirs()
-            val connection = URL(url).openConnection() as java.net.HttpURLConnection
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-            val responseCode = connection.responseCode
-            if (responseCode !in 200..299) {
-                throw GradleException("Failed to download protoc: Server returned HTTP response code $responseCode for URL: $url")
-            }
-            connection.inputStream.use { input ->
-                protocFile.outputStream().use { output ->
-                    input.copyTo(output)
+            var downloaded = false
+            var lastError: String? = null
+            for (url in candidateUrls) {
+                for (attempt in 1..3) {
+                    try {
+                        logger.lifecycle("Downloading protoc (attempt $attempt) from $url")
+                        val connection = URL(url).openConnection() as java.net.HttpURLConnection
+                        connection.connectTimeout = 30_000
+                        connection.readTimeout = 60_000
+                        connection.instanceFollowRedirects = true
+                        connection.setRequestProperty("User-Agent", "Gradle/NestMusic")
+                        val responseCode = connection.responseCode
+                        if (responseCode in 200..299) {
+                            connection.inputStream.use { input ->
+                                protocFile.outputStream().use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+                            if (protocFile.length() > 0L) {
+                                downloaded = true
+                                break
+                            }
+                        } else {
+                            lastError = "HTTP $responseCode for $url"
+                        }
+                    } catch (e: Exception) {
+                        lastError = "${e.javaClass.simpleName}: ${e.message} for $url"
+                    }
+                    Thread.sleep(1_500L * attempt)
                 }
+                if (downloaded) break
             }
-            protocFile.setExecutable(true)
+            if (!downloaded) {
+                throw GradleException("Failed to download protoc ($lastError)")
+            }
         }
+        protocFile.setExecutable(true)
 
         logger.lifecycle("Generating protobuf files in $outputDir")
-        execOperations.exec {
+        val errOut = ByteArrayOutputStream()
+        val execResult = execOperations.exec {
             executable = protocFile.absolutePath
             args(
                 "--java_out=lite:$outputDir",
                 "--kotlin_out=$outputDir",
                 "-I=${protoFile.parentFile}",
                 protoFile.absolutePath,
+            )
+            errorOutput = errOut
+            isIgnoreExitValue = true
+        }
+        if (execResult.exitValue != 0) {
+            throw GradleException(
+                "protoc failed (exit ${execResult.exitValue}): ${errOut.toString().trim().replace('\n', ' ')}",
             )
         }
         logger.lifecycle("Protobuf files generated successfully")
@@ -101,8 +152,8 @@ android {
         applicationId = applicationIdOverride ?: baseApplicationId
         minSdk = 26
         targetSdk = 36
-        versionCode = 162
-        versionName = "1.0.15"
+        versionCode = 163
+        versionName = "1.1.0"
         resValue("string", "app_name", appNameOverride ?: "Nest Music")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -275,7 +326,7 @@ android {
 
 val protocVersion = libs.versions.protobuf.get()
 
-fun getProtocUrl(): String {
+fun getProtocClassifier(): String {
     val os = System.getProperty("os.name").lowercase()
     val arch = System.getProperty("os.arch").lowercase()
 
@@ -293,7 +344,22 @@ fun getProtocUrl(): String {
         else -> "x86_64"
     }
 
-    return "https://repo1.maven.org/maven2/com/google/protobuf/protoc/$protocVersion/protoc-$protocVersion-$osName-$archName.exe"
+    return "$osName-$archName"
+}
+
+fun getProtocUrl(): String {
+    val classifier = getProtocClassifier()
+    return "https://repo1.maven.org/maven2/com/google/protobuf/protoc/$protocVersion/protoc-$protocVersion-$classifier.exe"
+}
+
+val protocCompiler by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    isTransitive = false
+}
+
+dependencies {
+    protocCompiler("com.google.protobuf:protoc:$protocVersion:${getProtocClassifier()}@exe")
 }
 
 val protoDir = rootProject.file("metroproto")
@@ -310,6 +376,7 @@ val generateProto = if (protoFile.exists()) {
         protoSourceFile.set(protoFile)
         generatedSourcesDir.set(file("src/main/java"))
         this.protocUrl.set(protocUrl)
+        this.protocBinary.from(protocCompiler)
         protocExecutable.set(layout.buildDirectory.file("protoc/$protocFileName"))
     }
 } else {
@@ -382,6 +449,7 @@ dependencies {
     implementation(libs.shimmer)
 
     implementation(libs.media3)
+    implementation(libs.media3.hls)
     implementation(libs.media3.session)
     implementation(libs.media3.okhttp)
 

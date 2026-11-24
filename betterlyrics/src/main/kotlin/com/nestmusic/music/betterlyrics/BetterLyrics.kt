@@ -45,6 +45,18 @@ object BetterLyrics {
         }
     }
 
+    private data class QueryCandidate(
+        val artist: String,
+        val title: String,
+        val duration: Int,
+        val album: String?,
+    )
+
+    private val parentheticalNoiseRegex =
+        Regex("""\s*[\(\[](?:official\s*(?:music\s*)?video|visualizer|lyric\s*video|audio|hd|4k|remaster(?:ed)?(?:\s*\d{4})?)[\)\]]""", RegexOption.IGNORE_CASE)
+    private val artistSplitRegex =
+        Regex("""\s*(?:,|&|\bfeat\.?|\bft\.?|\bx\b)\s*""", RegexOption.IGNORE_CASE)
+
     private suspend fun fetchTTML(
         artist: String,
         title: String,
@@ -74,16 +86,49 @@ object BetterLyrics {
         null
     }
 
+    private suspend fun fetchTTMLWithFallbacks(
+        artist: String,
+        title: String,
+        duration: Int,
+        album: String?,
+    ): String? {
+        val cleanTitle = title.replace(parentheticalNoiseRegex, "").trim().ifEmpty { title.trim() }
+        val primaryArtist = artist.split(artistSplitRegex).firstOrNull()?.trim().orEmpty().ifEmpty { artist.trim() }
+        val cleanAlbum = album?.trim()?.takeIf { it.isNotEmpty() && !it.equals(title, ignoreCase = true) }
+
+        val candidates = LinkedHashSet<QueryCandidate>().apply {
+            if (!cleanAlbum.isNullOrEmpty()) {
+                add(QueryCandidate(artist.trim(), title.trim(), duration, cleanAlbum))
+            }
+            add(QueryCandidate(artist.trim(), title.trim(), duration, null))
+            if (primaryArtist != artist.trim() || cleanTitle != title.trim()) {
+                add(QueryCandidate(primaryArtist, cleanTitle, duration, null))
+            }
+            if (duration > 0) {
+                add(QueryCandidate(primaryArtist, cleanTitle, -1, null))
+            }
+        }
+
+        for (candidate in candidates) {
+            val ttml = fetchTTML(
+                artist = candidate.artist,
+                title = candidate.title,
+                duration = candidate.duration,
+                album = candidate.album,
+            )
+            if (!ttml.isNullOrEmpty()) return ttml
+        }
+        return null
+    }
+
     suspend fun getLyrics(
         title: String,
         artist: String,
         duration: Int,
         album: String? = null,
     ) = runCatching {
-        // Use exact title and artist - no normalization to ensure correct sync
-        // Normalizing can return wrong lyrics (e.g., radio edit vs original)
         val ttml =
-            fetchTTML(artist, title, duration, album)
+            fetchTTMLWithFallbacks(artist, title, duration, album)
                 ?: throw IllegalStateException("Lyrics unavailable")
 
         val parsedLines = TTMLParser.parseTTML(ttml)

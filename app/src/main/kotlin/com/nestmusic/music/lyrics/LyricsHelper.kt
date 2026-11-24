@@ -26,8 +26,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val MAX_LYRICS_FETCH_MS = 25000L
-private const val PER_PROVIDER_TIMEOUT_MS = 8000L
+private const val MAX_LYRICS_FETCH_MS = 30000L
+private const val PER_PROVIDER_TIMEOUT_MS = 12000L
 private const val PROVIDER_NONE = ""
 
 class LyricsHelper
@@ -195,12 +195,21 @@ constructor(
     }
 
     private fun resolveLyricsProviders(preferences: androidx.datastore.preferences.core.Preferences): List<LyricsProvider> {
+        val defaultOrder = LyricsProviderRegistry.getDefaultProviderOrder()
         val providerOrder = preferences[LyricsProviderOrderKey].orEmpty()
         if (providerOrder.isNotBlank()) {
-            return LyricsProviderRegistry.getOrderedProviders(providerOrder)
+            val savedNames = LyricsProviderRegistry.deserializeProviderOrder(providerOrder)
+            val missingFromSaved = defaultOrder.filter { it !in savedNames }
+            val normalizedNames =
+                if ("BetterLyrics" in missingFromSaved) {
+                    listOf("BetterLyrics") + savedNames + missingFromSaved.filter { it != "BetterLyrics" }
+                } else {
+                    savedNames + missingFromSaved
+                }
+            return normalizedNames.mapNotNull { LyricsProviderRegistry.getProviderByName(it) }
         }
 
-        return LyricsProviderRegistry.getDefaultProviderOrder()
+        return defaultOrder
             .mapNotNull { LyricsProviderRegistry.getProviderByName(it) }
     }
 

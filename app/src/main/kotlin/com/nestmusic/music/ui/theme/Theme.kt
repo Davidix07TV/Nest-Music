@@ -27,8 +27,8 @@ import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicColorScheme
 import com.materialkolor.score.Score
 
-// Nest brand seed: the tangerine stop of the logo sunset
-val DefaultThemeColor = Color(0xFFF97316)
+// Nest Music Apple Music signature accent (#FA2D48)
+val DefaultThemeColor = Color(0xFFFA2D48)
 
 @Composable
 fun MetrolistTheme(

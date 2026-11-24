@@ -286,4 +286,14 @@
     <string name="use_login_for_browse_desc">Ciò può influenzare il contenuto che vedi e ad esempio mostra album solo premium se hai effettuato l\'accesso con un account Premium</string>
     <string name="dismiss">Ignorare</string>
     <string name="action_login">Accedi</string>
+    <string name="animated_album_covers">Copertine animate</string>
+    <string name="animated_album_covers_desc">Riproduci le copertine animate nel player</string>
+    <string name="full_bleed_artwork">Copertine a tutto schermo</string>
+    <string name="full_bleed_artwork_desc">Espandi la copertina da bordo a bordo nella schermata In riproduzione</string>
+    <string name="canvas_over_cellular">Copertine animate su rete dati</string>
+    <string name="canvas_over_cellular_desc">Carica le copertine animate anche senza connessione Wi-Fi</string>
+    <string name="dolby_atmos">Dolby Atmos</string>
+    <string name="dolby_atmos_desc">Attiva decodifica hardware E-AC-3 JOC e spazializzazione Atmos</string>
+    <string name="spatial_audio">Audio spaziale</string>
+    <string name="spatial_audio_desc">Palcoscenico binaurale 3D immersivo con crossfeed Haas</string>
 </resources>

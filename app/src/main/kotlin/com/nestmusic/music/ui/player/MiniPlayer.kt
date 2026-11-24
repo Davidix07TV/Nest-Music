@@ -125,9 +125,13 @@ import kotlinx.coroutines.withContext
 import com.nestmusic.music.ui.theme.NestSunsetColors
 import com.nestmusic.music.ui.theme.PlayerColorExtractor
 import com.nestmusic.music.ui.theme.useNestUi
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.graphicsLayer
 import com.nestmusic.music.ui.component.LocalGlassBackdrop
 import com.nestmusic.music.ui.component.LocalLiquidGlassEnabled
 import com.nestmusic.music.ui.component.LocalMenuState
+import com.nestmusic.music.ui.component.nestLiquidGlass
 import com.nestmusic.music.ui.component.isLiquidGlassSupported
 import com.nestmusic.music.ui.component.liquidGlass
 import com.nestmusic.music.ui.menu.AddToPlaylistDialog
@@ -396,28 +400,46 @@ private fun NewMiniPlayer(
                 },
     ) {
         val interactionSource = remember { MutableInteractionSource() }
+        val isPressed by interactionSource.collectIsPressedAsState()
+        val pressScale by animateFloatAsState(
+            targetValue = if (isPressed) 0.982f else 1f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium,
+            ),
+            label = "nestMiniPlayerPressScale",
+        )
+        val capsuleShape = if (nestUi) RoundedCornerShape(18.dp) else RoundedCornerShape(percent = 50)
         Box(
             modifier =
                 Modifier
                     .then(if (isTabletLandscape) Modifier.width(500.dp).align(Alignment.Center) else Modifier.fillMaxWidth())
-                    .height(64.dp)
+                    .height(if (nestUi) 58.dp else 64.dp)
                     .offset { IntOffset(offsetXAnimatable.value.roundToInt(), 0) }
-                    .clip(RoundedCornerShape(32.dp))
+                    .graphicsLayer {
+                        scaleX = pressScale
+                        scaleY = pressScale
+                    }
                     .then(
                         if (glassActive) {
-                            // Drawn behind the row's own content, exactly where the flat background
-                            // would have been.
-                            Modifier.liquidGlass(
+                            Modifier.nestLiquidGlass(
+                                shape = capsuleShape,
                                 backdrop = glassBackdrop,
-                                shape = RoundedCornerShape(32.dp),
-                                blurRadius = 24.dp,
+                                outerShadow = true,
                             )
                         } else {
                             Modifier
                         },
                     )
+                    .clip(capsuleShape)
                     .background(color = backgroundColor)
-                    .border(1.dp, outlineColor.copy(alpha = 0.3f), RoundedCornerShape(32.dp))
+                    .then(
+                        if (!glassActive) {
+                            Modifier.border(1.dp, outlineColor.copy(alpha = 0.3f), capsuleShape)
+                        } else {
+                            Modifier
+                        },
+                    )
                     .clickable(
                         interactionSource = interactionSource,
                         indication = LocalIndication.current,
@@ -465,6 +487,101 @@ private fun NewMiniPlayer(
                 }
                 else -> {}
             }
+            if (nestUi) {
+                val isPlaying by playerConnection.isPlaying.collectAsState()
+                val castIsPlaying by castHandler?.castIsPlaying?.collectAsState() ?: remember { mutableStateOf(false) }
+                val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(start = 9.dp, end = 6.dp, top = 7.dp, bottom = 7.dp),
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(42.dp)
+                                .shadow(6.dp, RoundedCornerShape(10.dp))
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                    ) {
+                        val thumb = mediaMetadata?.thumbnailUrl
+                        if (thumb != null) {
+                            AsyncImage(
+                                model = thumb,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.album),
+                                contentDescription = null,
+                                tint = onSurfaceColor.copy(alpha = 0.6f),
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.Center)
+                                        .size(22.dp),
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    NewMiniPlayerSongInfo(
+                        mediaMetadata = mediaMetadata,
+                        onSurfaceColor = onSurfaceColor,
+                        errorColor = errorColor,
+                        modifier = Modifier.weight(1f),
+                    )
+
+                    if (isCasting) {
+                        Icon(
+                            painter = painterResource(R.drawable.cast_connected),
+                            contentDescription = "Casting",
+                            tint = primaryColor,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+
+                    IconButton(
+                        onClick = {
+                            if (isCasting) {
+                                if (castIsPlaying) castHandler?.pause() else castHandler?.play()
+                            } else if (playbackState == Player.STATE_ENDED) {
+                                playerConnection.player.seekTo(0, 0)
+                                playerConnection.player.playWhenReady = true
+                            } else {
+                                playerConnection.togglePlayPause()
+                            }
+                        },
+                        modifier = Modifier.size(42.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(if (effectiveIsPlaying) R.drawable.pause else R.drawable.play),
+                            contentDescription = stringResource(if (effectiveIsPlaying) R.string.pause else R.string.play),
+                            tint = onSurfaceColor,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+
+                    IconButton(
+                        enabled = canSkipNext,
+                        onClick = { playerConnection.seekToNext() },
+                        modifier = Modifier.size(42.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.nest_apple_skip_next),
+                            contentDescription = null,
+                            tint = onSurfaceColor.copy(alpha = if (canSkipNext) 0.94f else 0.36f),
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+            } else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp),
@@ -545,6 +662,7 @@ private fun NewMiniPlayer(
                     onSurfaceColor = onSurfaceColor,
                 )
                 }
+            }
             }
         }
     }

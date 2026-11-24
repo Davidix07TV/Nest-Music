@@ -1,12 +1,8 @@
-/**
- * Metrolist Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
- */
-
 package com.nestmusic.music.ui.component
 
-import androidx.compose.foundation.Canvas
+import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,16 +25,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,18 +42,13 @@ import androidx.media3.common.Player
 import coil3.compose.AsyncImage
 import com.nestmusic.music.LocalPlayerConnection
 import com.nestmusic.music.R
-import com.nestmusic.music.extensions.togglePlayPause
-import com.nestmusic.music.ui.theme.NestRaspberry
-import com.nestmusic.music.ui.theme.NestSunsetBrush
-import com.nestmusic.music.ui.theme.NestTangerine
-import com.nestmusic.music.ui.theme.NestViolet
-import com.nestmusic.music.ui.theme.NestWater
+import com.nestmusic.music.ui.theme.NestAppleRed
 import com.nestmusic.music.utils.joinToArtistString
-import java.time.LocalTime
 
 /**
- * Editorial stage at the top of Home in Ember Room:
- * serif greeting, the record that's on, and four shortcuts.
+ * Apple Music / iOS 26 Home Editorial Top Pick & Quick Action Pills.
+ * Replaces the legacy sunset gradient banner with a refined neutral dark/light frosted card
+ * tinted subtly by the active album cover and crisp #FA2D48 Apple Music Red accents.
  */
 @Composable
 fun NestHomeHero(
@@ -73,228 +64,219 @@ fun NestHomeHero(
     val isPlaying by playerConnection.isPlaying.collectAsState()
     val playbackState by playerConnection.playbackState.collectAsState()
 
-    val greetingRes = when (LocalTime.now().hour) {
-        in 5..11 -> R.string.greeting_morning
-        in 12..17 -> R.string.greeting_afternoon
-        else -> R.string.greeting_evening
-    }
-    val cardShape = RoundedCornerShape(30.dp)
-
-    Column(modifier = modifier) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(cardShape)
-                .background(NestSunsetBrush),
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Sleek Apple Music quick-action pill chips
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 36.dp),
+            AppleQuickChip(
+                icon = R.drawable.history,
+                label = stringResource(R.string.history),
+                onClick = onHistory,
+                modifier = Modifier.weight(1f),
+            )
+            AppleQuickChip(
+                icon = R.drawable.stats,
+                label = stringResource(R.string.stats),
+                onClick = onStats,
+                modifier = Modifier.weight(1f),
+            )
+            AppleQuickChip(
+                icon = R.drawable.mic,
+                label = stringResource(R.string.recognize_music),
+                onClick = onRecognize,
+                modifier = Modifier.weight(1f),
+            )
+            AppleQuickChip(
+                icon = R.drawable.search,
+                label = stringResource(R.string.search),
+                onClick = onSearch,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        val metadata = mediaMetadata
+        if (metadata != null) {
+            Spacer(Modifier.height(16.dp))
+
+            val cardShape = RoundedCornerShape(22.dp)
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(cardShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                        .border(
+                            width = 0.6.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
+                            shape = cardShape,
+                        ).clickable {
+                            if (playbackState == Player.STATE_ENDED) {
+                                playerConnection.player.seekTo(0, 0)
+                                playerConnection.player.playWhenReady = true
+                            } else {
+                                playerConnection.togglePlayPause()
+                            }
+                        },
             ) {
+                // Subtle blurred album glow behind the glass card on Android 12+
+                val art = metadata.thumbnailUrl
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && art != null) {
+                    AsyncImage(
+                        model = art,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier =
+                            Modifier
+                                .matchParentSize()
+                                .graphicsLayer {
+                                    scaleX = 1.4f
+                                    scaleY = 1.4f
+                                    alpha = 0.32f
+                                }.blur(56.dp),
+                    )
+                    Box(
+                        modifier =
+                            Modifier
+                                .matchParentSize()
+                                .background(
+                                    Brush.horizontalGradient(
+                                        listOf(
+                                            Color.Black.copy(alpha = 0.64f),
+                                            Color.Black.copy(alpha = 0.36f),
+                                        ),
+                                    ),
+                                ),
+                    )
+                }
+
                 Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 18.dp, top = 18.dp, end = 16.dp, bottom = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        val name = accountName?.takeIf { it.isNotBlank() }
-                        if (name != null) {
-                            Text(
-                                text = name,
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color.White.copy(alpha = 0.86f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Spacer(Modifier.height(2.dp))
-                        }
-                        Text(
-                            text = stringResource(greetingRes),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = Color.White,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Spacer(Modifier.height(10.dp))
-                        Text(
-                            text = stringResource(R.string.now_playing).uppercase(),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White.copy(alpha = 0.78f),
-                            letterSpacing = 1.4.sp,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        val metadata = mediaMetadata
-                        if (metadata != null) {
-                            Text(
-                                text = metadata.title,
-                                style = MaterialTheme.typography.titleLarge,
-                                color = Color.White,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                text = metadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.82f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(72.dp)
+                                .shadow(10.dp, RoundedCornerShape(14.dp))
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                    ) {
+                        if (art != null) {
+                            AsyncImage(
+                                model = art,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
                             )
                         } else {
-                            Text(
-                                text = stringResource(R.string.tap_to_start),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.82f),
+                            Icon(
+                                painter = painterResource(R.drawable.album),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.Center)
+                                        .size(28.dp),
                             )
                         }
                     }
 
                     Spacer(Modifier.width(14.dp))
 
-                    Box(modifier = Modifier.size(108.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(Color.White.copy(alpha = 0.16f)),
-                        ) {
-                            val art = mediaMetadata?.thumbnailUrl
-                            if (art != null) {
-                                AsyncImage(
-                                    model = art,
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize(),
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(R.drawable.album),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .size(36.dp),
-                                )
-                            }
-                        }
-                        if (mediaMetadata != null) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(6.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White)
-                                    .clickable {
-                                        if (playbackState == Player.STATE_ENDED) {
-                                            playerConnection.player.seekTo(0, 0)
-                                            playerConnection.player.playWhenReady = true
-                                        } else {
-                                            playerConnection.togglePlayPause()
-                                        }
-                                    },
-                            ) {
-                                Icon(
-                                    painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                                    contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
-                                    tint = NestViolet,
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
-                        }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.now_playing).uppercase(),
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.85.sp,
+                            color = NestAppleRed,
+                            maxLines = 1,
+                        )
+                        Spacer(Modifier.height(3.dp))
+                        Text(
+                            text = metadata.title,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                            ),
+                            color = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && art != null) Color.White else MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = metadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && art != null) Color.White.copy(alpha = 0.72f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+
+                    Spacer(Modifier.width(12.dp))
+
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                            Modifier
+                                .size(42.dp)
+                                .clip(CircleShape)
+                                .background(NestAppleRed),
+                    ) {
+                        Icon(
+                            painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                            contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp),
+                        )
                     }
                 }
             }
-            LogoWater(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(42.dp),
-            )
-        }
-
-        Spacer(Modifier.height(14.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            NestShortcut(R.drawable.history, R.string.history, onHistory, Modifier.weight(1f))
-            NestShortcut(R.drawable.stats, R.string.stats, onStats, Modifier.weight(1f))
-            NestShortcut(R.drawable.mic, R.string.recognize_music, onRecognize, Modifier.weight(1f))
-            NestShortcut(R.drawable.search, R.string.search, onSearch, Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun LogoWater(modifier: Modifier = Modifier) {
-    Canvas(modifier) {
-        drawRect(
-            brush = Brush.verticalGradient(
-                listOf(Color.Transparent, NestWater),
-            ),
-        )
-        val ripples = listOf(
-            Triple(0.16f, 0.42f, NestTangerine),
-            Triple(0.38f, 0.58f, NestRaspberry),
-            Triple(0.62f, 0.40f, Color(0xFF3A46C8)),
-            Triple(0.82f, 0.62f, NestTangerine.copy(alpha = 0.85f)),
-            Triple(0.28f, 0.82f, NestRaspberry.copy(alpha = 0.7f)),
-            Triple(0.54f, 0.84f, Color(0xFF241E78)),
-            Triple(0.74f, 0.86f, NestTangerine.copy(alpha = 0.55f)),
-        )
-        ripples.forEach { (xf, yf, color) ->
-            val w = size.width * 0.2f
-            val h = size.height * 0.32f
-            drawOval(
-                color = color,
-                topLeft = Offset(size.width * xf - w / 2f, size.height * yf - h / 2f),
-                size = Size(w, h),
-            )
-        }
-    }
-}
-
-@Composable
-private fun NestShortcut(
+private fun AppleQuickChip(
     icon: Int,
-    label: Int,
+    label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(18.dp))
-            .clickable(onClick = onClick)
-            .padding(vertical = 4.dp),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .border(
+                    width = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f),
+                    shape = RoundedCornerShape(16.dp),
+                ).clickable(onClick = onClick)
+                .padding(horizontal = 8.dp, vertical = 11.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(46.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
-        ) {
-            Icon(
-                painter = painterResource(icon),
-                contentDescription = stringResource(label),
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(20.dp),
-            )
-        }
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = label,
+            tint = NestAppleRed,
+            modifier = Modifier.size(20.dp),
+        )
         Spacer(Modifier.height(6.dp))
         Text(
-            text = stringResource(label),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            text = label,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.5.sp,
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
         )
     }
 }

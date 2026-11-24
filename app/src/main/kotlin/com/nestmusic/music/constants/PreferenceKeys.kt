@@ -507,6 +507,11 @@ enum class PlayerStyle {
  * the setting is offered only there; below it the surfaces fall back to the flat pill.
  */
 val LiquidGlassKey = booleanPreferencesKey("liquid_glass")
+val AnimatedCanvasKey = booleanPreferencesKey("animated_canvas")
+val FullBleedArtworkKey = booleanPreferencesKey("full_bleed_artwork")
+val CanvasOverCellularKey = booleanPreferencesKey("canvas_over_cellular")
+val DolbyAtmosKey = booleanPreferencesKey("dolby_atmos")
+val SpatialAudioKey = booleanPreferencesKey("spatial_audio")
 
 val TopSize = stringPreferencesKey("topSize")
 val HistoryDuration = floatPreferencesKey("historyDuration")

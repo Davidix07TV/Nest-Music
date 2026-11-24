@@ -187,8 +187,12 @@ import com.nestmusic.music.ui.component.LocalBottomSheetPageState
 import com.nestmusic.music.ui.component.LocalMenuState
 import com.nestmusic.music.ui.component.NestUiChoiceDialog
 import com.nestmusic.music.ui.theme.NestViolet
+import com.nestmusic.music.ui.component.BottomFadeScrim
+import com.nestmusic.music.ui.component.GlassMotion
+import com.nestmusic.music.ui.component.LocalAppBackdrop
 import com.nestmusic.music.ui.component.LocalGlassBackdrop
 import com.nestmusic.music.ui.component.LocalLiquidGlassEnabled
+import com.nestmusic.music.ui.component.backdrop.backdrops.EmptyBackdrop
 import com.nestmusic.music.ui.component.glassBackdrop
 import com.nestmusic.music.ui.component.isLiquidGlassSupported
 import com.nestmusic.music.ui.component.rememberBottomSheetState
@@ -601,7 +605,7 @@ class MainActivity : ComponentActivity() {
         // recording a full-screen layer costs a GPU copy per frame, and there is no point paying it
         // for a blur the platform cannot do.
         val glassBackdrop = rememberGlassBackdrop().takeIf { liquidGlass && isLiquidGlassSupported }
-        val (uiChoiceShown, onUiChoiceShownChange) = rememberPreference(NestUiChoiceShownKey, defaultValue = false)
+        val (uiChoiceShown, onUiChoiceShownChange) = rememberPreference(NestUiChoiceShownKey, defaultValue = true)
 
         val showChangelog = rememberSaveable { mutableStateOf(false) }
 
@@ -710,21 +714,6 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(if (pureBlack) Color.Black else MaterialTheme.colorScheme.surface),
             ) {
-                if (nestUi && !pureBlack) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(340.dp)
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
-                                        Color.Transparent,
-                                    ),
-                                ),
-                            ),
-                    )
-                }
                 val density = LocalDensity.current
                 val configuration = LocalWindowInfo.current
                 val cutoutInsets = WindowInsets.displayCutout
@@ -1044,6 +1033,18 @@ class MainActivity : ComponentActivity() {
                     else -> MaterialTheme.colorScheme.surfaceContainer
                 }
 
+                val glassScrollConnection = remember {
+                    object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+                        override fun onPreScroll(
+                            available: androidx.compose.ui.geometry.Offset,
+                            source: androidx.compose.ui.input.nestedscroll.NestedScrollSource,
+                        ): androidx.compose.ui.geometry.Offset {
+                            if (available.y != 0f) GlassMotion.scroll.moved()
+                            return androidx.compose.ui.geometry.Offset.Zero
+                        }
+                    }
+                }
+
                 CompositionLocalProvider(
                     LocalDatabase provides database,
                     LocalNavController provides navController,
@@ -1051,6 +1052,7 @@ class MainActivity : ComponentActivity() {
                     LocalPlayerConnection provides playerConnection,
                     LocalLiquidGlassEnabled provides (liquidGlass && isLiquidGlassSupported),
                     LocalGlassBackdrop provides glassBackdrop,
+                    LocalAppBackdrop provides (glassBackdrop ?: EmptyBackdrop),
                     LocalPlayerAwareWindowInsets provides playerAwareWindowInsets,
                     LocalDownloadUtil provides downloadUtil,
                     LocalShimmerTheme provides ShimmerTheme,
@@ -1076,10 +1078,10 @@ class MainActivity : ComponentActivity() {
                                         title = {
                                             Text(
                                                 text = when {
-                                                    nestUi && currentTitleRes == R.string.home -> stringResource(R.string.app_name)
+                                                    currentTitleRes == R.string.home -> stringResource(R.string.home)
                                                     else -> currentTitleRes?.let { stringResource(it) } ?: ""
                                                 },
-                                                style = if (nestUi) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
+                                                style = if (nestUi) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.titleLarge,
                                             )
                                         },
                                         actions = {
@@ -1133,11 +1135,19 @@ class MainActivity : ComponentActivity() {
                                         scrollBehavior = topAppBarScrollBehavior,
                                         colors =
                                             TopAppBarDefaults.topAppBarColors(
-                                                containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
-                                                scrolledContainerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+                                                containerColor = when {
+                                                    pureBlack -> Color.Black
+                                                    nestUi -> MaterialTheme.colorScheme.background.copy(alpha = 0.92f)
+                                                    else -> MaterialTheme.colorScheme.surfaceContainer
+                                                },
+                                                scrolledContainerColor = when {
+                                                    pureBlack -> Color.Black.copy(alpha = 0.92f)
+                                                    nestUi -> MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.92f)
+                                                    else -> MaterialTheme.colorScheme.surfaceContainer
+                                                },
                                                 titleContentColor = MaterialTheme.colorScheme.onSurface,
-                                                actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                actionIconContentColor = if (nestUi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                navigationIconContentColor = if (nestUi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                             ),
                                         modifier =
                                             Modifier.windowInsetsPadding(
@@ -1219,6 +1229,20 @@ class MainActivity : ComponentActivity() {
 
                             if (!showRail && currentRoute != "wrapped") {
                                 Box {
+                                    if (nestUi || (liquidGlass && isLiquidGlassSupported)) {
+                                        BottomFadeScrim(
+                                            withMiniPlayer = activePlayerConnection != null && !playerBottomSheetState.isDismissed,
+                                            bottomInset = bottomInsetDp,
+                                            pageColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.background,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomCenter)
+                                                .graphicsLayer {
+                                                    val p = playerBottomSheetState.progress.coerceIn(0f, 1f)
+                                                    alpha = 1f - p
+                                                },
+                                        )
+                                    }
+
                                     if (activePlayerConnection != null) {
                                         BottomSheetPlayer(
                                             state = playerBottomSheetState,
@@ -1227,36 +1251,44 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
 
-                                    AppNavigationBar(
-                                        navigationItems = navigationItems,
-                                        currentRoute = currentRoute,
-                                        onItemClick = onNavItemClick,
-                                        pureBlack = pureBlack,
-                                        slimNav = slimNav,
-                                        onSearchLongClick = onSearchLongClick,
-                                        modifier =
-                                            Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .height(bottomInset + navPadding)
-                                                // Use graphicsLayer instead of offset to avoid recomposition
-                                                // graphicsLayer runs during draw phase, not composition phase
-                                                .graphicsLayer {
-                                                    val navBarHeightPx = navigationBarHeight.toPx()
-                                                    val totalHeightPx = navBarTotalHeight.toPx()
+                                    val renderNavBarHeight = if (slimNav) SlimNavBarHeight else NavigationBarHeight
+                                    if (!playerBottomSheetState.isExpanded &&
+                                        (shouldShowNavigationBar || navigationBarHeight > 0.5.dp)
+                                    ) {
+                                        AppNavigationBar(
+                                            navigationItems = navigationItems,
+                                            currentRoute = currentRoute,
+                                            onItemClick = onNavItemClick,
+                                            pureBlack = pureBlack,
+                                            slimNav = slimNav,
+                                            onSearchLongClick = onSearchLongClick,
+                                            modifier =
+                                                Modifier
+                                                    .align(Alignment.BottomCenter)
+                                                    .height(bottomInset + renderNavBarHeight)
+                                                    // Use graphicsLayer instead of offset to avoid recomposition
+                                                    // graphicsLayer runs during draw phase, not composition phase
+                                                    .graphicsLayer {
+                                                        val navBarHeightPx = navigationBarHeight.toPx().coerceAtLeast(0f)
+                                                        val totalHeightPx = (bottomInset + renderNavBarHeight).toPx()
+                                                        val extraMarginPx = 32.dp.toPx()
+                                                        val navVisibleFraction =
+                                                            (navBarHeightPx / NavigationBarHeight.toPx()).coerceIn(0f, 1f)
+                                                        val progress = playerBottomSheetState.progress.coerceIn(0f, 1f)
 
-                                                    translationY =
-                                                        if (navBarHeightPx == 0f) {
-                                                            totalHeightPx
-                                                        } else {
-                                                            // Read progress only during draw phase
-                                                            val progress = playerBottomSheetState.progress.coerceIn(0f, 1f)
-                                                            val slideOffset = totalHeightPx * progress
-                                                            val hideOffset =
-                                                                totalHeightPx * (1 - navBarHeightPx / NavigationBarHeight.toPx())
-                                                            slideOffset + hideOffset
-                                                        }
-                                                },
-                                    )
+                                                        alpha = ((1f - progress * 2.5f) * navVisibleFraction).coerceIn(0f, 1f)
+                                                        translationY =
+                                                            if (navBarHeightPx <= 0.5f) {
+                                                                totalHeightPx + extraMarginPx
+                                                            } else {
+                                                                val slideOffset = (totalHeightPx + extraMarginPx) * progress
+                                                                val hideOffset =
+                                                                    (totalHeightPx + extraMarginPx) * (1f - navVisibleFraction)
+                                                                slideOffset + hideOffset
+                                                            }
+                                                    },
+                                        )
+                                    }
 
                                     Box(
                                         modifier =
@@ -1307,6 +1339,7 @@ class MainActivity : ComponentActivity() {
                         modifier =
                             Modifier
                                 .fillMaxSize()
+                                .nestedScroll(glassScrollConnection)
                                 .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
                     ) {
                         Row(Modifier.fillMaxSize()) {
