@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.nestmusic.music.ui.component.backdrop.Backdrop
 import com.nestmusic.music.ui.component.backdrop.BackdropEffectScope
 import com.nestmusic.music.ui.component.backdrop.backdrops.EmptyBackdrop
+import com.nestmusic.music.ui.component.backdrop.backdrops.LayerBackdrop
 import com.nestmusic.music.ui.component.backdrop.drawBackdrop
 import com.nestmusic.music.ui.component.backdrop.effects.blur
 import com.nestmusic.music.ui.component.backdrop.effects.colorControls
@@ -73,6 +74,7 @@ internal const val HighlightAngleFrozen = 45f
 
 val LocalGlassEffectConfig = staticCompositionLocalOf { GlassEffectConfig() }
 val LocalAppBackdrop = compositionLocalOf<Backdrop> { EmptyBackdrop }
+val LocalGlassExport = compositionLocalOf<LayerBackdrop?> { null }
 val LocalAppBackdropFrozen = staticCompositionLocalOf<() -> Boolean> { { false } }
 val LocalAmbientBackgroundColor = compositionLocalOf<State<Color>> { mutableStateOf(Color.Unspecified) }
 
@@ -234,12 +236,15 @@ fun Modifier.liquidGlassEffect(
         }
     }
 
+    val exported = LocalGlassExport.current
+
     return drawBackdrop(
         backdrop = backdrop,
         shape = shapeBlock,
         effects = effectsBlock,
         highlight = highlightBlock,
         shadow = shadowBlock,
+        exportedBackdrop = exported,
         onDrawSurface = surfaceBlock,
         backdropScale = resolutionScale,
         frozen = frozen,

@@ -120,7 +120,7 @@ class GlassBackdrop internal constructor(
 @Composable
 fun rememberGlassBackdrop(): GlassBackdrop {
     LaunchedEffect(Unit) {
-        GlassShaderWarmup.warmUpAsync()
+        GlassShaderWarmup.warmUp()
     }
     val layer = rememberLayerBackdrop()
     return remember(layer) { GlassBackdrop(layer) }
@@ -200,21 +200,25 @@ fun Modifier.nestLiquidGlass(
 fun Modifier.liquidGlass(
     backdrop: GlassBackdrop? = LocalGlassBackdrop.current,
     shape: Shape = DefaultGlassShape,
+    enabled: Boolean = LocalLiquidGlassEnabled.current,
+    interactive: Boolean = true,
     blurRadius: Dp = 3.dp,
+    tint: Color? = null,
     tintColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
     borderWidth: Dp = EdgeHighlightWidth,
     refraction: Float = 1f,
     fallbackColor: Color = Color.Black.copy(alpha = 0.28f),
 ): Modifier {
-    val enabled = LocalLiquidGlassEnabled.current
-    val resolvedBackdrop: Backdrop = backdrop ?: LocalAppBackdrop.current
+    val hasExplicitTint = tint != null && tint.isSpecified
+    val resolvedBackdrop: Backdrop = backdrop ?: if (hasExplicitTint) EmptyBackdrop else LocalAppBackdrop.current
+    val resolvedFallback = if (hasExplicitTint) tint!! else fallbackColor
 
     if (!enabled || !isLiquidGlassSupported || resolvedBackdrop === EmptyBackdrop) {
         val base = this
             .clip(shape)
-            .background(fallbackColor, shape)
-        return if (borderWidth > 0.dp && borderColor.isSpecified && borderColor.alpha > 0f) {
+            .background(resolvedFallback, shape)
+        return if (borderWidth > 0.dp && borderColor.isSpecified && borderColor.alpha > 0f && !hasExplicitTint) {
             base.border(borderWidth, borderColor, shape)
         } else {
             base
